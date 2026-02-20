@@ -1,0 +1,41 @@
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import EmailProvider from "next-auth/providers/email";
+import { SupabaseAdapter } from "@auth/supabase-adapter";
+
+export const authOptions = {
+    providers: [
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID || "",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+        }),
+        EmailProvider({
+            server: {
+                host: process.env.EMAIL_SERVER_HOST,
+                port: parseInt(process.env.EMAIL_SERVER_PORT || '587'),
+                auth: {
+                    user: process.env.EMAIL_SERVER_USER,
+                    pass: process.env.EMAIL_SERVER_PASSWORD,
+                },
+            },
+            from: process.env.EMAIL_FROM,
+        }),
+    ],
+    adapter: SupabaseAdapter({
+        url: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+        secret: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+    }),
+    callbacks: {
+        async session({ session, user }: any) {
+            session.user.id = user.id;
+            return session;
+        },
+    },
+    pages: {
+        signIn: '/login',
+    },
+};
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
