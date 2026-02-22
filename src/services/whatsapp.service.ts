@@ -50,8 +50,10 @@ export const whatsappService = {
     setWebhook: async (instanceName: string) => {
         const webhookUrl = `${process.env.APP_URL}/api/webhooks/whatsapp`;
 
-        // Wrapped payload as required by some v2 versions
-        const wrappedPayload = {
+        // Confirmed working payload format for this Evolution API version
+        // Endpoint: POST /webhook/set/{instance}
+        // Payload must have config wrapped in a "webhook" key
+        const payload = {
             webhook: {
                 enabled: true,
                 url: webhookUrl,
@@ -62,43 +64,15 @@ export const whatsappService = {
                     'MESSAGES_DELETE',
                     'SEND_MESSAGE',
                     'CONNECTION_UPDATE',
-                    'TYPEBOT_START',
-                    'TYPEBOT_CHANGE_STATUS'
+                    'QRCODE_UPDATED'
                 ]
             }
         };
 
-        const simplePayload = {
-            enabled: true,
-            url: webhookUrl,
-            webhook_by_events: false,
-            events: wrappedPayload.webhook.events
-        };
-
-        try {
-            console.log('Syncing Webhook (v2-instance-set):', instanceName);
-            // Try wrapping first as the error message suggested
-            const response = await evolutionApi.post(`/webhook/instance/set/${instanceName}`, wrappedPayload);
-            return response.data;
-        } catch (error: any) {
-            console.warn('v2-instance-set wrapped failed, trying alternative v2 simple:', error.message);
-            try {
-                const response = await evolutionApi.post(`/webhook/set/${instanceName}`, simplePayload);
-                return response.data;
-            } catch (err: any) {
-                console.warn('Alternative v2 failed, trying global set with instance in body:', err.message);
-                try {
-                    const response = await evolutionApi.post(`/webhook/set`, {
-                        ...simplePayload,
-                        instance: instanceName
-                    });
-                    return response.data;
-                } catch (lastErr: any) {
-                    console.error('All webhook set endpoints failed');
-                    throw lastErr;
-                }
-            }
-        }
+        console.log('Setting Webhook for:', instanceName, '-> URL:', webhookUrl);
+        const response = await evolutionApi.post(`/webhook/set/${instanceName}`, payload);
+        console.log('Webhook set successfully:', response.data);
+        return response.data;
     },
 
     getQrCode: async (instanceName: string) => {
