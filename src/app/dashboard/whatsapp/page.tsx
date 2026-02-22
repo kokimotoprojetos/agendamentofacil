@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { whatsappService } from '@/services/whatsapp.service';
-import { supabase } from '@/lib/supabase';
 import { QRCodeSVG } from 'qrcode.react';
 import { useSession } from 'next-auth/react';
 
@@ -21,48 +19,22 @@ export default function WhatsAppManager() {
     const connectWhatsApp = async () => {
         if (sessionStatus === 'loading') return;
 
-        console.log('Attempting to connect WhatsApp. Current session:', session);
-
-        if (!session || !session.user) {
-            setError('Não foi possível identificar seu usuário. Verifique se você está logado corretamente.');
-            return;
-        }
-
-        const userId = (session.user as any).id || (session.user as any).sub;
-        if (!userId) {
-            setError('ID do usuário não encontrado na sessão. Tente sair e entrar novamente.');
-            return;
-        }
-
         setLoading(true);
         setError(null);
         try {
-            // 1. Get current tenant ID
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('tenant_id')
-                .eq('id', userId)
-                .single();
+            const response = await fetch('/api/whatsapp/connect', {
+                method: 'POST',
+            });
 
-            if (profileError || !profile) {
-                throw new Error('Não foi possível carregar seu perfil de negócio.');
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Erro ao conectar ao WhatsApp');
             }
 
-            const instanceName = `tenant-${profile.tenant_id}`;
-
-            // 2. Check if instance exists, create if not
-            const exists = await whatsappService.instanceExists(instanceName);
-            if (!exists) {
-                await whatsappService.createInstance(instanceName);
-                // Wait a moment for the instance to initialize
-                await new Promise(resolve => setTimeout(resolve, 2000));
-            }
-
-            // 3. Get QR Code
-            const data = await whatsappService.getQrCode(instanceName);
             if (data.code) {
                 setQrCode(data.code);
-            } else if (data.instance?.state === 'open') {
+            } else if (data.instance?.state === 'open' || data.status === 'open') {
                 setStatus('connected');
             } else {
                 throw new Error('Não foi possível gerar o QR Code. Tente novamente.');
