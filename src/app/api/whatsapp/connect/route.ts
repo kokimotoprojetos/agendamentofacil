@@ -72,7 +72,7 @@ export async function POST() {
         console.error('WhatsApp Connection API Root Error:', error);
 
         let errorMessage = error.message || 'Erro interno ao conectar WhatsApp';
-        let errorDetails = null;
+        let errorDetails = error.response?.data || null;
 
         if (error.response) {
             console.error('Evolution API Error Response:', {
@@ -80,12 +80,15 @@ export async function POST() {
                 data: error.response.data
             });
 
-            errorDetails = error.response.data;
-            const apiMessage = error.response.data?.message;
-            if (Array.isArray(apiMessage)) {
-                errorMessage = apiMessage.join(', ');
-            } else if (typeof apiMessage === 'string') {
-                errorMessage = apiMessage;
+            // If the error data is an object with a message or error field, use it
+            const detailMsg = error.response.data?.message || error.response.data?.error || error.response.data?.err;
+
+            if (Array.isArray(detailMsg)) {
+                errorMessage = detailMsg.join(', ');
+            } else if (typeof detailMsg === 'string') {
+                errorMessage = detailMsg;
+            } else if (typeof error.response.data === 'object') {
+                errorMessage = JSON.stringify(error.response.data);
             }
         }
 
