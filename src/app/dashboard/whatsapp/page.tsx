@@ -11,10 +11,21 @@ export default function WhatsAppManager() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        console.log('WhatsApp Manager - Session Status:', sessionStatus);
-        console.log('WhatsApp Manager - Session Data:', session);
-    }, [session, sessionStatus]);
+    const checkStatus = async () => {
+        try {
+            const response = await fetch('/api/whatsapp/status');
+            const data = await response.json();
+
+            if (data.status === 'open') {
+                setStatus('connected');
+                setQrCode(null);
+            } else {
+                setStatus('disconnected');
+            }
+        } catch (error) {
+            console.error('Error checking status:', error);
+        }
+    };
 
     const connectWhatsApp = async () => {
         if (sessionStatus === 'loading') return;
@@ -35,7 +46,7 @@ export default function WhatsAppManager() {
 
             if (data.code) {
                 setQrCode(data.code);
-            } else if (data.instance?.state === 'open' || data.status === 'open') {
+            } else if (data.status === 'open' || data.instance?.state === 'open') {
                 setStatus('connected');
             } else {
                 throw new Error('Não foi possível gerar o QR Code. Tente novamente.');
@@ -47,6 +58,24 @@ export default function WhatsAppManager() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        // Initial check
+        checkStatus();
+
+        // Poll every 5 seconds if not connected
+        const interval = setInterval(() => {
+            if (status !== 'connected') {
+                checkStatus();
+            }
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [status]);
+
+    useEffect(() => {
+        console.log('WhatsApp Manager - Session Status:', sessionStatus);
+    }, [sessionStatus]);
 
     return (
         <div className="max-w-4xl mx-auto">
