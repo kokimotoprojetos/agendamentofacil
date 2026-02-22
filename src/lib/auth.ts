@@ -6,6 +6,12 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import bcrypt from "bcryptjs";
 import { AuthOptions } from "next-auth";
 
+const isSupabaseConfigured =
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.SUPABASE_SERVICE_ROLE_KEY &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('your-') &&
+    !process.env.SUPABASE_SERVICE_ROLE_KEY.includes('your-');
+
 export const authOptions: AuthOptions = {
     providers: [
         GoogleProvider({
@@ -58,10 +64,10 @@ export const authOptions: AuthOptions = {
             }
         }),
     ],
-    adapter: (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+    adapter: isSupabaseConfigured
         ? SupabaseAdapter({
-            url: process.env.NEXT_PUBLIC_SUPABASE_URL,
-            secret: process.env.SUPABASE_SERVICE_ROLE_KEY,
+            url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
             schema: 'public',
         } as any)
         : undefined,
@@ -85,5 +91,5 @@ export const authOptions: AuthOptions = {
     pages: {
         signIn: '/login',
     },
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
 };
