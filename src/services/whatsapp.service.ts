@@ -73,13 +73,24 @@ export const whatsappService = {
             const response = await evolutionApi.post(`/webhook/instance/set/${instanceName}`, payload);
             return response.data;
         } catch (error: any) {
-            console.warn('v2-instance webhook set failed, trying v1-style:', error.message);
+            console.warn('v2-instance webhook set failed, trying alternative v2:', error.message);
             try {
+                // Alternative v2 endpoint often used in some distributions
                 const response = await evolutionApi.post(`/webhook/set/${instanceName}`, payload);
                 return response.data;
             } catch (err: any) {
-                console.error('All webhook set endpoints failed');
-                throw err;
+                console.warn('Alternative v2 failed, trying global set with instance in body:', err.message);
+                try {
+                    // Some versions use a global /webhook/set and require instanceName in payload
+                    const response = await evolutionApi.post(`/webhook/set`, {
+                        ...payload,
+                        instance: instanceName
+                    });
+                    return response.data;
+                } catch (lastErr: any) {
+                    console.error('All webhook set endpoints failed');
+                    throw lastErr;
+                }
             }
         }
     },

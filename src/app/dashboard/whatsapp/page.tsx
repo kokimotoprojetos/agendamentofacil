@@ -27,6 +27,33 @@ export default function WhatsAppManager() {
         }
     };
 
+    const [syncing, setSyncing] = useState(false);
+    const [syncSuccess, setSyncSuccess] = useState(false);
+
+    const syncSettings = async () => {
+        setSyncing(true);
+        setSyncSuccess(false);
+        setError(null);
+        try {
+            const response = await fetch('/api/debug/env', {
+                method: 'POST',
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setSyncSuccess(true);
+                setTimeout(() => setSyncSuccess(false), 3000);
+            } else {
+                throw new Error(data.error || 'Falha na sincronização');
+            }
+        } catch (error: any) {
+            console.error('Sync error:', error);
+            setError('Erro ao sincronizar: ' + error.message);
+        } finally {
+            setSyncing(false);
+        }
+    };
+
     const connectWhatsApp = async () => {
         if (sessionStatus === 'loading') return;
 
@@ -121,6 +148,15 @@ export default function WhatsAppManager() {
                                 className="text-xs text-red-500 hover:text-red-700 font-medium underline disabled:opacity-50"
                             >
                                 {loading ? 'Desconectando...' : 'Desconectar conta'}
+                            </button>
+                        )}
+                        {status === 'connected' && (
+                            <button
+                                onClick={syncSettings}
+                                disabled={syncing}
+                                className={`mt-2 text-[10px] px-2 py-1 rounded border transition-colors ${syncSuccess ? 'bg-green-50 border-green-200 text-green-600' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}
+                            >
+                                {syncing ? 'Sincronizando...' : syncSuccess ? '✓ Sincronizado' : '⚙ Sincronizar Webhook'}
                             </button>
                         )}
                     </div>
