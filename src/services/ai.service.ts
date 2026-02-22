@@ -7,7 +7,7 @@ const deepseek = new OpenAI({
 });
 
 export const aiAgentService = {
-  processMessage: async (message: string, context: any) => {
+  processMessage: async (message: string, context: any): Promise<string> => {
     const systemPrompt = `
       Você é um assistente virtual inteligente para agendamento de serviços em um(a) ${context.businessName}.
       Seu objetivo é ajudar o cliente a agendar um horário, responder dúvidas sobre serviços e preços.
@@ -42,7 +42,7 @@ export const aiAgentService = {
     }
   },
 
-  async processResponse(tenantId: string, customerPhone: string, messageText: string, context: any) {
+  async processResponse(tenantId: string, customerPhone: string, messageText: string, context: any): Promise<string> {
     try {
       // 1. Get or Create Conversation
       let { data: conversation } = await supabase
