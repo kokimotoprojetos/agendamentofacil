@@ -59,6 +59,11 @@ export async function POST() {
         if (!exists) {
             console.log('WhatsApp Connection API: Creating new instance:', instanceName);
             await whatsappService.createInstance(instanceName);
+
+            // 4.1 Configure Webhook
+            console.log('WhatsApp Connection API: Configuring webhook for new instance');
+            await whatsappService.setWebhook(instanceName);
+
             // Wait for instance to be ready
             await new Promise(resolve => setTimeout(resolve, 3000));
         }

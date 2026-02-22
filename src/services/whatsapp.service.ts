@@ -25,21 +25,33 @@ export const whatsappService = {
 
     createInstance: async (instanceName: string) => {
         try {
-            const payload: any = {
+            const payload = {
                 instanceName,
-                qrcode: true,
-                webhook: `${process.env.APP_URL}/api/webhooks/whatsapp`,
-                events: ['MESSAGES_UPSERT', 'QRCODE_UPDATED', 'CONNECTION_UPDATE']
+                qrcode: true
             };
 
-            console.log('Creating WhatsApp Instance with URL:', `${process.env.EVOLUTION_API_URL}/instance/create`);
-            console.log('Payload:', JSON.stringify(payload, null, 2));
-
+            console.log('Creating WhatsApp Instance (Minimal Payload):', JSON.stringify(payload));
             const response = await evolutionApi.post('/instance/create', payload);
             return response.data;
         } catch (error: any) {
-            console.error('Error creating WhatsApp instance details:', error.response?.data || error.message);
+            console.error('Error creating WhatsApp instance:', error.response?.data || error.message);
             throw error;
+        }
+    },
+
+    setWebhook: async (instanceName: string) => {
+        try {
+            const payload = {
+                enabled: true,
+                url: `${process.env.APP_URL}/api/webhooks/whatsapp`,
+                webhook_by_events: false,
+                events: ['MESSAGES_UPSERT', 'QRCODE_UPDATED', 'CONNECTION_UPDATE']
+            };
+            console.log('Configuring Webhook for:', instanceName);
+            await evolutionApi.post(`/webhook/set/${instanceName}`, payload);
+        } catch (error) {
+            console.error('Error setting WhatsApp webhook:', error);
+            // Don't throw here as getting the QR code is more important than the webhook working initially
         }
     },
 
