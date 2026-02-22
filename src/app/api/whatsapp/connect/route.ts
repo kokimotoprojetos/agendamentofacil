@@ -80,9 +80,15 @@ export async function POST() {
                 onConflict: 'instance_name'
             });
 
+        await supabaseAdmin.from('agent_logs').insert({
+            tenant_id: profile.tenant_id,
+            event_type: 'whatsapp_connect_attempt',
+            description: `Tentativa de conexão para ${instanceName}. Erro upsert: ${upsertError?.message || 'nenhum'}`,
+            metadata: { instanceName, upsertError }
+        });
+
         if (upsertError) {
             console.error('Error persisting WhatsApp connection:', upsertError);
-            // We continue even with error as the QR code is already generated/ready
         }
 
         // 5. Get QR Code
