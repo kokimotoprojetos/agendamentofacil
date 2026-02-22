@@ -51,7 +51,7 @@ export async function POST() {
             return NextResponse.json({ error: 'Configuração de negócio não encontrada no banco de dados.' }, { status: 404 });
         }
 
-        const instanceName = `tenant-${profile.tenant_id}`;
+        const instanceName = `wa_${profile.tenant_id.split('-')[0]}`;
         console.log('WhatsApp Connection API: Instance Name:', instanceName);
 
         // 4. Check if instance exists, create if not

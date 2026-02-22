@@ -65,9 +65,15 @@ export default function WhatsAppManager() {
                 {error && (
                     <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl mb-8">
                         <p className="text-red-400 font-medium mb-2">{error}</p>
-                        <p className="text-red-400/60 text-sm">
-                            Por favor, verifique se as configurações da Evolution API estão corretas e se a instância não está duplicada.
+                        <p className="text-red-400/60 text-sm mb-4">
+                            Por favor, verifique se as configurações da Evolution API estão corretas.
                         </p>
+                        <div className="mt-4 p-3 bg-black/5 rounded-lg border border-red-500/10">
+                            <p className="text-[10px] uppercase tracking-widest text-red-400/40 font-bold mb-1">Detalhes Técnicos</p>
+                            <code className="text-xs text-red-400/80 break-all font-mono">
+                                {error.includes('{') ? error : `Error 400: ${error}`}
+                            </code>
+                        </div>
                     </div>
                 )}
 
