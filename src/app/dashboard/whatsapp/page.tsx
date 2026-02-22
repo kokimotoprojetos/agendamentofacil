@@ -77,6 +77,30 @@ export default function WhatsAppManager() {
         console.log('WhatsApp Manager - Session Status:', sessionStatus);
     }, [sessionStatus]);
 
+    const disconnectWhatsApp = async () => {
+        if (!confirm('Tem certeza que deseja desconectar o WhatsApp? Isso interromperá o atendimento automático.')) return;
+
+        setLoading(true);
+        try {
+            const response = await fetch('/api/whatsapp/disconnect', {
+                method: 'POST',
+            });
+
+            if (response.ok) {
+                setStatus('disconnected');
+                setQrCode(null);
+            } else {
+                const data = await response.json();
+                throw new Error(data.error || 'Erro ao desconectar');
+            }
+        } catch (error: any) {
+            console.error('Failed to disconnect:', error);
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="max-w-4xl mx-auto">
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
@@ -85,9 +109,20 @@ export default function WhatsAppManager() {
                         <h1 className="text-2xl font-bold">Conectar WhatsApp</h1>
                         <p className="text-gray-600">Conecte seu número para começar a automatizar os agendamentos.</p>
                     </div>
-                    <div className="flex items-center">
-                        <span className={`w-3 h-3 rounded-full mr-2 ${status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                        <span className="font-medium text-gray-700 capitalize">{status === 'connected' ? 'Conectado' : 'Desconectado'}</span>
+                    <div className="flex flex-col items-end">
+                        <div className="flex items-center mb-2">
+                            <span className={`w-3 h-3 rounded-full mr-2 ${status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                            <span className="font-medium text-gray-700 capitalize">{status === 'connected' ? 'Conectado' : 'Desconectado'}</span>
+                        </div>
+                        {status === 'connected' && (
+                            <button
+                                onClick={disconnectWhatsApp}
+                                disabled={loading}
+                                className="text-xs text-red-500 hover:text-red-700 font-medium underline disabled:opacity-50"
+                            >
+                                {loading ? 'Desconectando...' : 'Desconectar conta'}
+                            </button>
+                        )}
                     </div>
                 </div>
 
