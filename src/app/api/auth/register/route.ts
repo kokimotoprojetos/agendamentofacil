@@ -9,9 +9,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        // 1. Check if user already exists in next_auth.users
+        // 1. Check if user already exists in public.users
         const { data: existingUser } = await supabaseAdmin
-            .schema('next_auth')
             .from('users')
             .select('id')
             .eq('email', email)
@@ -22,9 +21,8 @@ export async function POST(request: Request) {
         if (existingUser) {
             userId = existingUser.id;
         } else {
-            // 2. Create user in next_auth.users
+            // 2. Create user in public.users
             const { data: newUser, error: userError } = await supabaseAdmin
-                .schema('next_auth')
                 .from('users')
                 .insert({ name, email })
                 .select('id')
