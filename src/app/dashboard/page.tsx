@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 
 export default function DashboardPage() {
@@ -47,27 +48,27 @@ export default function DashboardPage() {
                 <div className="bg-[#0f0f0f] p-8 rounded-2xl border border-white/5">
                     <h3 className="text-lg font-bold mb-6 text-white">Ações Rápidas</h3>
                     <div className="space-y-3">
-                        <button className="w-full flex items-center p-4 border border-white/5 rounded-xl hover:bg-purple-900/20 hover:border-purple-500/30 transition-all text-left group">
+                        <Link href="/dashboard/agent" className="w-full flex items-center p-4 border border-white/5 rounded-xl hover:bg-purple-900/20 hover:border-purple-500/30 transition-all text-left group">
                             <span className="mr-3 p-2 bg-[#1a1a1a] rounded-lg group-hover:bg-purple-900/40">🤖</span>
                             <div>
                                 <p className="font-bold text-white">Configurar Agente</p>
                                 <p className="text-xs text-gray-500">Ajuste a personalidade da IA</p>
                             </div>
-                        </button>
-                        <button className="w-full flex items-center p-4 border border-white/5 rounded-xl hover:bg-blue-900/20 hover:border-blue-500/30 transition-all text-left group">
+                        </Link>
+                        <Link href="/dashboard/whatsapp" className="w-full flex items-center p-4 border border-white/5 rounded-xl hover:bg-blue-900/20 hover:border-blue-500/30 transition-all text-left group">
                             <span className="mr-3 p-2 bg-[#1a1a1a] rounded-lg group-hover:bg-blue-900/40">🔌</span>
                             <div>
                                 <p className="font-bold text-white">Conectar WhatsApp</p>
                                 <p className="text-xs text-gray-500">Escaneie o QR Code</p>
                             </div>
-                        </button>
-                        <button className="w-full flex items-center p-4 border border-white/5 rounded-xl hover:bg-green-900/20 hover:border-green-500/30 transition-all text-left group">
+                        </Link>
+                        <Link href="/dashboard/calendar" className="w-full flex items-center p-4 border border-white/5 rounded-xl hover:bg-green-900/20 hover:border-green-500/30 transition-all text-left group">
                             <span className="mr-3 p-2 bg-[#1a1a1a] rounded-lg group-hover:bg-green-900/40">📅</span>
                             <div>
                                 <p className="font-bold text-white">Sinalizar Google</p>
                                 <p className="text-xs text-gray-500">Integrar calendário</p>
                             </div>
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

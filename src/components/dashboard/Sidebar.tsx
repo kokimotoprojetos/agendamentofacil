@@ -7,6 +7,7 @@ const menuItems = [
     { icon: "💬", label: "Conversas", href: "/dashboard/chats" },
     { icon: "📅", label: "Agenda", href: "/dashboard/calendar" },
     { icon: "🛠️", label: "Serviços", href: "/dashboard/services" },
+    { icon: "🔌", label: "WhatsApp", href: "/dashboard/whatsapp" },
 ];
 
 export const Sidebar = () => {
