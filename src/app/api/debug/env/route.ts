@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { whatsappService } from '@/services/whatsapp.service';
 import axios from 'axios';
 
 export async function GET() {
@@ -51,5 +52,47 @@ export async function GET() {
         });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
+export async function POST() {
+    try {
+        const session = await getServerSession(authOptions);
+
+        if (!session || !session.user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { data: profile } = await supabaseAdmin
+            .from('profiles')
+            .select('tenant_id')
+            .eq('id', (session.user as any).id)
+            .single();
+
+        if (!profile) return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+
+        const instanceName = `wa_${profile.tenant_id.split('-')[0]}`;
+
+        console.log('Force Webhook Sync from Debug Route:', instanceName);
+        const result = await whatsappService.setWebhook(instanceName);
+
+        await supabaseAdmin.from('agent_logs').insert({
+            tenant_id: profile.tenant_id,
+            event_type: 'webhook_forced_sync',
+            description: `Sincronização forçada do webhook via rota de debug para ${instanceName}`,
+            metadata: { result, appUrl: process.env.APP_URL }
+        });
+
+        return NextResponse.json({
+            success: true,
+            message: 'Webhook synchronization forced!',
+            result
+        });
+    } catch (error: any) {
+        console.error('Force Sync Error:', error);
+        return NextResponse.json({
+            error: error.message,
+            details: error.response?.data
+        }, { status: 500 });
     }
 }

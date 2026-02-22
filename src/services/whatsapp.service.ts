@@ -49,36 +49,38 @@ export const whatsappService = {
 
     setWebhook: async (instanceName: string) => {
         const webhookUrl = `${process.env.APP_URL}/api/webhooks/whatsapp`;
+        const payload = {
+            enabled: true,
+            url: webhookUrl,
+            webhook_by_events: false,
+            events: [
+                'MESSAGES_UPSERT',
+                'MESSAGES_UPDATE',
+                'MESSAGES_DELETE',
+                'SEND_MESSAGE',
+                'CONTACTS_UPSERT',
+                'CONTACTS_UPDATE',
+                'PRESENCE_UPDATE',
+                'CHAT_STATE_UPDATE',
+                'QRCODE_UPDATED',
+                'CONNECTION_UPDATE',
+                'INSTANCE_RELOADED'
+            ]
+        };
+
         try {
-            const payload = {
-                enabled: true,
-                url: webhookUrl,
-                webhook_by_events: false,
-                events: [
-                    'MESSAGES_UPSERT',
-                    'MESSAGES_UPDATE',
-                    'MESSAGES_DELETE',
-                    'SEND_MESSAGE',
-                    'CONTACTS_UPSERT',
-                    'CONTACTS_UPDATE',
-                    'PRESENCE_UPDATE',
-                    'CHAT_STATE_UPDATE',
-                    'QRCODE_UPDATED',
-                    'CONNECTION_UPDATE',
-                    'INSTANCE_RELOADED'
-                ]
-            };
-
-            console.log('Finalizing Webhook for:', instanceName, 'at', webhookUrl);
-
-            // Try v1/universal endpoint
-            const response = await evolutionApi.post(`/webhook/set/${instanceName}`, payload);
-            console.log('Webhook sync response:', response.data);
+            console.log('Syncing Webhook (v2-instance):', instanceName, 'at', webhookUrl);
+            const response = await evolutionApi.post(`/webhook/instance/set/${instanceName}`, payload);
             return response.data;
         } catch (error: any) {
-            console.error('Error setting WhatsApp webhook:', error.response?.data || error.message);
-            // Fallback or just log to agent_logs
-            throw error;
+            console.warn('v2-instance webhook set failed, trying v1-style:', error.message);
+            try {
+                const response = await evolutionApi.post(`/webhook/set/${instanceName}`, payload);
+                return response.data;
+            } catch (err: any) {
+                console.error('All webhook set endpoints failed');
+                throw err;
+            }
         }
     },
 
