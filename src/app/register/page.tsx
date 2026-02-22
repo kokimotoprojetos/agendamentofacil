@@ -9,6 +9,7 @@ import { signIn } from 'next-auth/react';
 const registerSchema = z.object({
     name: z.string().min(2, 'Nome muito curto'),
     email: z.string().email('Email inválido'),
+    password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
     businessName: z.string().min(2, 'Nome do negócio muito curto'),
 });
 
@@ -32,7 +33,19 @@ export default function RegisterPage() {
                 throw new Error(result.error || 'Failed to register');
             }
 
-            await signIn('email', { email: data.email, callbackUrl: '/dashboard' });
+            // Log in automatically after registration
+            const signInResult = await signIn('credentials', {
+                email: data.email,
+                password: data.password,
+                redirect: false,
+                callbackUrl: '/dashboard'
+            });
+
+            if (signInResult?.error) {
+                throw new Error(signInResult.error);
+            }
+
+            window.location.href = '/dashboard';
         } catch (error: any) {
             console.error('Registration error:', error);
             alert(error.message || 'Erro ao criar conta. Tente novamente.');
@@ -79,6 +92,17 @@ export default function RegisterPage() {
                             placeholder="contato@empresa.com"
                         />
                         {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300">Senha</label>
+                        <input
+                            {...register('password')}
+                            type="password"
+                            className={`mt-1 block w-full px-4 py-3 bg-[#1a1a1a] border ${errors.password ? 'border-red-500' : 'border-white/10'} text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none placeholder:text-gray-600`}
+                            placeholder="••••••••"
+                        />
+                        {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
                     </div>
 
                     <button

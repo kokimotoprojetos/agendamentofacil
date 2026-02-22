@@ -1,7 +1,10 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import EmailProvider from "next-auth/providers/email";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { SupabaseAdapter } from "@auth/supabase-adapter";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import bcrypt from "bcryptjs";
 
 export const authOptions = {
     providers: [
@@ -20,6 +23,40 @@ export const authOptions = {
             },
             from: process.env.EMAIL_FROM,
         }),
+        CredentialsProvider({
+            name: "Credentials",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                password: { label: "Password", type: "password" }
+            },
+            async authorize(credentials) {
+                if (!credentials?.email || !credentials?.password) {
+                    throw new Error("Credenciais inválidas");
+                }
+
+                const { data: user, error } = await supabaseAdmin
+                    .from("users")
+                    .select("*")
+                    .eq("email", credentials.email)
+                    .single();
+
+                if (error || !user || !user.password) {
+                    throw new Error("Usuário não encontrado ou senha não configurada");
+                }
+
+                const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+
+                if (!isPasswordValid) {
+                    throw new Error("Senha incorreta");
+                }
+
+                return {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                };
+            }
+        }),
     ],
     adapter: (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
         ? SupabaseAdapter({
@@ -28,9 +65,20 @@ export const authOptions = {
             schema: 'public',
         } as any)
         : undefined,
+    session: {
+        strategy: "jwt" as const,
+    },
     callbacks: {
-        async session({ session, user }: any) {
-            session.user.id = user.id;
+        async jwt({ token, user }: any) {
+            if (user) {
+                token.id = user.id;
+            }
+            return token;
+        },
+        async session({ session, token }: any) {
+            if (session.user) {
+                session.user.id = token.id;
+            }
             return session;
         },
     },

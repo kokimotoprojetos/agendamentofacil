@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
     try {
-        const { name, email, businessName } = await request.json();
+        const { name, email, password, businessName } = await request.json();
 
-        if (!name || !email || !businessName) {
+        if (!name || !email || !password || !businessName) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
@@ -22,9 +23,14 @@ export async function POST(request: Request) {
             userId = existingUser.id;
         } else {
             // 2. Create user in public.users
+            const hashedPassword = await bcrypt.hash(password, 10);
             const { data: newUser, error: userError } = await supabaseAdmin
                 .from('users')
-                .insert({ name, email })
+                .insert({
+                    name,
+                    email,
+                    password: hashedPassword
+                })
                 .select('id')
                 .single();
 

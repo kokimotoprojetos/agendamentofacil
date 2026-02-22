@@ -8,6 +8,7 @@ import * as z from 'zod';
 
 const loginSchema = z.object({
     email: z.string().email('Email inválido'),
+    password: z.string().min(1, 'A senha é obrigatória'),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -18,7 +19,24 @@ export default function LoginPage() {
     });
 
     const onSubmit = async (data: LoginFormValues) => {
-        await signIn('email', { email: data.email, callbackUrl: '/dashboard' });
+        try {
+            const result = await signIn('credentials', {
+                email: data.email,
+                password: data.password,
+                redirect: false,
+                callbackUrl: '/dashboard',
+            });
+
+            if (result?.error) {
+                alert('Erro ao entrar: ' + (result.error === 'CredentialsSignin' ? 'Email ou senha incorretos' : result.error));
+                return;
+            }
+
+            window.location.href = '/dashboard';
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Erro ao realizar login. Tente novamente.');
+        }
     };
 
     return (
@@ -41,12 +59,23 @@ export default function LoginPage() {
                         {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
                     </div>
 
+                    <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-300">Senha</label>
+                        <input
+                            {...register('password')}
+                            type="password"
+                            className={`mt-1 block w-full px-4 py-3 bg-[#1a1a1a] border ${errors.password ? 'border-red-500' : 'border-white/10'} text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none placeholder:text-gray-600`}
+                            placeholder="••••••••"
+                        />
+                        {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
+                    </div>
+
                     <button
                         type="submit"
                         disabled={isSubmitting}
                         className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-900/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isSubmitting ? 'Entrando...' : 'Entrar com Email'}
+                        {isSubmitting ? 'Entrando...' : 'Entrar na Conta'}
                     </button>
                 </form>
 
