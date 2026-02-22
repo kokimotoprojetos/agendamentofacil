@@ -42,7 +42,7 @@ export const aiAgentService = {
     }
   },
 
-  async processResponse(tenantId: string, customerPhone: string, message: string, context: any) {
+  async processResponse(tenantId: string, customerPhone: string, messageText: string, context: any) {
     try {
       // 1. Get or Create Conversation
       let { data: conversation } = await supabase
@@ -61,28 +61,73 @@ export const aiAgentService = {
         conversation = newConv;
       }
 
-      // 2. Save Inbound Message
+      // 2. Fetch recent message history for context
+      const { data: history } = await supabase
+        .from('messages')
+        .select('direction, content')
+        .eq('conversation_id', conversation.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      const formattedHistory = history?.reverse().map(msg => ({
+        role: msg.direction === 'inbound' ? 'user' : 'assistant',
+        content: msg.content
+      })) || [];
+
+      // 3. Save Inbound Message
       await supabase.from('messages').insert({
         conversation_id: conversation.id,
         direction: 'inbound',
-        content: message
+        content: messageText
       });
 
-      // 3. AI Processing
-      const intent = await this.extractBookingIntent(message);
+      // 4. AI Processing
+
+      // Check for confirmation first if there is a pending intent
+      const pendingIntent = (conversation.context as any)?.pending_intent;
+      const isConfirmation = await this.checkConfirmation(messageText);
 
       let aiResponse = "";
-      if (intent && intent.serviceName && intent.date) {
-        const isAvailable = await this.checkAvailability(tenantId, intent.date, intent.time);
-        aiResponse = isAvailable
-          ? `Perfeito! Tenho disponibilidade para ${intent.serviceName} no dia ${intent.date} às ${intent.time}. Gostaria de confirmar?`
-          : `Sinto muito, esse horário para ${intent.serviceName} já está ocupado. Poderíamos tentar outro horário?`;
+
+      if (pendingIntent && isConfirmation) {
+        // EXECUTE BOOKING
+        const success = await this.executeBooking(tenantId, pendingIntent, customerPhone);
+        if (success) {
+          aiResponse = `Confirmado! Seu agendamento para ${pendingIntent.serviceName} no dia ${pendingIntent.date} às ${pendingIntent.time} foi realizado com sucesso.`;
+          // Clear pending intent
+          await supabase.from('conversations').update({
+            context: { ...(conversation.context as any), pending_intent: null }
+          }).eq('id', conversation.id);
+        } else {
+          aiResponse = "Tive um problema ao finalizar seu agendamento. Poderia tentar novamente em alguns instantes?";
+        }
       } else {
-        // Se não for intenção de agendamento clara, usa o processMessage normal para conversa fluida
-        aiResponse = await this.processMessage(message, context) || "Olá! Como posso ajudar você hoje?";
+        // Check for new intent
+        const intent = await this.extractBookingIntent(messageText);
+
+        if (intent && intent.serviceName && intent.date) {
+          const isAvailable = await this.checkAvailability(tenantId, intent.date, intent.time);
+
+          if (isAvailable) {
+            aiResponse = `Perfeito! Tenho disponibilidade para ${intent.serviceName} no dia ${intent.date} às ${intent.time}. Posso confirmar o seu agendamento?`;
+            // Save as pending intent
+            await supabase.from('conversations').update({
+              context: { ...(conversation.context as any), pending_intent: intent }
+            }).eq('id', conversation.id);
+          } else {
+            // Suggest other time via AI
+            aiResponse = await this.processMessage(
+              `O cliente tentou agendar ${intent.serviceName} para ${intent.date} às ${intent.time}, mas esse horário está ocupado. Sugira outro horário amigavelmente.`,
+              { ...context, history: formattedHistory }
+            );
+          }
+        } else {
+          // Normal conversation flow
+          aiResponse = await this.processMessage(messageText, { ...context, history: formattedHistory }) || "Olá! Como posso ajudar você hoje?";
+        }
       }
 
-      // 4. Save Outbound Message
+      // 5. Save Outbound Message
       await supabase.from('messages').insert({
         conversation_id: conversation.id,
         direction: 'outbound',
@@ -97,7 +142,9 @@ export const aiAgentService = {
   },
 
   extractBookingIntent: async (message: string) => {
-    const prompt = `Extraia a intenção de agendamento desta mensagem: "${message}". Retorne JSON com { "date": "YYYY-MM-DD", "time": "HH:MM", "serviceName": "string" } ou null se não houver intenção clara.`;
+    const prompt = `Extraia a intenção de agendamento desta mensagem: "${message}". 
+    Retorne APENAS um JSON com { "date": "YYYY-MM-DD", "time": "HH:MM", "serviceName": "string" } ou null se não houver intenção clara de novo agendamento.
+    Considere a data atual como ${new Date().toISOString().split('T')[0]}.`;
 
     try {
       const response = await deepseek.chat.completions.create({
@@ -105,15 +152,123 @@ export const aiAgentService = {
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
       });
-      return JSON.parse(response.choices[0].message.content || 'null');
+      const result = JSON.parse(response.choices[0].message.content || 'null');
+      return result;
     } catch {
       return null;
     }
   },
 
   checkAvailability: async (tenantId: string, date: string, time: string) => {
-    // Mock checking logic
-    console.log(`Checking availability for ${tenantId} on ${date} at ${time}`);
-    return true; // Simplified for this stage
+    try {
+      const { data: tokens } = await supabase
+        .from('google_calendar_tokens')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .single();
+
+      if (!tokens) {
+        console.warn('Google Calendar tokens not found for tenant:', tenantId);
+        return true; // Fallback to allowing if no calendar connected
+      }
+
+      const { calendarService } = await import('./calendar.service');
+      calendarService.setCredentials({
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        expiry_date: tokens.expiry_date
+      });
+
+      const start = `${date}T${time}:00Z`;
+      // Assume 1 hour duration if not specified
+      const end = new Date(new Date(start).getTime() + 60 * 60 * 1000).toISOString();
+
+      return await calendarService.checkAvailability(start, end, tokens.calendar_id);
+    } catch (error) {
+      console.error('Error checking real availability:', error);
+      return true; // Fallback
+    }
+  },
+
+  checkConfirmation: async (message: string) => {
+    const prompt = `Avalie se a mensagem a seguir é uma confirmação positiva (ex: sim, claro, pode confirmar, ok): "${message}". Retorne apenas "true" ou "false".`;
+    try {
+      const response = await deepseek.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: prompt }],
+      });
+      return response.choices[0].message.content?.toLowerCase().includes('true');
+    } catch {
+      return false;
+    }
+  },
+
+  executeBooking: async (tenantId: string, intent: any, customerPhone: string) => {
+    try {
+      // 1. Get Service ID
+      const { data: service } = await supabase
+        .from('services')
+        .select('id, duration')
+        .eq('tenant_id', tenantId)
+        .ilike('name', `%${intent.serviceName}%`)
+        .limit(1)
+        .single();
+
+      // 2. Create Appointment in DB
+      const startTime = `${intent.date}T${intent.time}:00Z`;
+      const duration = service?.duration || 60;
+      const endTime = new Date(new Date(startTime).getTime() + duration * 60 * 1000).toISOString();
+
+      const { data: appointment, error: appError } = await supabase
+        .from('appointments')
+        .insert({
+          tenant_id: tenantId,
+          service_id: service?.id,
+          customer_name: "Cliente WhatsApp",
+          customer_phone: customerPhone,
+          start_time: startTime,
+          end_time: endTime,
+          status: 'scheduled'
+        })
+        .select()
+        .single();
+
+      if (appError) throw appError;
+
+      // 3. Sync with Google Calendar
+      const { data: tokens } = await supabase
+        .from('google_calendar_tokens')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .single();
+
+      if (tokens) {
+        const { calendarService } = await import('./calendar.service');
+        calendarService.setCredentials({
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+          expiry_date: tokens.expiry_date
+        });
+
+        const gEvent = await calendarService.createEvent({
+          title: `${intent.serviceName} - WhatsApp`,
+          description: `Agendamento via IA para ${customerPhone}`,
+          start: startTime,
+          end: endTime
+        }, tokens.calendar_id);
+
+        if (gEvent?.id) {
+          await supabase
+            .from('appointments')
+            .update({ google_event_id: gEvent.id })
+            .eq('id', appointment.id);
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error executing booking:', error);
+      return false;
+    }
   }
 };

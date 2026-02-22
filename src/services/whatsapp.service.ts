@@ -48,5 +48,24 @@ export const whatsappService = {
         } catch (error) {
             console.error('Error deleting WhatsApp instance:', error);
         }
+    },
+
+    sendMessage: async (instanceName: string, remoteJid: string, text: string) => {
+        try {
+            const response = await evolutionApi.post(`/message/sendText/${instanceName}`, {
+                number: remoteJid,
+                options: {
+                    delay: 1200,
+                    presence: "composing"
+                },
+                textMessage: {
+                    text
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error sending WhatsApp message:', error);
+            throw error;
+        }
     }
 };
