@@ -8,6 +8,13 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Received WhatsApp Webhook:', JSON.stringify(body, null, 2));
 
+    // 0. Diagnostic Logging
+    await supabaseAdmin.from('agent_logs').insert({
+      event_type: 'webhook_hit',
+      description: `Webhook received: ${body.event || 'unknown event'}`,
+      metadata: body
+    });
+
     // Handle MESSAGES_UPSERT event from Evolution API
     // Note: Evolution API v2 uses 'messages.upsert', some versions use 'MESSAGES_UPSERT'
     if (body.event === 'messages.upsert' || body.event === 'MESSAGES_UPSERT') {
