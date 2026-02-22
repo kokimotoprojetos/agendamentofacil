@@ -27,10 +27,10 @@ export const whatsappService = {
         try {
             const payload = {
                 instanceName,
-                qrcode: true
+                qrcode: true,
+                integration: 'WHATSAPP-BAILEYS'
             };
 
-            console.log('Creating WhatsApp Instance (Minimal Payload):', JSON.stringify(payload));
             const response = await evolutionApi.post('/instance/create', payload);
             return response.data;
         } catch (error: any) {
