@@ -16,21 +16,35 @@ export async function POST(req: Request) {
     });
 
     // Handle MESSAGES_UPSERT event from Evolution API
-    // Note: Evolution API v2 uses 'messages.upsert', some versions use 'MESSAGES_UPSERT'
-    if (body.event === 'messages.upsert' || body.event === 'MESSAGES_UPSERT') {
+    const isUpsert = body.event === 'messages.upsert' ||
+      body.event === 'MESSAGES_UPSERT' ||
+      body.type === 'messages.upsert';
+
+    if (isUpsert) {
       const { instance, data } = body;
 
+      // Evolution API v2 payload structure can vary
+      const messageObj = data.message || data;
+      const key = data.key || messageObj?.key;
+
       // Basic validation: ignore if it's from the bot itself (sent by us)
-      if (data.key?.fromMe) {
+      if (key?.fromMe) {
         return NextResponse.json({ status: 'ignored', reason: 'own_message' });
       }
 
-      const customerPhone = data.key?.remoteJid;
-      const messageText = data.message?.conversation ||
-        data.message?.extendedTextMessage?.text ||
-        data.message?.text || "";
+      const customerPhone = key?.remoteJid;
+      const messageText = messageObj?.conversation ||
+        messageObj?.extendedTextMessage?.text ||
+        messageObj?.text ||
+        messageObj?.message?.conversation ||
+        "";
 
       if (!messageText || !customerPhone) {
+        await supabaseAdmin.from('agent_logs').insert({
+          event_type: 'webhook_ignored',
+          description: `Payload inválido ou vazio de ${instance}`,
+          metadata: { body }
+        });
         return NextResponse.json({ status: 'ignored', reason: 'invalid_payload' });
       }
 
@@ -43,6 +57,11 @@ export async function POST(req: Request) {
 
       if (connError || !connection) {
         console.error('Tenant not found for instance:', instance);
+        await supabaseAdmin.from('agent_logs').insert({
+          event_type: 'webhook_error',
+          description: `Tenant não encontrado para a instância: ${instance}`,
+          metadata: { instance, body }
+        });
         return NextResponse.json({ status: 'error', message: 'Tenant not found' }, { status: 404 });
       }
 
