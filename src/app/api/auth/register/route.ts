@@ -20,6 +20,16 @@ export async function POST(request: Request) {
         let userId: string;
 
         if (existingUser) {
+            // Check if user already has a profile
+            const { data: existingProfile } = await supabaseAdmin
+                .from('profiles')
+                .select('id')
+                .eq('id', existingUser.id)
+                .single();
+
+            if (existingProfile) {
+                return NextResponse.json({ error: 'Este email já está em uso. Por favor, faça login.' }, { status: 400 });
+            }
             userId = existingUser.id;
         } else {
             // 2. Create user in public.users
@@ -72,7 +82,7 @@ export async function POST(request: Request) {
         // 4. Create Profile
         const { error: profileError } = await supabaseAdmin
             .from('profiles')
-            .insert({
+            .upsert({
                 id: userId,
                 tenant_id: tenant.id,
                 full_name: name,
