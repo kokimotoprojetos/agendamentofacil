@@ -20,10 +20,23 @@ export default function RegisterPage() {
     });
 
     const onSubmit = async (data: RegisterFormValues) => {
-        // Para simplificar, usamos o mesmo fluxo de email do NextAuth
-        // Em um sistema real, você salvaria os dados do negócio antes
-        console.log('Registering:', data);
-        await signIn('email', { email: data.email, callbackUrl: '/dashboard' });
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const result = await response.json();
+                throw new Error(result.error || 'Failed to register');
+            }
+
+            await signIn('email', { email: data.email, callbackUrl: '/dashboard' });
+        } catch (error: any) {
+            console.error('Registration error:', error);
+            alert(error.message || 'Erro ao criar conta. Tente novamente.');
+        }
     };
 
     return (
