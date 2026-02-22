@@ -26,7 +26,7 @@ export const authOptions = {
             url: process.env.NEXT_PUBLIC_SUPABASE_URL,
             secret: process.env.SUPABASE_SERVICE_ROLE_KEY,
             schema: 'public',
-        })
+        } as any)
         : undefined,
     callbacks: {
         async session({ session, user }: any) {
