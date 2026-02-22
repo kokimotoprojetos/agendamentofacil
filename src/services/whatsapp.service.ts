@@ -11,25 +11,34 @@ const evolutionApi = axios.create({
 export const whatsappService = {
     instanceExists: async (instanceName: string) => {
         try {
+            console.log(`Checking instance existence: ${instanceName}`);
             const response = await evolutionApi.get(`/instance/connectionState/${instanceName}`);
             return response.status === 200;
         } catch (error: any) {
+            console.log(`Instance state check for ${instanceName} failed with status: ${error.response?.status}`);
             if (error.response?.status === 404) return false;
+            // Some versions might return 400 for non-existent instances in connectionState
+            if (error.response?.status === 400) return false;
             throw error;
         }
     },
 
     createInstance: async (instanceName: string) => {
         try {
-            const response = await evolutionApi.post('/instance/create', {
+            const payload: any = {
                 instanceName,
-                token: '', // Optional token
+                qrcode: true,
                 webhook: `${process.env.APP_URL}/api/webhooks/whatsapp`,
                 events: ['MESSAGES_UPSERT', 'QRCODE_UPDATED', 'CONNECTION_UPDATE']
-            });
+            };
+
+            console.log('Creating WhatsApp Instance with URL:', `${process.env.EVOLUTION_API_URL}/instance/create`);
+            console.log('Payload:', JSON.stringify(payload, null, 2));
+
+            const response = await evolutionApi.post('/instance/create', payload);
             return response.data;
-        } catch (error) {
-            console.error('Error creating WhatsApp instance:', error);
+        } catch (error: any) {
+            console.error('Error creating WhatsApp instance details:', error.response?.data || error.message);
             throw error;
         }
     },

@@ -63,8 +63,11 @@ export default function WhatsAppManager() {
                 </div>
 
                 {error && (
-                    <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 rounded-xl text-red-500 text-sm">
-                        {error}
+                    <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl mb-8">
+                        <p className="text-red-400 font-medium mb-2">{error}</p>
+                        <p className="text-red-400/60 text-sm">
+                            Por favor, verifique se as configurações da Evolution API estão corretas e se a instância não está duplicada.
+                        </p>
                     </div>
                 )}
 

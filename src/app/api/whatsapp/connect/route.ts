@@ -79,8 +79,14 @@ export async function POST() {
                 status: error.response.status,
                 data: error.response.data
             });
-            errorMessage = error.response.data?.message || errorMessage;
+
             errorDetails = error.response.data;
+            const apiMessage = error.response.data?.message;
+            if (Array.isArray(apiMessage)) {
+                errorMessage = apiMessage.join(', ');
+            } else if (typeof apiMessage === 'string') {
+                errorMessage = apiMessage;
+            }
         }
 
         return NextResponse.json({
