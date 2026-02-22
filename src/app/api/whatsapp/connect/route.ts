@@ -68,6 +68,24 @@ export async function POST() {
             await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
+        // 4.2 Persist connection in DB for webhook lookup
+        console.log('WhatsApp Connection API: Persisting connection in DB');
+        const { error: upsertError } = await supabaseAdmin
+            .from('whatsapp_connections')
+            .upsert({
+                tenant_id: profile.tenant_id,
+                instance_name: instanceName,
+                status: 'connected',
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'instance_name'
+            });
+
+        if (upsertError) {
+            console.error('Error persisting WhatsApp connection:', upsertError);
+            // We continue even with error as the QR code is already generated/ready
+        }
+
         // 5. Get QR Code
         console.log('WhatsApp Connection API: Fetching QR Code for:', instanceName);
         const data = await whatsappService.getQrCode(instanceName);
