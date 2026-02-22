@@ -21,10 +21,12 @@ export const authOptions = {
             from: process.env.EMAIL_FROM,
         }),
     ],
-    adapter: SupabaseAdapter({
-        url: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-        secret: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
-    }),
+    adapter: (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+        ? SupabaseAdapter({
+            url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+            secret: process.env.SUPABASE_SERVICE_ROLE_KEY,
+        })
+        : undefined,
     callbacks: {
         async session({ session, user }: any) {
             session.user.id = user.id;
