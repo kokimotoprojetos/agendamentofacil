@@ -29,7 +29,8 @@ export default function WhatsAppManager() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Erro ao conectar ao WhatsApp');
+                const errorMsg = data.details?.message || data.error || 'Erro ao conectar ao WhatsApp';
+                throw new Error(errorMsg);
             }
 
             if (data.code) {

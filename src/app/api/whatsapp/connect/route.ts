@@ -71,10 +71,21 @@ export async function POST() {
     } catch (error: any) {
         console.error('WhatsApp Connection API Root Error:', error);
 
-        const errorMessage = error.response?.data?.message || error.message || 'Erro interno ao conectar WhatsApp';
+        let errorMessage = error.message || 'Erro interno ao conectar WhatsApp';
+        let errorDetails = null;
+
+        if (error.response) {
+            console.error('Evolution API Error Response:', {
+                status: error.response.status,
+                data: error.response.data
+            });
+            errorMessage = error.response.data?.message || errorMessage;
+            errorDetails = error.response.data;
+        }
 
         return NextResponse.json({
-            error: errorMessage
-        }, { status: 500 });
+            error: errorMessage,
+            details: errorDetails
+        }, { status: error.response?.status || 500 });
     }
 }
