@@ -35,7 +35,7 @@ export const aiAgentService = {
         temperature: 0.7,
       });
 
-      return response.choices[0].message.content;
+      return response.choices[0].message.content || "";
     } catch (error) {
       console.error('Error processing AI message:', error);
       return "Desculpe, estou com uma instabilidade técnica momentânea. Pode repetir por favor?";
@@ -116,10 +116,10 @@ export const aiAgentService = {
             }).eq('id', conversation.id);
           } else {
             // Suggest other time via AI
-            aiResponse = await this.processMessage(
+            aiResponse = (await this.processMessage(
               `O cliente tentou agendar ${intent.serviceName} para ${intent.date} às ${intent.time}, mas esse horário está ocupado. Sugira outro horário amigavelmente.`,
               { ...context, history: formattedHistory }
-            );
+            )) || "";
           }
         } else {
           // Normal conversation flow
