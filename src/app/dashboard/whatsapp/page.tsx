@@ -4,23 +4,57 @@ import React, { useState, useEffect } from 'react';
 import { whatsappService } from '@/services/whatsapp.service';
 import { supabase } from '@/lib/supabase';
 import { QRCodeSVG } from 'qrcode.react';
+import { useSession } from 'next-auth/react';
 
 export default function WhatsAppManager() {
+    const { data: session } = useSession();
     const [status, setStatus] = useState('disconnected');
     const [qrCode, setQrCode] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const connectWhatsApp = async () => {
+        if (!session?.user) {
+            setError('Você precisa estar logado para conectar o WhatsApp.');
+            return;
+        }
+
         setLoading(true);
+        setError(null);
         try {
-            // In a real app, we'd use the current tenant's ID as the instance name
-            const instanceName = 'tenant-123';
+            // 1. Get current tenant ID
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('tenant_id')
+                .eq('id', (session.user as any).id)
+                .single();
+
+            if (profileError || !profile) {
+                throw new Error('Não foi possível carregar seu perfil de negócio.');
+            }
+
+            const instanceName = `tenant-${profile.tenant_id}`;
+
+            // 2. Check if instance exists, create if not
+            const exists = await whatsappService.instanceExists(instanceName);
+            if (!exists) {
+                await whatsappService.createInstance(instanceName);
+                // Wait a moment for the instance to initialize
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+
+            // 3. Get QR Code
             const data = await whatsappService.getQrCode(instanceName);
             if (data.code) {
                 setQrCode(data.code);
+            } else if (data.instance?.state === 'open') {
+                setStatus('connected');
+            } else {
+                throw new Error('Não foi possível gerar o QR Code. Tente novamente.');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to connect:', error);
+            setError(error.message || 'Erro ao conectar ao WhatsApp. Verifique as configurações da API.');
         } finally {
             setLoading(false);
         }
@@ -39,6 +73,12 @@ export default function WhatsAppManager() {
                         <span className="font-medium text-gray-700 capitalize">{status === 'connected' ? 'Conectado' : 'Desconectado'}</span>
                     </div>
                 </div>
+
+                {error && (
+                    <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 rounded-xl text-red-500 text-sm">
+                        {error}
+                    </div>
+                )}
 
                 {status !== 'connected' && (
                     <div className="p-12 border-2 border-dashed border-gray-100 rounded-2xl text-center">

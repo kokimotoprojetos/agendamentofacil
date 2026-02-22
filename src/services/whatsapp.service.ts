@@ -9,6 +9,16 @@ const evolutionApi = axios.create({
 });
 
 export const whatsappService = {
+    instanceExists: async (instanceName: string) => {
+        try {
+            const response = await evolutionApi.get(`/instance/connectionState/${instanceName}`);
+            return response.status === 200;
+        } catch (error: any) {
+            if (error.response?.status === 404) return false;
+            throw error;
+        }
+    },
+
     createInstance: async (instanceName: string) => {
         try {
             const response = await evolutionApi.post('/instance/create', {
