@@ -6,13 +6,12 @@ import { whatsappService } from '@/services/whatsapp.service';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log('Received WhatsApp Webhook:', JSON.stringify(body, null, 2));
 
-    // 0. Diagnostic Logging
+    // 0. Diagnostic Logging — always log the hit
     await supabaseAdmin.from('agent_logs').insert({
       event_type: 'webhook_hit',
       description: `Webhook received: ${body.event || 'unknown event'}`,
-      metadata: body
+      metadata: { event: body.event, instance: body.instance }
     });
 
     // Handle MESSAGES_UPSERT event from Evolution API
@@ -20,91 +19,127 @@ export async function POST(req: Request) {
       body.event === 'MESSAGES_UPSERT' ||
       body.type === 'messages.upsert';
 
-    if (isUpsert) {
-      const { instance, data } = body;
-
-      // Evolution API v2 payload structure can vary
-      const messageObj = data.message || data;
-      const key = data.key || messageObj?.key;
-
-      // Basic validation: ignore if it's from the bot itself (sent by us)
-      if (key?.fromMe) {
-        return NextResponse.json({ status: 'ignored', reason: 'own_message' });
-      }
-
-      const customerPhone = key?.remoteJid;
-      const messageText = messageObj?.conversation ||
-        messageObj?.extendedTextMessage?.text ||
-        messageObj?.text ||
-        messageObj?.message?.conversation ||
-        "";
-
-      if (!messageText || !customerPhone) {
-        await supabaseAdmin.from('agent_logs').insert({
-          event_type: 'webhook_ignored',
-          description: `Payload inválido ou vazio de ${instance}`,
-          metadata: { body }
-        });
-        return NextResponse.json({ status: 'ignored', reason: 'invalid_payload' });
-      }
-
-      // 1. Resolve Tenant from Instance Name
-      const { data: connection, error: connError } = await supabaseAdmin
-        .from('whatsapp_connections')
-        .select('tenant_id')
-        .eq('instance_name', instance)
-        .single();
-
-      if (connError || !connection) {
-        console.error('Tenant not found for instance:', instance);
-        await supabaseAdmin.from('agent_logs').insert({
-          event_type: 'webhook_error',
-          description: `Tenant não encontrado para a instância: ${instance}`,
-          metadata: { instance, body }
-        });
-        return NextResponse.json({ status: 'error', message: 'Tenant not found' }, { status: 404 });
-      }
-
-      const tenantId = connection.tenant_id;
-
-      // 2. Fetch Tenant Context
-      const { data: tenant } = await supabaseAdmin
-        .from('tenants')
-        .select('*')
-        .eq('id', tenantId)
-        .single();
-
-      const { data: services } = await supabaseAdmin
-        .from('services')
-        .select('*')
-        .eq('tenant_id', tenantId);
-
-      const context = {
-        businessName: tenant?.business_name || "Nosso Salão",
-        personality: tenant?.settings?.personality || "Amigável e profissional",
-        workingHours: tenant?.settings?.workingHours || { start: "09:00", end: "18:00" },
-        services: services || [],
-        history: [] // History will be handled inside aiAgentService.processResponse
-      };
-
-      // 3. Process with AI
-      const aiResponse = await aiAgentService.processResponse(tenantId, customerPhone, messageText, context);
-
-      // 4. Send Response via WhatsApp (mocked or real call)
-      // Note: evolutionApi.post('/message/sendText/{{instance}}', ...)
-      await whatsappService.sendMessage(instance, customerPhone, aiResponse);
-
-      return NextResponse.json({ status: 'success' });
+    if (!isUpsert) {
+      return NextResponse.json({ status: 'received', reason: 'not_a_message_event' });
     }
 
-    return NextResponse.json({ status: 'received' });
-  } catch (error) {
-    console.error('Webhook Error:', error);
+    const { instance, data } = body;
+
+    // Evolution API v2: key and message are directly under data
+    const key = data?.key;
+
+    // Ignore messages sent by the bot itself
+    if (key?.fromMe) {
+      return NextResponse.json({ status: 'ignored', reason: 'own_message' });
+    }
+
+    const customerPhone = key?.remoteJid;
+    // In this Evolution API version, message text is under data.message.conversation
+    const messageText = data?.message?.conversation ||
+      data?.message?.extendedTextMessage?.text ||
+      data?.conversation ||
+      data?.text ||
+      "";
+
+    await supabaseAdmin.from('agent_logs').insert({
+      event_type: 'webhook_parsed',
+      description: `Mensagem recebida de ${customerPhone}: "${messageText.substring(0, 50)}"`,
+      metadata: { customerPhone, messageText, instance }
+    });
+
+    if (!messageText || !customerPhone) {
+      return NextResponse.json({ status: 'ignored', reason: 'invalid_payload' });
+    }
+
+    // 1. Resolve Tenant from Instance Name
+    const { data: connection, error: connError } = await supabaseAdmin
+      .from('whatsapp_connections')
+      .select('tenant_id')
+      .eq('instance_name', instance)
+      .single();
+
+    if (connError || !connection) {
+      await supabaseAdmin.from('agent_logs').insert({
+        event_type: 'webhook_error',
+        description: `Tenant não encontrado para a instância: ${instance}`,
+        metadata: { instance, connError }
+      });
+      return NextResponse.json({ status: 'error', message: 'Tenant not found' }, { status: 404 });
+    }
+
+    const tenantId = connection.tenant_id;
+
+    // 2. Fetch Tenant Context
+    const { data: tenant } = await supabaseAdmin
+      .from('tenants')
+      .select('*')
+      .eq('id', tenantId)
+      .single();
+
+    const { data: services } = await supabaseAdmin
+      .from('services')
+      .select('*')
+      .eq('tenant_id', tenantId);
+
+    const context = {
+      businessName: tenant?.business_name || "Nosso Salão",
+      personality: tenant?.settings?.personality || "Amigável e profissional",
+      workingHours: tenant?.settings?.workingHours || { start: "09:00", end: "18:00" },
+      services: services || [],
+      history: []
+    };
+
+    // 3. Process with AI
+    let aiResponse: string;
+    try {
+      aiResponse = await aiAgentService.processResponse(tenantId, customerPhone, messageText, context);
+      await supabaseAdmin.from('agent_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'ai_response_generated',
+        description: `Resposta IA gerada: "${aiResponse.substring(0, 100)}"`,
+        metadata: { customerPhone, aiResponse }
+      });
+    } catch (aiError: any) {
+      await supabaseAdmin.from('agent_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'ai_response_error',
+        description: `Falha ao gerar resposta da IA: ${aiError.message}`,
+        metadata: { error: aiError.message, customerPhone }
+      });
+      return NextResponse.json({ status: 'error', message: 'AI processing failed' }, { status: 500 });
+    }
+
+    // 4. Send Response via WhatsApp
+    try {
+      await whatsappService.sendMessage(instance, customerPhone, aiResponse);
+      await supabaseAdmin.from('agent_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'message_sent',
+        description: `Mensagem enviada para ${customerPhone}`,
+        metadata: { customerPhone, instance }
+      });
+    } catch (sendError: any) {
+      await supabaseAdmin.from('agent_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'message_send_error',
+        description: `Falha ao enviar mensagem para ${customerPhone}: ${sendError.message}`,
+        metadata: { error: sendError.message, customerPhone, instance }
+      });
+      return NextResponse.json({ status: 'error', message: 'Message send failed' }, { status: 500 });
+    }
+
+    return NextResponse.json({ status: 'success' });
+  } catch (error: any) {
+    console.error('Webhook Root Error:', error);
+    await supabaseAdmin.from('agent_logs').insert({
+      event_type: 'webhook_fatal_error',
+      description: `Erro fatal no webhook: ${error.message}`,
+      metadata: { error: error.message }
+    }).catch(() => { }); // Don't throw if logging fails
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-// Helper to handle GET requests for webhook validation if needed by some providers
 export async function GET() {
   return new NextResponse('Webhook Operational');
 }
