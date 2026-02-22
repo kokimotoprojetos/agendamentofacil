@@ -131,11 +131,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ status: 'success' });
   } catch (error: any) {
     console.error('Webhook Root Error:', error);
-    await supabaseAdmin.from('agent_logs').insert({
-      event_type: 'webhook_fatal_error',
-      description: `Erro fatal no webhook: ${error.message}`,
-      metadata: { error: error.message }
-    }).catch(() => { }); // Don't throw if logging fails
+    try {
+      await supabaseAdmin.from('agent_logs').insert({
+        event_type: 'webhook_fatal_error',
+        description: `Erro fatal no webhook: ${error.message}`,
+        metadata: { error: error.message }
+      });
+    } catch (_) { /* ignore logging errors */ }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
