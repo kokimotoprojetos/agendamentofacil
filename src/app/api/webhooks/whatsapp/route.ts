@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { aiAgentService } from '@/services/ai.service';
 import { whatsappService } from '@/services/whatsapp.service';
 
@@ -9,24 +9,26 @@ export async function POST(req: Request) {
     console.log('Received WhatsApp Webhook:', JSON.stringify(body, null, 2));
 
     // Handle MESSAGES_UPSERT event from Evolution API
-    if (body.event === 'messages.upsert') {
+    // Note: Evolution API v2 uses 'messages.upsert', some versions use 'MESSAGES_UPSERT'
+    if (body.event === 'messages.upsert' || body.event === 'MESSAGES_UPSERT') {
       const { instance, data } = body;
-      const message = data.message;
-      
+
       // Basic validation: ignore if it's from the bot itself (sent by us)
-      if (data.key.fromMe) {
+      if (data.key?.fromMe) {
         return NextResponse.json({ status: 'ignored', reason: 'own_message' });
       }
 
-      const customerPhone = data.key.remoteJid;
-      const messageText = message?.conversation || message?.extendedTextMessage?.text || "";
+      const customerPhone = data.key?.remoteJid;
+      const messageText = data.message?.conversation ||
+        data.message?.extendedTextMessage?.text ||
+        data.message?.text || "";
 
-      if (!messageText) {
-        return NextResponse.json({ status: 'ignored', reason: 'empty_message' });
+      if (!messageText || !customerPhone) {
+        return NextResponse.json({ status: 'ignored', reason: 'invalid_payload' });
       }
 
       // 1. Resolve Tenant from Instance Name
-      const { data: connection, error: connError } = await supabase
+      const { data: connection, error: connError } = await supabaseAdmin
         .from('whatsapp_connections')
         .select('tenant_id')
         .eq('instance_name', instance)
@@ -40,13 +42,13 @@ export async function POST(req: Request) {
       const tenantId = connection.tenant_id;
 
       // 2. Fetch Tenant Context
-      const { data: tenant } = await supabase
+      const { data: tenant } = await supabaseAdmin
         .from('tenants')
         .select('*')
         .eq('id', tenantId)
         .single();
 
-      const { data: services } = await supabase
+      const { data: services } = await supabaseAdmin
         .from('services')
         .select('*')
         .eq('tenant_id', tenantId);
