@@ -27,42 +27,42 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-            <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-xl border border-gray-100">
+        <div className="flex items-center justify-center min-h-screen bg-[#050505] px-4 font-sans">
+            <div className="w-full max-w-md p-8 space-y-8 bg-[#0f0f0f] rounded-2xl shadow-2xl border border-white/5">
                 <div className="text-center">
-                    <h1 className="text-3xl font-extrabold text-gray-900">Agendamento<span className="text-purple-600">IA</span></h1>
-                    <p className="mt-2 text-sm text-gray-600">Crie sua conta e comece a automatizar seus agendamentos</p>
+                    <h1 className="text-3xl font-extrabold text-white">Agendamento<span className="text-purple-500">IA</span></h1>
+                    <p className="mt-2 text-sm text-gray-400">Crie sua conta e comece a automatizar seus agendamentos</p>
                 </div>
 
                 <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Seu Nome</label>
+                        <label className="block text-sm font-medium text-gray-300">Seu Nome</label>
                         <input
                             {...register('name')}
                             type="text"
-                            className={`mt-1 block w-full px-4 py-3 bg-gray-50 border ${errors.name ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none`}
+                            className={`mt-1 block w-full px-4 py-3 bg-[#1a1a1a] border ${errors.name ? 'border-red-500' : 'border-white/10'} text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none placeholder:text-gray-600`}
                             placeholder="João Silva"
                         />
                         {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Nome do Negócio (ex: Barbearia do João)</label>
+                        <label className="block text-sm font-medium text-gray-300">Nome do Negócio</label>
                         <input
                             {...register('businessName')}
                             type="text"
-                            className={`mt-1 block w-full px-4 py-3 bg-gray-50 border ${errors.businessName ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none`}
+                            className={`mt-1 block w-full px-4 py-3 bg-[#1a1a1a] border ${errors.businessName ? 'border-red-500' : 'border-white/10'} text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none placeholder:text-gray-600`}
                             placeholder="Barbearia Imperial"
                         />
                         {errors.businessName && <p className="mt-1 text-xs text-red-500">{errors.businessName.message}</p>}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Email Profissional</label>
+                        <label className="block text-sm font-medium text-gray-300">Email Profissional</label>
                         <input
                             {...register('email')}
                             type="email"
-                            className={`mt-1 block w-full px-4 py-3 bg-gray-50 border ${errors.email ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none`}
+                            className={`mt-1 block w-full px-4 py-3 bg-[#1a1a1a] border ${errors.email ? 'border-red-500' : 'border-white/10'} text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none placeholder:text-gray-600`}
                             placeholder="contato@empresa.com"
                         />
                         {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
@@ -71,14 +71,14 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-200 transition-all transform hover:-translate-y-0.5 disabled:opacity-50"
+                        className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-900/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-50"
                     >
                         {isSubmitting ? 'Criando conta...' : 'Criar Conta Grátis'}
                     </button>
                 </form>
 
-                <p className="text-center text-sm text-gray-600">
-                    Já tem uma conta? <a href="/login" className="font-bold text-purple-600 hover:underline">Entre aqui</a>
+                <p className="text-center text-sm text-gray-400">
+                    Já tem uma conta? <a href="/login" className="font-bold text-purple-500 hover:underline">Entre aqui</a>
                 </p>
             </div>
         </div>

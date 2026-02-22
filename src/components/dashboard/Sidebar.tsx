@@ -11,9 +11,9 @@ const menuItems = [
 
 export const Sidebar = () => {
     return (
-        <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-100 flex flex-col">
-            <div className="p-6 border-b border-gray-100 flex items-center">
-                <span className="text-xl font-bold">Agendamento<span className="text-purple-600">IA</span></span>
+        <aside className="fixed left-0 top-0 h-screen w-64 bg-[#0a0a0a] border-r border-white/5 flex flex-col">
+            <div className="p-6 border-b border-white/5 flex items-center">
+                <span className="text-xl font-bold text-white">Agendamento<span className="text-purple-500">IA</span></span>
             </div>
             <nav className="flex-1 p-4">
                 <ul className="space-y-2">
@@ -21,7 +21,7 @@ export const Sidebar = () => {
                         <li key={index}>
                             <Link
                                 href={item.href}
-                                className="flex items-center p-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors group"
+                                className="flex items-center p-3 text-gray-400 hover:bg-purple-900/20 hover:text-purple-400 rounded-lg transition-colors group"
                             >
                                 <span className="mr-3 text-xl">{item.icon}</span>
                                 <span className="font-medium">{item.label}</span>
@@ -30,7 +30,7 @@ export const Sidebar = () => {
                     ))}
                 </ul>
             </nav>
-            <div className="p-4 border-t border-gray-100 italic text-xs text-gray-400">
+            <div className="p-4 border-t border-white/5 italic text-xs text-gray-600">
                 v1.0.0
             </div>
         </aside>
