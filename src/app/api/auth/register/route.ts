@@ -39,12 +39,30 @@ export async function POST(request: Request) {
         }
 
         // 3. Create Tenant
+        let slug = businessName.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+            .replace(/[^a-z0-9]/g, '-') // Replace non-alphanumeric with -
+            .replace(/-+/g, '-') // Replace multiple - with single -
+            .replace(/^-|-$/g, ''); // Remove leading/trailing -
+
+        // Check if slug already exists and add random suffix if it does
+        const { data: existingTenant } = await supabaseAdmin
+            .from('tenants')
+            .select('id')
+            .eq('slug', slug)
+            .single();
+
+        if (existingTenant) {
+            const randomSuffix = Math.random().toString(36).substring(2, 6);
+            slug = `${slug}-${randomSuffix}`;
+        }
+
         const { data: tenant, error: tenantError } = await supabaseAdmin
             .from('tenants')
             .insert({
                 business_name: businessName,
                 user_id: userId,
-                slug: businessName.toLowerCase().replace(/ /g, '-')
+                slug: slug
             })
             .select('id')
             .single();
