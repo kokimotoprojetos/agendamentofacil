@@ -65,7 +65,26 @@ export async function POST() {
 
         // Always Update/Sync Webhook to ensure reachable URL is correct
         console.log('WhatsApp Connection API: Synchronizing webhook configuration');
-        await whatsappService.setWebhook(instanceName);
+        try {
+            const webhookResult = await whatsappService.setWebhook(instanceName);
+            await supabaseAdmin.from('agent_logs').insert({
+                tenant_id: profile.tenant_id,
+                event_type: 'webhook_sync_success',
+                description: `Webhook sincronizado para ${instanceName} com URL: ${process.env.APP_URL}`,
+                metadata: { webhookResult, appUrl: process.env.APP_URL }
+            });
+        } catch (webhookError: any) {
+            console.error('Webhook sync failed:', webhookError);
+            await supabaseAdmin.from('agent_logs').insert({
+                tenant_id: profile.tenant_id,
+                event_type: 'webhook_sync_error',
+                description: `Falha ao sincronizar webhook para ${instanceName}: ${webhookError.message}`,
+                metadata: {
+                    error: webhookError.response?.data || webhookError.message,
+                    appUrl: process.env.APP_URL
+                }
+            });
+        }
 
         // 4.2 Persist connection in DB for webhook lookup
         console.log('WhatsApp Connection API: Persisting connection in DB');

@@ -48,18 +48,37 @@ export const whatsappService = {
     },
 
     setWebhook: async (instanceName: string) => {
+        const webhookUrl = `${process.env.APP_URL}/api/webhooks/whatsapp`;
         try {
             const payload = {
                 enabled: true,
-                url: `${process.env.APP_URL}/api/webhooks/whatsapp`,
+                url: webhookUrl,
                 webhook_by_events: false,
-                events: ['MESSAGES_UPSERT', 'QRCODE_UPDATED', 'CONNECTION_UPDATE']
+                events: [
+                    'MESSAGES_UPSERT',
+                    'MESSAGES_UPDATE',
+                    'MESSAGES_DELETE',
+                    'SEND_MESSAGE',
+                    'CONTACTS_UPSERT',
+                    'CONTACTS_UPDATE',
+                    'PRESENCE_UPDATE',
+                    'CHAT_STATE_UPDATE',
+                    'QRCODE_UPDATED',
+                    'CONNECTION_UPDATE',
+                    'INSTANCE_RELOADED'
+                ]
             };
-            console.log('Configuring Webhook for:', instanceName);
-            await evolutionApi.post(`/webhook/set/${instanceName}`, payload);
-        } catch (error) {
-            console.error('Error setting WhatsApp webhook:', error);
-            // Don't throw here as getting the QR code is more important than the webhook working initially
+
+            console.log('Finalizing Webhook for:', instanceName, 'at', webhookUrl);
+
+            // Try v1/universal endpoint
+            const response = await evolutionApi.post(`/webhook/set/${instanceName}`, payload);
+            console.log('Webhook sync response:', response.data);
+            return response.data;
+        } catch (error: any) {
+            console.error('Error setting WhatsApp webhook:', error.response?.data || error.message);
+            // Fallback or just log to agent_logs
+            throw error;
         }
     },
 
