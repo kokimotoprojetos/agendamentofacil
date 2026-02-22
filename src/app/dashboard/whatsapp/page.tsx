@@ -7,15 +7,30 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useSession } from 'next-auth/react';
 
 export default function WhatsAppManager() {
-    const { data: session } = useSession();
+    const { data: session, status: sessionStatus } = useSession();
     const [status, setStatus] = useState('disconnected');
     const [qrCode, setQrCode] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        console.log('WhatsApp Manager - Session Status:', sessionStatus);
+        console.log('WhatsApp Manager - Session Data:', session);
+    }, [session, sessionStatus]);
+
     const connectWhatsApp = async () => {
-        if (!session?.user) {
-            setError('Você precisa estar logado para conectar o WhatsApp.');
+        if (sessionStatus === 'loading') return;
+
+        console.log('Attempting to connect WhatsApp. Current session:', session);
+
+        if (!session || !session.user) {
+            setError('Não foi possível identificar seu usuário. Verifique se você está logado corretamente.');
+            return;
+        }
+
+        const userId = (session.user as any).id || (session.user as any).sub;
+        if (!userId) {
+            setError('ID do usuário não encontrado na sessão. Tente sair e entrar novamente.');
             return;
         }
 
@@ -26,7 +41,7 @@ export default function WhatsAppManager() {
             const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('tenant_id')
-                .eq('id', (session.user as any).id)
+                .eq('id', userId)
                 .single();
 
             if (profileError || !profile) {
@@ -104,10 +119,10 @@ export default function WhatsAppManager() {
                                 <p className="text-gray-500 mb-6">Configure seu WhatsApp em instantes para começar a atender seus clientes.</p>
                                 <button
                                     onClick={connectWhatsApp}
-                                    disabled={loading}
+                                    disabled={loading || sessionStatus === 'loading'}
                                     className="w-full py-4 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all disabled:opacity-50"
                                 >
-                                    {loading ? 'Gerando QR Code...' : 'Gerar QR Code'}
+                                    {sessionStatus === 'loading' ? 'Verificando acesso...' : loading ? 'Gerando QR Code...' : 'Gerar QR Code'}
                                 </button>
                             </div>
                         )}
