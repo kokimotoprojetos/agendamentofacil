@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: 'error', message: 'Tenant not found' }, { status: 404 });
     }
 
-    const tenantId = connection.tenant_id;
+    const tenantId = String(connection.tenant_id);
 
     // 2. Fetch Tenant Context
     const { data: tenant } = await supabaseAdmin
