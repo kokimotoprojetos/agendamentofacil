@@ -107,13 +107,10 @@ export const whatsappService = {
             const number = remoteJid.replace('@s.whatsapp.net', '').replace('@g.us', '');
             const response = await evolutionApi.post(`/message/sendText/${instanceName}`, {
                 number,
-                options: {
-                    delay: 1200,
-                    presence: "composing"
-                },
-                textMessage: {
-                    text
-                }
+                text,
+                linkPreview: false,
+                delay: 1200,
+                presence: "composing"
             });
             return response.data;
         } catch (error: any) {

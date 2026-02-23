@@ -119,13 +119,23 @@ export async function POST(req: Request) {
         metadata: { customerPhone, instance }
       });
     } catch (sendError: any) {
+      const errorDetails = sendError.response?.data || sendError.message;
+      const statusCode = sendError.response?.status || 500;
+
       await supabaseAdmin.from('agent_logs').insert({
         tenant_id: tenantId,
         event_type: 'message_send_error',
         description: `Falha ao enviar mensagem para ${customerPhone}: ${sendError.message}`,
-        metadata: { error: sendError.message, customerPhone, instance }
+        metadata: {
+          error: sendError.message,
+          errorBody: errorDetails,
+          statusCode: statusCode,
+          customerPhone,
+          instance,
+          payload: { number: customerPhone.replace('@s.whatsapp.net', '').replace('@g.us', ''), text: aiResponse.substring(0, 100) }
+        }
       });
-      return NextResponse.json({ status: 'error', message: 'Message send failed' }, { status: 500 });
+      return NextResponse.json({ status: 'error', message: 'Message send failed', details: errorDetails }, { status: 500 });
     }
 
     return NextResponse.json({ status: 'success' });
