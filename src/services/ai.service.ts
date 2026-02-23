@@ -16,7 +16,8 @@ export const aiAgentService = {
       INFORMAÇÕES REAIS DO NEGÓCIO:
       - Localização Exata: ${context.location}
       - Horário de Atendimento: ${context.workingHours.start} até ${context.workingHours.end}
-      - Catálogo de Serviços e Preços: ${context.services.length > 0 ? JSON.stringify(context.services.map((s: any) => ({ serviço: s.name, preço: `R$ ${s.price}`, duração: `${s.duration} min` }))) : "Nenhum serviço cadastrado no momento."}
+      - Catálogo de Serviços e Preços:
+        ${context.services.length > 0 ? context.services.map((s: any) => `- ${s.name}: R$ ${s.price} (${s.duration} min)`).join('\n        ') : "Nenhum serviço cadastrado no momento."}
       
       DIRETRIZES DE RESPOSTA:
       1. Use a personalidade: ${context.personality}.
