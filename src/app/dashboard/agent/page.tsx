@@ -54,90 +54,125 @@ export default function AgentConfig() {
     };
 
     if (loading) return (
-        <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+        <div className="flex justify-center py-40">
+            <div className="relative w-12 h-12">
+                <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20"></div>
+                <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 animate-spin"></div>
+            </div>
         </div>
     );
 
     return (
-        <div className="max-w-4xl mx-auto pb-20 animate-fade-up">
-            <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="max-w-5xl mx-auto pb-32 animate-fade-up">
+            <header className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">Configuração do Agente IA</h1>
-                    <p className="text-slate-400 mt-1">Personalize como sua IA atende seus clientes.</p>
+                    <h1 className="text-4xl font-black text-white tracking-tighter mb-2">Engenharia do Agente</h1>
+                    <p className="text-slate-500 font-medium">Configure a inteligência cognitiva e as diretrizes operacionais do seu assistente.</p>
                 </div>
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 transition-all disabled:opacity-50"
+                    className="group relative px-10 py-4 bg-white text-[#020617] font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] transition-all active:scale-95 disabled:opacity-50 overflow-hidden"
                 >
-                    {saving ? 'Salvando...' : 'Salvar Alterações'}
+                    <span className="relative z-10">{saving ? 'Processando...' : 'Salvar Protocolos'}</span>
+                    <div className="absolute inset-0 bg-indigo-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-10" />
                 </button>
-            </div>
+            </header>
 
-            <div className="grid grid-cols-1 gap-8">
-                <div className="glass p-10 rounded-[2.5rem] border-white/5 shadow-2xl">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="w-10 h-10 bg-indigo-600/10 rounded-xl flex items-center justify-center text-xl">📖</div>
-                        <h3 className="text-xl font-bold text-white tracking-tight">Conhecimento e Personalidade</h3>
-                    </div>
-
-                    <div className="space-y-8">
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Comportamento do Agente</label>
-                            <textarea
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:outline-none focus:border-indigo-500 focus:bg-white/10 h-40 transition-all placeholder:text-slate-600 leading-relaxed shadow-inner"
-                                placeholder="Descreva como o agente deve conversar... Ex: Seja amigável, use emojis e sempre tente marcar um horário."
-                                value={config.personality}
-                                onChange={(e) => setConfig({ ...config, personality: e.target.value })}
-                            ></textarea>
-                            <p className="text-[10px] text-slate-500 mt-3 font-medium uppercase tracking-tight italic">O agente usará isso como base para todas as respostas.</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <div className="lg:col-span-2 space-y-10">
+                    <section className="glass p-12 rounded-[3.5rem] border-white/5 relative overflow-hidden premium-glow">
+                        <div className="flex items-center gap-5 mb-12">
+                            <div className="w-14 h-14 bg-indigo-600/10 rounded-2xl flex items-center justify-center text-2xl border border-indigo-500/20 text-indigo-400">
+                                🧠
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-black text-white tracking-tight">Núcleo de Personalidade</h3>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Definição de Comportamento</p>
+                            </div>
                         </div>
 
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">📍 Localização / Endereço</label>
-                            <input
-                                type="text"
-                                placeholder="Rua Exemplo, 123 - Centro"
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:outline-none focus:border-indigo-500 focus:bg-white/10 transition-all shadow-inner"
-                                value={config.location}
-                                onChange={(e) => setConfig({ ...config, location: e.target.value })}
-                            />
+                        <div className="space-y-10">
+                            <div>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Instruções de Resposta</label>
+                                <textarea
+                                    className="w-full px-8 py-6 bg-white/[0.02] border border-white/5 text-white rounded-3xl focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] h-56 transition-all placeholder:text-slate-700 leading-relaxed tabular-nums shadow-inner scrollbar-hide"
+                                    placeholder="Ex: Você é um assistente executivo bilíngue, use um tom profissional, emojis discretos e priorize a conversão de agendamentos."
+                                    value={config.personality}
+                                    onChange={(e) => setConfig({ ...config, personality: e.target.value })}
+                                ></textarea>
+                                <div className="mt-4 flex items-center gap-3">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
+                                    <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest leading-loose">A IA interpretará estas diretrizes para cada interação via WhatsApp.</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-10 pt-4">
+                                <div className="group">
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">📍 Endereço Geográfico</label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Avenida Paulista, 1000 - Bela Vista, SP"
+                                            className="w-full px-8 py-5 bg-white/[0.02] border border-white/5 text-white rounded-2xl focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all shadow-inner group-hover:border-white/10"
+                                            value={config.location}
+                                            onChange={(e) => setConfig({ ...config, location: e.target.value })}
+                                        />
+                                        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
 
-                <div className="glass p-10 rounded-[2.5rem] border-white/5 shadow-2xl">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="w-10 h-10 bg-indigo-600/10 rounded-xl flex items-center justify-center text-xl">⏰</div>
-                        <h3 className="text-xl font-bold text-white tracking-tight">Horário de Funcionamento</h3>
-                    </div>
+                <aside className="space-y-10">
+                    <section className="glass p-10 rounded-[3rem] border-white/5 premium-glow">
+                        <div className="flex items-center gap-4 mb-10">
+                            <div className="w-12 h-12 bg-indigo-600/10 rounded-xl flex items-center justify-center text-xl border border-indigo-500/20 text-indigo-400">
+                                ⏱️
+                            </div>
+                            <h3 className="text-xl font-black text-white tracking-tight">Cronograma</h3>
+                        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Início das Atividades</label>
-                            <input
-                                type="time"
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:outline-none focus:border-indigo-500 focus:bg-white/10 transition-all shadow-inner"
-                                value={config.workingHours.start}
-                                onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, start: e.target.value } })}
-                            />
+                        <div className="space-y-8">
+                            <div>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Início do Turno</label>
+                                <input
+                                    type="time"
+                                    className="w-full px-8 py-5 bg-white/[0.02] border border-white/5 text-white rounded-2xl focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all shadow-inner"
+                                    value={config.workingHours.start}
+                                    onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, start: e.target.value } })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Fechamento</label>
+                                <input
+                                    type="time"
+                                    className="w-full px-8 py-5 bg-white/[0.02] border border-white/5 text-white rounded-2xl focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all shadow-inner"
+                                    value={config.workingHours.end}
+                                    onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, end: e.target.value } })}
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Encerramento</label>
-                            <input
-                                type="time"
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:outline-none focus:border-indigo-500 focus:bg-white/10 transition-all shadow-inner"
-                                value={config.workingHours.end}
-                                onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, end: e.target.value } })}
-                            />
+
+                        <div className="mt-10 p-6 bg-indigo-500/5 rounded-3xl border border-indigo-500/10">
+                            <p className="text-[10px] text-indigo-300 font-bold leading-relaxed">A IA filtrará solicitações fora deste intervalo para garantir a precisão operacional.</p>
                         </div>
-                    </div>
-                    <div className="mt-8 flex items-center gap-2 p-4 bg-indigo-600/5 rounded-2xl border border-indigo-500/10">
-                        <span className="text-xl">ℹ️</span>
-                        <p className="text-xs text-indigo-300 font-medium">A IA bloqueará automaticamente qualquer tentativa de agendamento fora destes horários.</p>
-                    </div>
-                </div>
+                    </section>
+
+                    <section className="p-8 rounded-[2.5rem] bg-indigo-600/10 border border-indigo-500/20 relative overflow-hidden group hover:bg-indigo-600/20 transition-all duration-500 cursor-help">
+                        <div className="relative z-10 flex gap-4">
+                            <div className="text-2xl">💡</div>
+                            <div>
+                                <p className="text-xs font-black text-white uppercase tracking-tight mb-1">Dica de Especialista</p>
+                                <p className="text-[10px] text-indigo-300 font-medium leading-relaxed italic">Quanto mais detalhada for a personalidade, menos halucinações o agente terá.</p>
+                            </div>
+                        </div>
+                    </section>
+                </aside>
             </div>
         </div>
     );
