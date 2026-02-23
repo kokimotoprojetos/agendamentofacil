@@ -87,22 +87,14 @@ export default function WhatsAppManager() {
     };
 
     useEffect(() => {
-        // Initial check
         checkStatus();
-
-        // Poll every 5 seconds if not connected
         const interval = setInterval(() => {
             if (status !== 'connected') {
                 checkStatus();
             }
         }, 5000);
-
         return () => clearInterval(interval);
     }, [status]);
-
-    useEffect(() => {
-        console.log('WhatsApp Manager - Session Status:', sessionStatus);
-    }, [sessionStatus]);
 
     const disconnectWhatsApp = async () => {
         if (!confirm('Tem certeza que deseja desconectar o WhatsApp? Isso interromperá o atendimento automático.')) return;
@@ -129,99 +121,108 @@ export default function WhatsAppManager() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-8">
+        <div className="max-w-4xl mx-auto animate-fade-up">
+            <div className="glass p-10 rounded-[2.5rem] border-white/5 shadow-2xl">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                     <div>
-                        <h1 className="text-2xl font-bold">Conectar WhatsApp</h1>
-                        <p className="text-gray-600">Conecte seu número para começar a automatizar os agendamentos.</p>
+                        <h1 className="text-3xl font-bold text-white tracking-tight">Conexão WhatsApp</h1>
+                        <p className="text-slate-400 mt-2">Conecte seu número para ativar o agente automático.</p>
                     </div>
-                    <div className="flex flex-col items-end">
-                        <div className="flex items-center mb-2">
-                            <span className={`w-3 h-3 rounded-full mr-2 ${status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                            <span className="font-medium text-gray-700 capitalize">{status === 'connected' ? 'Conectado' : 'Desconectado'}</span>
+                    <div className="flex flex-col items-end gap-3">
+                        <div className={`flex items-center px-4 py-2 rounded-2xl border ${status === 'connected' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
+                            <span className={`relative flex h-2 w-2 mr-3`}>
+                                <span className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${status === 'connected' ? 'animate-ping bg-emerald-400' : 'bg-rose-400'}`}></span>
+                                <span className={`relative inline-flex rounded-full h-2 w-2 ${status === 'connected' ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                            </span>
+                            <span className="text-xs font-bold uppercase tracking-widest">{status === 'connected' ? 'Ativo' : 'Desconectado'}</span>
                         </div>
+
                         {status === 'connected' && (
-                            <button
-                                onClick={disconnectWhatsApp}
-                                disabled={loading}
-                                className="text-xs text-red-500 hover:text-red-700 font-medium underline disabled:opacity-50"
-                            >
-                                {loading ? 'Desconectando...' : 'Desconectar conta'}
-                            </button>
-                        )}
-                        {status === 'connected' && (
-                            <button
-                                onClick={syncSettings}
-                                disabled={syncing}
-                                className={`mt-2 text-[10px] px-2 py-1 rounded border transition-colors ${syncSuccess ? 'bg-green-50 border-green-200 text-green-600' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}
-                            >
-                                {syncing ? 'Sincronizando...' : syncSuccess ? '✓ Sincronizado' : '⚙ Sincronizar Webhook'}
-                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={syncSettings}
+                                    disabled={syncing}
+                                    className="text-[10px] font-bold text-slate-500 hover:text-indigo-400 uppercase tracking-widest transition-colors"
+                                >
+                                    {syncing ? 'Sincronizando...' : syncSuccess ? '✓ Webhook OK' : '⚙ Sincronizar Webhook'}
+                                </button>
+                                <button
+                                    onClick={disconnectWhatsApp}
+                                    disabled={loading}
+                                    className="text-[10px] font-bold text-rose-500/50 hover:text-rose-500 uppercase tracking-widest transition-colors"
+                                >
+                                    {loading ? '...' : 'Desconectar'}
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
 
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl mb-8">
-                        <p className="text-red-400 font-medium mb-2">{error}</p>
-                        <p className="text-red-400/60 text-sm mb-4">
-                            Por favor, verifique se as configurações da Evolution API estão corretas.
+                    <div className="bg-rose-500/5 border border-rose-500/10 p-8 rounded-[2rem] mb-10 group">
+                        <div className="flex items-center gap-3 mb-4">
+                            <span className="text-xl">⚠️</span>
+                            <h4 className="font-bold text-rose-400">Erro de Conexão</h4>
+                        </div>
+                        <p className="text-rose-400/80 text-sm leading-relaxed mb-6">
+                            {error}
                         </p>
-                        <div className="mt-4 p-3 bg-black/5 rounded-lg border border-red-500/10">
-                            <p className="text-[10px] uppercase tracking-widest text-red-400/40 font-bold mb-1">Detalhes Técnicos</p>
-                            <code className="text-xs text-red-400/80 break-all font-mono">
-                                {error.includes('{') ? error : `Error 400: ${error}`}
-                            </code>
+                        <div className="p-4 bg-black/20 rounded-2xl border border-rose-500/5">
+                            <p className="text-[10px] uppercase tracking-[.2em] text-rose-400/40 font-bold mb-2">Logs do Sistema</p>
+                            <code className="text-xs text-rose-400/60 font-mono break-all">{error}</code>
                         </div>
                     </div>
                 )}
 
                 {status !== 'connected' && (
-                    <div className="p-12 border-2 border-dashed border-gray-100 rounded-2xl text-center">
+                    <div className="p-16 border-2 border-dashed border-white/5 rounded-[2.5rem] bg-white/5 text-center flex flex-col items-center">
                         {qrCode ? (
-                            <div className="flex flex-col items-center">
-                                <p className="mb-6 font-medium text-gray-900">Escaneie o QR Code abaixo com seu WhatsApp:</p>
-                                <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
-                                    <QRCodeSVG value={qrCode} size={256} />
+                            <div className="animate-in fade-in zoom-in-95 duration-500 flex flex-col items-center">
+                                <p className="mb-8 text-slate-300 font-medium">Aponte a câmera do WhatsApp para o código:</p>
+                                <div className="p-8 bg-white rounded-[2rem] shadow-[0_0_50px_rgba(255,255,255,0.1)]">
+                                    <QRCodeSVG value={qrCode} size={220} />
                                 </div>
                                 <button
                                     onClick={() => setQrCode(null)}
-                                    className="mt-6 text-sm text-gray-500 hover:text-purple-600"
+                                    className="mt-8 text-xs font-bold text-slate-500 hover:text-white uppercase tracking-widest transition-colors"
                                 >
-                                    Cancelar
+                                    Gerar Novo Código
                                 </button>
                             </div>
                         ) : (
-                            <div className="max-w-xs mx-auto">
-                                <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">
+                            <div className="max-w-sm flex flex-col items-center">
+                                <div className="w-24 h-24 bg-indigo-600/10 rounded-[2rem] border border-indigo-500/20 flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform">
                                     📱
                                 </div>
-                                <h3 className="text-lg font-bold mb-2">Conectar novo número</h3>
-                                <p className="text-gray-500 mb-6">Configure seu WhatsApp em instantes para começar a atender seus clientes.</p>
+                                <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">Vincular Celular</h3>
+                                <p className="text-slate-500 mb-8 text-sm leading-relaxed">Conecte seu número para que a Beautfy.ai possa atender seus clientes 24h por dia.</p>
                                 <button
                                     onClick={connectWhatsApp}
                                     disabled={loading || sessionStatus === 'loading'}
-                                    className="w-full py-4 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all disabled:opacity-50"
+                                    className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500 shadow-xl shadow-indigo-500/20 transition-all disabled:opacity-50 tracking-tight"
                                 >
-                                    {sessionStatus === 'loading' ? 'Verificando acesso...' : loading ? 'Gerando QR Code...' : 'Gerar QR Code'}
+                                    {loading ? 'Iniciando Conexão...' : 'Conectar Agora'}
                                 </button>
                             </div>
                         )}
                     </div>
                 )}
 
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-6 bg-gray-50 rounded-xl">
-                        <h4 className="font-bold mb-2">💡 Dica</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                            Mantenha seu celular conectado à internet para garantir que o robô responda seus clientes instantaneamente.
+                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="p-8 bg-white/5 rounded-3xl border border-white/5">
+                        <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                            <span className="text-indigo-400">💡</span> Dica
+                        </h4>
+                        <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                            Para melhores resultados, utilize um número exclusivo para o atendimento do seu salão e mantenha o aparelho carregado.
                         </p>
                     </div>
-                    <div className="p-6 bg-gray-50 rounded-xl">
-                        <h4 className="font-bold mb-2">🔒 Segurança</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                            Não salvamos suas mensagens. A integração é feita via API oficial e segue todos os protocolos de segurança.
+                    <div className="p-8 bg-white/5 rounded-3xl border border-white/5">
+                        <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                            <span className="text-indigo-400">🔒</span> Segurança
+                        </h4>
+                        <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                            Suas mensagens são processadas em tempo real e não são armazenadas permanentemente em nossos servidores.
                         </p>
                     </div>
                 </div>

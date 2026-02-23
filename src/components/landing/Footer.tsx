@@ -2,49 +2,43 @@ import React from 'react';
 
 export const Footer = () => {
     return (
-        <footer className="py-12 bg-[#050505] border-t border-white/5">
+        <footer className="py-20 border-t border-white/5 bg-slate-950/30">
             <div className="container px-4 mx-auto">
                 <div className="flex flex-wrap -mx-4">
-                    <div className="w-full px-4 mb-8 lg:w-1/3 lg:mb-0">
-                        <a href="#" className="inline-block mb-6 text-2xl font-bold text-white">
-                            Agendamento<span className="text-purple-500">IA</span>
-                        </a>
-                        <p className="max-w-xs text-gray-400">
-                            Transformando o atendimento de pequenos negócios através de Inteligência Artificial no WhatsApp.
+                    <div className="w-full px-4 mb-12 lg:w-1/2 lg:mb-0">
+                        <div className="flex items-center gap-2 mb-6">
+                            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">
+                                B
+                            </div>
+                            <span className="text-xl font-bold text-white">
+                                Beautfy<span className="text-indigo-500">.ai</span>
+                            </span>
+                        </div>
+                        <p className="max-w-sm text-slate-400 leading-relaxed">
+                            A tecnologia de inteligência artificial que humaniza o atendimento do seu salão e escala seu faturamento no piloto automático.
                         </p>
                     </div>
-                    <div className="w-full px-4 mb-8 md:w-1/2 lg:w-1/6 lg:mb-0">
-                        <h4 className="mb-6 font-bold text-white uppercase tracking-widest text-xs">Produto</h4>
-                        <ul className="space-y-4 text-gray-500">
-                            <li><a href="#features" className="hover:text-purple-500 transition-colors">Funcionalidades</a></li>
-                            <li><a href="#pricing" className="hover:text-purple-500 transition-colors">Preços</a></li>
-                            <li><a href="#" className="hover:text-purple-500 transition-colors">Demonstração</a></li>
+                    <div className="w-full px-4 mb-12 lg:w-1/4 lg:mb-0">
+                        <h4 className="mb-6 text-sm font-bold text-white tracking-widest uppercase">Produto</h4>
+                        <ul className="text-slate-400 space-y-4">
+                            <li><a href="#features" className="hover:text-indigo-400 transition-colors">Funcionalidades</a></li>
+                            <li><a href="#pricing" className="hover:text-indigo-400 transition-colors">Preços</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Demonstração</a></li>
                         </ul>
                     </div>
-                    <div className="w-full px-4 mb-8 md:w-1/2 lg:w-1/6 lg:mb-0">
-                        <h4 className="mb-6 font-bold text-white uppercase tracking-widest text-xs">Empresa</h4>
-                        <ul className="space-y-4 text-gray-500">
-                            <li><a href="#" className="hover:text-purple-500 transition-colors">Sobre</a></li>
-                            <li><a href="#" className="hover:text-purple-500 transition-colors">Contato</a></li>
-                            <li><a href="#" className="hover:text-purple-500 transition-colors">Blog</a></li>
+                    <div className="w-full px-4 lg:w-1/4">
+                        <h4 className="mb-6 text-sm font-bold text-white tracking-widest uppercase">Legal</h4>
+                        <ul className="text-slate-400 space-y-4">
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Privacidade</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Termos de Uso</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">LGPD</a></li>
                         </ul>
-                    </div>
-                    <div className="w-full px-4 lg:w-1/3">
-                        <h4 className="mb-6 font-bold text-white uppercase tracking-widest text-xs">Newsletter</h4>
-                        <div className="flex flex-wrap items-center">
-                            <input
-                                type="email"
-                                placeholder="Seu melhor e-mail"
-                                className="w-full px-4 py-3 mb-4 mr-4 text-white bg-[#0f0f0f] border border-white/10 rounded-lg lg:w-auto lg:mb-0 focus:outline-none focus:border-purple-600 transition-colors"
-                            />
-                            <button className="px-6 py-3 font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 shadow-lg shadow-purple-900/20 transition-all">
-                                Assinar
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <div className="pt-12 mt-12 border-t border-white/5 text-center">
-                    <p className="text-gray-600">&copy; 2024 AgendamentoIA. Todos os direitos reservados.</p>
+                    <p className="text-sm text-slate-500">
+                        © {new Date().getFullYear()} Beautfy.ai. Todos os direitos reservados.
+                    </p>
                 </div>
             </div>
         </footer>
