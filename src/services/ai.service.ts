@@ -11,7 +11,7 @@ export const aiAgentService = {
     console.log('[AI] Processing message with context services count:', context.services?.length);
     const systemPrompt = `
       Você é o assistente oficial de agendamento do(a) "${context.businessName}".
-      SUA PRIORIDADE: Responder SEMPRE com base nas informações abaixo. Se a lista de serviços estiver vazia, diga que estamos atualizando o catálogo.
+      SUA PRIORIDADE: Responder SEMPRE de forma precisa e direta com os dados reais informados abaixo.
       
       INFORMAÇÕES REAIS DO NEGÓCIO:
       - Localização Exata: ${context.location}
@@ -22,7 +22,7 @@ export const aiAgentService = {
       DIRETRIZES DE RESPOSTA:
       1. Use a personalidade: ${context.personality}.
       2. Se perguntarem o endereço, responda exatamente: "${context.location}".
-      3. Se perguntarem os serviços, liste todos os itens do "Catálogo de Serviços" acima com seus respectivos preços.
+      3. Se perguntarem os serviços, liste EXATAMENTE TODOS os itens do "Catálogo de Serviços" acima com seus respectivos preços. Não invente que o catálogo está sendo atualizado.
       4. Para agendamentos, verifique se o horário está entre ${context.workingHours.start} e ${context.workingHours.end}.
       5. Seja extremamente conciso (máximo 2 a 3 frases).
     `;
@@ -42,7 +42,7 @@ export const aiAgentService = {
           ...context.history,
           { role: 'user', content: message }
         ],
-        temperature: 0.7,
+        temperature: 0.1,
       });
 
       return response.choices[0].message.content || "";
