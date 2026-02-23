@@ -52,23 +52,10 @@ export default function ChatsPage() {
 
     const fetchConversations = async () => {
         try {
-            // 1. Get user profile and tenant
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('tenant_id')
-                .eq('id', (session?.user as any).id)
-                .single();
+            const response = await fetch('/api/conversations');
+            if (!response.ok) throw new Error('Falha ao buscar conversas');
+            const convs = await response.json();
 
-            if (!profile) return;
-
-            // 2. Get conversations
-            const { data: convs, error } = await supabase
-                .from('conversations')
-                .select('*')
-                .eq('tenant_id', profile.tenant_id)
-                .order('last_message_at', { ascending: false });
-
-            if (error) throw error;
             setConversations(convs || []);
             if (convs && convs.length > 0 && !selectedId) {
                 setSelectedId(convs[0].id);
@@ -83,13 +70,9 @@ export default function ChatsPage() {
     const fetchMessages = async (convId: string) => {
         setLoadingMessages(true);
         try {
-            const { data: msgs, error } = await supabase
-                .from('messages')
-                .select('*')
-                .eq('conversation_id', convId)
-                .order('created_at', { ascending: true });
-
-            if (error) throw error;
+            const response = await fetch(`/api/conversations/${convId}/messages`);
+            if (!response.ok) throw new Error('Falha ao buscar mensagens');
+            const msgs = await response.json();
             setMessages(msgs || []);
         } catch (error) {
             console.error('Error fetching messages:', error);
@@ -97,6 +80,15 @@ export default function ChatsPage() {
             setLoadingMessages(false);
         }
     };
+
+    // Auto-refresh every 10 seconds for "near real-time" feel without RLS issues
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchConversations();
+            if (selectedId) fetchMessages(selectedId);
+        }, 10000);
+        return () => clearInterval(interval);
+    }, [selectedId]);
 
     if (loading) {
         return (
@@ -182,8 +174,8 @@ export default function ChatsPage() {
                                     >
                                         <div
                                             className={`max-w-[70%] p-3 rounded-2xl text-sm shadow-xl ${msg.direction === 'outbound'
-                                                    ? 'bg-purple-600 text-white rounded-tr-none'
-                                                    : 'bg-[#1a1a1a] text-gray-200 border border-white/5 rounded-tl-none'
+                                                ? 'bg-purple-600 text-white rounded-tr-none'
+                                                : 'bg-[#1a1a1a] text-gray-200 border border-white/5 rounded-tl-none'
                                                 }`}
                                         >
                                             <p className="leading-relaxed">{msg.content}</p>
