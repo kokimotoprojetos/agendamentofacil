@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { supabase } from '@/lib/supabase';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Search, MoreVertical, Smartphone, User } from 'lucide-react';
 
 interface Message {
     id: string;
@@ -92,10 +93,7 @@ export default function ChatsPage() {
     if (loading) {
         return (
             <div className="flex h-[calc(100vh-140px)] items-center justify-center">
-                <div className="relative w-12 h-12">
-                    <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20"></div>
-                    <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 animate-spin"></div>
-                </div>
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -103,40 +101,46 @@ export default function ChatsPage() {
     const selectedConv = conversations.find(c => c.id === selectedId);
 
     return (
-        <div className="flex h-[calc(100vh-140px)] gap-8 animate-fade-up">
+        <div className="flex h-[calc(100vh-140px)] gap-4 animate-fade-up">
             {/* Sidebar de Conversas */}
-            <div className="w-[380px] glass rounded-[3rem] border-white/5 flex flex-col overflow-hidden premium-glow bg-[#0a0a0a]/40">
-                <header className="px-10 py-8 border-b border-white/5">
-                    <h2 className="text-2xl font-black text-white tracking-tighter">Fluxo de Diálogo</h2>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-1">Interações em Tempo Real</p>
+            <div className="w-80 glass rounded-2xl border-white/5 flex flex-col overflow-hidden">
+                <header className="p-4 border-b border-white/5">
+                    <h2 className="text-xl font-bold text-white mb-4">Conversas</h2>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Buscar contato..."
+                            className="w-full bg-white/5 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-primary/50 transition-all"
+                        />
+                    </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto px-6 py-8 space-y-4 scrollbar-hide">
+                <div className="flex-1 overflow-y-auto p-2 space-y-1">
                     {conversations.length === 0 ? (
-                        <div className="py-20 text-center">
-                            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 opacity-20">🔇</div>
-                            <p className="text-xs font-bold text-slate-600 uppercase tracking-widest">Nenhuma Atividade</p>
+                        <div className="py-12 text-center text-slate-500 px-4">
+                            <p className="text-sm font-medium">Nenhuma conversa encontrada</p>
                         </div>
                     ) : (
                         conversations.map((conv) => (
                             <button
                                 key={conv.id}
                                 onClick={() => setSelectedId(conv.id)}
-                                className={`w-full p-6 flex items-center gap-5 rounded-[2rem] transition-all group relative overflow-hidden ${selectedId === conv.id ? 'bg-indigo-600/10 border border-indigo-500/20 shadow-inner' : 'hover:bg-white/5 border border-transparent'}`}
+                                className={`w-full p-3 flex items-center gap-3 rounded-xl transition-all ${selectedId === conv.id ? 'bg-primary/10 border border-primary/20' : 'hover:bg-white/5 border border-transparent'}`}
                             >
-                                <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center font-black text-xs shrink-0 transition-all duration-500 ${selectedId === conv.id ? 'bg-indigo-600 text-white border-indigo-400 scale-105 shadow-xl shadow-indigo-600/20' : 'bg-white/5 text-slate-500 border-white/10 group-hover:border-indigo-500/30 group-hover:text-indigo-400'}`}>
+                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${selectedId === conv.id ? 'bg-primary text-white' : 'bg-white/5 text-slate-400'}`}>
                                     {conv.customer_phone.substring(0, 2)}
                                 </div>
                                 <div className="flex-1 min-w-0 text-left">
-                                    <div className="flex justify-between items-center mb-1">
-                                        <p className={`font-black tracking-tight truncate text-base transition-colors ${selectedId === conv.id ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`}>
+                                    <div className="flex justify-between items-center mb-0.5">
+                                        <p className={`font-semibold truncate text-sm ${selectedId === conv.id ? 'text-white' : 'text-slate-300'}`}>
                                             {conv.customer_phone}
                                         </p>
-                                        <span className="text-[9px] text-slate-600 font-black uppercase tabular-nums">
-                                            {conv.last_message_at ? format(new Date(conv.last_message_at), 'HH:mm', { locale: ptBR }) : ''}
+                                        <span className="text-[10px] text-slate-500 font-medium">
+                                            {conv.last_message_at ? format(new Date(conv.last_message_at), 'HH:mm') : ''}
                                         </span>
                                     </div>
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate">Visualizar Histórico</p>
+                                    <p className="text-[11px] text-slate-500 truncate">Atividade recente</p>
                                 </div>
                             </button>
                         ))
@@ -145,68 +149,55 @@ export default function ChatsPage() {
             </div>
 
             {/* Janela de Chat */}
-            <div className="flex-1 glass rounded-[3rem] border-white/5 flex flex-col overflow-hidden premium-glow relative bg-[#0a0a0a]/20">
+            <div className="flex-1 glass rounded-2xl border-white/5 flex flex-col overflow-hidden">
                 {!selectedId ? (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center p-12">
-                        <div className="w-32 h-32 bg-indigo-600/5 rounded-[2.5rem] flex items-center justify-center text-5xl mb-10 border border-indigo-500/10 opacity-50">🛰️</div>
-                        <h3 className="text-2xl font-black text-white tracking-tighter mb-4">Central de Inteligência</h3>
-                        <p className="text-slate-600 text-sm max-w-sm font-medium leading-relaxed">Selecione uma transmissão ativa na barra lateral para monitorar o processamento da Linguagem Natural em tempo real.</p>
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+                        <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center text-2xl mb-4 border border-white/5 opacity-50">💬</div>
+                        <h3 className="text-lg font-bold text-white mb-2">Suas Conversas</h3>
+                        <p className="text-slate-500 text-sm max-w-xs">Selecione uma conversa para ver o histórico de mensagens.</p>
                     </div>
                 ) : (
                     <>
-                        {/* Header do Chat */}
-                        <header className="px-12 py-10 border-b border-white/5 bg-slate-900/10 backdrop-blur-md flex items-center justify-between z-10">
-                            <div className="flex items-center gap-6">
-                                <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-black text-xl shadow-2xl shadow-indigo-600/30">
+                        <header className="px-6 py-4 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold">
                                     {selectedConv?.customer_phone.substring(0, 2)}
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-black text-white tracking-tighter">{selectedConv?.customer_phone}</h3>
-                                    <div className="flex items-center gap-3 mt-1">
-                                        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
-                                            <span className="relative flex h-2 w-2">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                            </span>
-                                            <span className="text-[9px] text-emerald-400 font-black uppercase tracking-[0.2em]">IA Ativa</span>
-                                        </div>
-                                        <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest italic">Monitoramento de Protocolo</span>
+                                    <h3 className="text-sm font-bold text-white leading-none mb-1">{selectedConv?.customer_phone}</h3>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span className="text-[10px] text-emerald-500 font-semibold uppercase tracking-wider">Atendido pela IA</span>
                                     </div>
                                 </div>
                             </div>
+                            <button className="p-2 text-slate-400 hover:text-white transition-all">
+                                <MoreVertical size={20} />
+                            </button>
                         </header>
 
-                        {/* Área de Mensagens */}
-                        <div className="flex-1 overflow-y-auto p-12 space-y-12 scrollbar-hide">
+                        <div className="flex-1 overflow-y-auto p-6 space-y-4">
                             {loadingMessages ? (
                                 <div className="flex items-center justify-center h-full">
-                                    <div className="relative w-10 h-10">
-                                        <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20"></div>
-                                        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 animate-spin"></div>
-                                    </div>
+                                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                                 </div>
                             ) : (
                                 messages.map((msg) => (
                                     <div
                                         key={msg.id}
-                                        className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}
+                                        className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}
                                     >
-                                        <div
-                                            className={`max-w-[65%] group relative ${msg.direction === 'outbound' ? 'text-right' : 'text-left'}`}
-                                        >
+                                        <div className={`max-w-[70%] ${msg.direction === 'outbound' ? 'text-right' : 'text-left'}`}>
                                             <div
-                                                className={`px-8 py-5 rounded-[2.5rem] text-sm font-medium leading-relaxed tracking-tight shadow-2xl ${msg.direction === 'outbound'
-                                                    ? 'bg-indigo-600 text-white rounded-tr-none shadow-indigo-600/10'
+                                                className={`px-4 py-2 text-sm rounded-2xl inline-block ${msg.direction === 'outbound'
+                                                    ? 'bg-primary text-white rounded-tr-none'
                                                     : 'bg-white/5 text-slate-200 border border-white/5 rounded-tl-none'
                                                     }`}
                                             >
                                                 {msg.content}
                                             </div>
-                                            <div className={`mt-3 flex items-center gap-3 opacity-30 text-[9px] font-black uppercase tracking-widest ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}>
-                                                {format(new Date(msg.created_at), 'HH:mm', { locale: ptBR })}
-                                                {msg.direction === 'outbound' && (
-                                                    <span className="text-indigo-400 text-xs">✓✓</span>
-                                                )}
+                                            <div className="mt-1 flex items-center gap-1.5 px-1 opacity-40 text-[10px] font-medium text-slate-400">
+                                                {format(new Date(msg.created_at), 'HH:mm')}
                                             </div>
                                         </div>
                                     </div>
@@ -215,15 +206,14 @@ export default function ChatsPage() {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* Banner de Processamento */}
-                        <footer className="px-10 py-6 bg-indigo-600/5 border-t border-white/5">
-                            <div className="flex items-center justify-center gap-4">
-                                <div className="flex gap-1">
-                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce"></div>
-                                </div>
-                                <p className="text-[10px] text-indigo-400/60 font-black uppercase tracking-[0.3em] py-1">O Agente IA Beautfy.ai está autogerenciando esta transmissão</p>
+                        <footer className="px-6 py-3 bg-white/[0.01] border-t border-white/5">
+                            <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500">
+                                <span className="flex gap-0.5">
+                                    <span className="w-1 h-1 bg-primary rounded-full animate-bounce"></span>
+                                    <span className="w-1 h-1 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                    <span className="w-1 h-1 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                </span>
+                                <span className="font-medium uppercase tracking-wider">Monitoramento de IA Ativo</span>
                             </div>
                         </footer>
                     </>

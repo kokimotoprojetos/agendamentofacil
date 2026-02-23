@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Brain, MapPin, Clock, Lightbulb, Save } from 'lucide-react';
 
 export default function AgentConfig() {
     const [config, setConfig] = useState({
@@ -54,121 +55,107 @@ export default function AgentConfig() {
     };
 
     if (loading) return (
-        <div className="flex justify-center py-40">
-            <div className="relative w-12 h-12">
-                <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20"></div>
-                <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 animate-spin"></div>
-            </div>
+        <div className="flex justify-center py-20">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
     );
 
     return (
-        <div className="max-w-5xl mx-auto pb-32 animate-fade-up">
-            <header className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="max-w-5xl mx-auto pb-20 animate-fade-up">
+            <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-4xl font-black text-white tracking-tighter mb-2">Engenharia do Agente</h1>
-                    <p className="text-slate-500 font-medium">Configure a inteligência cognitiva e as diretrizes operacionais do seu assistente.</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight mb-1">Configuração do Agente</h1>
+                    <p className="text-sm text-slate-400">Personalize o comportamento e as informações do seu assistente de IA.</p>
                 </div>
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="group relative px-10 py-4 bg-white text-[#020617] font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] transition-all active:scale-95 disabled:opacity-50 overflow-hidden"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-bold text-sm rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50"
                 >
-                    <span className="relative z-10">{saving ? 'Processando...' : 'Salvar Protocolos'}</span>
-                    <div className="absolute inset-0 bg-indigo-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-10" />
+                    <Save size={18} />
+                    <span>{saving ? 'Salvando...' : 'Salvar Alterações'}</span>
                 </button>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 space-y-10">
-                    <section className="glass p-12 rounded-[3.5rem] border-white/5 relative overflow-hidden premium-glow">
-                        <div className="flex items-center gap-5 mb-12">
-                            <div className="w-14 h-14 bg-indigo-600/10 rounded-2xl flex items-center justify-center text-2xl border border-indigo-500/20 text-indigo-400">
-                                🧠
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                    <section className="glass p-8 rounded-3xl border-white/5">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/10">
+                                <Brain size={20} />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight">Núcleo de Personalidade</h3>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Definição de Comportamento</p>
+                                <h3 className="text-xl font-bold text-white tracking-tight">Personalidade e Tom</h3>
+                                <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Como o agente deve conversar</p>
                             </div>
                         </div>
 
-                        <div className="space-y-10">
+                        <div className="space-y-6">
                             <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Instruções de Resposta</label>
+                                <label className="block text-xs font-semibold text-slate-400 mb-3">Instruções de Comportamento</label>
                                 <textarea
-                                    className="w-full px-8 py-6 bg-white/[0.02] border border-white/5 text-white rounded-3xl focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] h-56 transition-all placeholder:text-slate-700 leading-relaxed tabular-nums shadow-inner scrollbar-hide"
-                                    placeholder="Ex: Você é um assistente executivo bilíngue, use um tom profissional, emojis discretos e priorize a conversão de agendamentos."
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/5 text-white rounded-xl focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] h-48 transition-all placeholder:text-slate-600 text-sm leading-relaxed"
+                                    placeholder="Ex: Você é um assistente amigável, usa emojis e foca em agendar horários."
                                     value={config.personality}
                                     onChange={(e) => setConfig({ ...config, personality: e.target.value })}
                                 ></textarea>
-                                <div className="mt-4 flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
-                                    <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest leading-loose">A IA interpretará estas diretrizes para cada interação via WhatsApp.</p>
-                                </div>
+                                <p className="mt-3 text-[11px] text-slate-500 leading-relaxed">Estas diretrizes moldam a forma como a IA responde aos seus clientes no WhatsApp.</p>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-10 pt-4">
-                                <div className="group">
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">📍 Endereço Geográfico</label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            placeholder="Avenida Paulista, 1000 - Bela Vista, SP"
-                                            className="w-full px-8 py-5 bg-white/[0.02] border border-white/5 text-white rounded-2xl focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all shadow-inner group-hover:border-white/10"
-                                            value={config.location}
-                                            onChange={(e) => setConfig({ ...config, location: e.target.value })}
-                                        />
-                                        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-                                        </div>
-                                    </div>
+                            <div className="group">
+                                <label className="block text-xs font-semibold text-slate-400 mb-3">📍 Endereço da Unidade</label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Digite o endereço completo"
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/5 text-white rounded-xl focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] transition-all text-sm pl-11"
+                                        value={config.location}
+                                        onChange={(e) => setConfig({ ...config, location: e.target.value })}
+                                    />
+                                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
                                 </div>
                             </div>
                         </div>
                     </section>
                 </div>
 
-                <aside className="space-y-10">
-                    <section className="glass p-10 rounded-[3rem] border-white/5 premium-glow">
-                        <div className="flex items-center gap-4 mb-10">
-                            <div className="w-12 h-12 bg-indigo-600/10 rounded-xl flex items-center justify-center text-xl border border-indigo-500/20 text-indigo-400">
-                                ⏱️
+                <aside className="space-y-8">
+                    <section className="glass p-6 rounded-3xl border-white/5">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+                                <Clock size={18} />
                             </div>
-                            <h3 className="text-xl font-black text-white tracking-tight">Cronograma</h3>
+                            <h3 className="text-lg font-bold text-white tracking-tight">Horário de Atendimento</h3>
                         </div>
 
-                        <div className="space-y-8">
+                        <div className="space-y-4">
                             <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Início do Turno</label>
+                                <label className="block text-xs font-semibold text-slate-400 mb-2">Início</label>
                                 <input
                                     type="time"
-                                    className="w-full px-8 py-5 bg-white/[0.02] border border-white/5 text-white rounded-2xl focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all shadow-inner"
+                                    className="w-full px-4 py-2.5 bg-white/5 border border-white/5 text-white rounded-xl focus:outline-none focus:border-primary/50 transition-all text-sm"
                                     value={config.workingHours.start}
                                     onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, start: e.target.value } })}
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Fechamento</label>
+                                <label className="block text-xs font-semibold text-slate-400 mb-2">Fim</label>
                                 <input
                                     type="time"
-                                    className="w-full px-8 py-5 bg-white/[0.02] border border-white/5 text-white rounded-2xl focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all shadow-inner"
+                                    className="w-full px-4 py-2.5 bg-white/5 border border-white/5 text-white rounded-xl focus:outline-none focus:border-primary/50 transition-all text-sm"
                                     value={config.workingHours.end}
                                     onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, end: e.target.value } })}
                                 />
                             </div>
                         </div>
-
-                        <div className="mt-10 p-6 bg-indigo-500/5 rounded-3xl border border-indigo-500/10">
-                            <p className="text-[10px] text-indigo-300 font-bold leading-relaxed">A IA filtrará solicitações fora deste intervalo para garantir a precisão operacional.</p>
-                        </div>
                     </section>
 
-                    <section className="p-8 rounded-[2.5rem] bg-indigo-600/10 border border-indigo-500/20 relative overflow-hidden group hover:bg-indigo-600/20 transition-all duration-500 cursor-help">
-                        <div className="relative z-10 flex gap-4">
-                            <div className="text-2xl">💡</div>
+                    <section className="p-5 rounded-2xl bg-primary/5 border border-primary/10">
+                        <div className="flex gap-3">
+                            <Lightbulb className="text-primary shrink-0" size={20} />
                             <div>
-                                <p className="text-xs font-black text-white uppercase tracking-tight mb-1">Dica de Especialista</p>
-                                <p className="text-[10px] text-indigo-300 font-medium leading-relaxed italic">Quanto mais detalhada for a personalidade, menos halucinações o agente terá.</p>
+                                <p className="text-xs font-bold text-white mb-1">Dica de IA</p>
+                                <p className="text-[11px] text-slate-400 leading-relaxed font-medium">Forneça detalhes específicos sobre os serviços mais procurados para que a IA possa vender melhor por você.</p>
                             </div>
                         </div>
                     </section>
