@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -14,7 +14,7 @@ export async function GET(
         }
 
         const userId = (session.user as any).id;
-        const conversationId = params.id;
+        const { id: conversationId } = await params;
 
         // 1. Get user profile and tenant (security check)
         const { data: profile } = await supabaseAdmin
