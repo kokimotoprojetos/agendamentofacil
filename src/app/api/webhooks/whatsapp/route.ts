@@ -84,6 +84,7 @@ export async function POST(req: Request) {
     const context = {
       businessName: tenant?.business_name || "Nosso Salão",
       personality: tenant?.settings?.personality || "Amigável e profissional",
+      location: tenant?.settings?.location || tenant?.settings?.address || "Endereço sob consulta",
       workingHours: tenant?.settings?.workingHours || { start: "09:00", end: "18:00" },
       services: services || [],
       history: []
