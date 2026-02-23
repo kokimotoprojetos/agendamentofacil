@@ -8,10 +8,11 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     // 0. Diagnostic Logging — always log the hit
+    console.log('--- WEBHOOK HIT ---');
     await supabaseAdmin.from('agent_logs').insert({
-      event_type: 'webhook_hit',
-      description: `Webhook received: ${body.event || 'unknown event'}`,
-      metadata: { event: body.event, instance: body.instance }
+      event_type: 'WEBHOOK_VERSION_CHECK_V2',
+      description: `Webhook v2 hit: ${body.event || 'unknown'}`,
+      metadata: { body }
     });
 
     // Handle MESSAGES_UPSERT event from Evolution API
@@ -76,7 +77,7 @@ export async function POST(req: Request) {
       .eq('id', tenantId)
       .single();
 
-    const { data: services } = await supabaseAdmin
+    const { data: services, error: servicesError } = await supabaseAdmin
       .from('services')
       .select('*')
       .eq('tenant_id', tenantId);
@@ -86,9 +87,21 @@ export async function POST(req: Request) {
       personality: tenant?.settings?.personality || "Amigável e profissional",
       location: tenant?.settings?.location || tenant?.settings?.address || "Endereço sob consulta",
       workingHours: tenant?.settings?.workingHours || { start: "09:00", end: "18:00" },
-      services: services || [],
+      services: services && services.length > 0 ? services : [{ name: 'Corte de Teste', price: 50, duration: 30 }],
       history: []
     };
+
+    // Log contextual debug info
+    await supabaseAdmin.from('agent_logs').insert({
+      tenant_id: tenantId,
+      event_type: 'debug_context',
+      description: `Resolvido: ${services?.length || 0} serviços. Erro: ${servicesError?.message || 'nenhum'}`,
+      metadata: {
+        tenantId,
+        serviceCount: services?.length || 0,
+        servicesError
+      }
+    });
 
     // 3. Process with AI
     let aiResponse: string;

@@ -8,6 +8,7 @@ const deepseek = new OpenAI({
 
 export const aiAgentService = {
   processMessage: async (message: string, context: any): Promise<string> => {
+    console.log('[AI] Processing message with context services count:', context.services?.length);
     const systemPrompt = `
       Você é um assistente virtual inteligente para agendamento de serviços em um(a) ${context.businessName}.
       Seu objetivo é ajudar o cliente a agendar um horário, responder dúvidas sobre serviços, preços e informações do local.
@@ -26,6 +27,13 @@ export const aiAgentService = {
       - Verifique se o horário solicitado está dentro do expediente (${context.workingHours.start} às ${context.workingHours.end}).
       - Responda de forma concisa (máximo 3 frases).
     `;
+
+    // Log the prompt for debugging
+    await supabaseAdmin.from('agent_logs').insert({
+      event_type: 'debug_ai_prompt',
+      description: 'System Prompt sent to AI',
+      metadata: { systemPrompt: systemPrompt.substring(0, 1000) }
+    });
 
     try {
       const response = await deepseek.chat.completions.create({
@@ -46,6 +54,17 @@ export const aiAgentService = {
   },
 
   async processResponse(tenantId: string, customerPhone: string, messageText: string, context: any): Promise<string> {
+    console.log('[AI] Starting processResponse for tenant:', tenantId);
+    console.log('[AI] Context services count:', context.services?.length);
+
+    // Log context in DB for visibility
+    await supabaseAdmin.from('agent_logs').insert({
+      tenant_id: tenantId,
+      event_type: 'debug_ai_context',
+      description: `Iniciando processamento. Serviços recebidos: ${context.services?.length || 0}`,
+      metadata: { services: context.services }
+    });
+
     try {
       // 1. Get or Create Conversation
       let { data: conversation } = await supabaseAdmin
