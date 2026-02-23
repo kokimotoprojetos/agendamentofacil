@@ -103,8 +103,10 @@ export const whatsappService = {
 
     sendMessage: async (instanceName: string, remoteJid: string, text: string) => {
         try {
+            // Evolution API expects a clean phone number (no @s.whatsapp.net suffix)
+            const number = remoteJid.replace('@s.whatsapp.net', '').replace('@g.us', '');
             const response = await evolutionApi.post(`/message/sendText/${instanceName}`, {
-                number: remoteJid,
+                number,
                 options: {
                     delay: 1200,
                     presence: "composing"
@@ -114,8 +116,8 @@ export const whatsappService = {
                 }
             });
             return response.data;
-        } catch (error) {
-            console.error('Error sending WhatsApp message:', error);
+        } catch (error: any) {
+            console.error('Error sending WhatsApp message:', error.response?.data || error.message);
             throw error;
         }
     }

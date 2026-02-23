@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 const deepseek = new OpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY,
@@ -45,7 +45,7 @@ export const aiAgentService = {
   async processResponse(tenantId: string, customerPhone: string, messageText: string, context: any): Promise<string> {
     try {
       // 1. Get or Create Conversation
-      let { data: conversation } = await supabase
+      let { data: conversation } = await supabaseAdmin
         .from('conversations')
         .select('*')
         .eq('tenant_id', tenantId)
@@ -53,7 +53,7 @@ export const aiAgentService = {
         .single();
 
       if (!conversation) {
-        const { data: newConv } = await supabase
+        const { data: newConv } = await supabaseAdmin
           .from('conversations')
           .insert({ tenant_id: tenantId, customer_phone: customerPhone })
           .select()
@@ -62,7 +62,7 @@ export const aiAgentService = {
       }
 
       // 2. Fetch recent message history for context
-      const { data: history } = await supabase
+      const { data: history } = await supabaseAdmin
         .from('messages')
         .select('direction, content')
         .eq('conversation_id', conversation.id)
@@ -75,7 +75,7 @@ export const aiAgentService = {
       })) || [];
 
       // 3. Save Inbound Message
-      await supabase.from('messages').insert({
+      await supabaseAdmin.from('messages').insert({
         conversation_id: conversation.id,
         direction: 'inbound',
         content: messageText
@@ -95,7 +95,7 @@ export const aiAgentService = {
         if (success) {
           aiResponse = `Confirmado! Seu agendamento para ${pendingIntent.serviceName} no dia ${pendingIntent.date} às ${pendingIntent.time} foi realizado com sucesso.`;
           // Clear pending intent
-          await supabase.from('conversations').update({
+          await supabaseAdmin.from('conversations').update({
             context: { ...(conversation.context as any), pending_intent: null }
           }).eq('id', conversation.id);
         } else {
@@ -111,7 +111,7 @@ export const aiAgentService = {
           if (isAvailable) {
             aiResponse = `Perfeito! Tenho disponibilidade para ${intent.serviceName} no dia ${intent.date} às ${intent.time}. Posso confirmar o seu agendamento?`;
             // Save as pending intent
-            await supabase.from('conversations').update({
+            await supabaseAdmin.from('conversations').update({
               context: { ...(conversation.context as any), pending_intent: intent }
             }).eq('id', conversation.id);
           } else {
@@ -128,7 +128,7 @@ export const aiAgentService = {
       }
 
       // 5. Save Outbound Message
-      await supabase.from('messages').insert({
+      await supabaseAdmin.from('messages').insert({
         conversation_id: conversation.id,
         direction: 'outbound',
         content: aiResponse
@@ -161,7 +161,7 @@ export const aiAgentService = {
 
   checkAvailability: async (tenantId: string, date: string, time: string) => {
     try {
-      const { data: tokens } = await supabase
+      const { data: tokens } = await supabaseAdmin
         .from('google_calendar_tokens')
         .select('*')
         .eq('tenant_id', tenantId)
@@ -206,7 +206,7 @@ export const aiAgentService = {
   executeBooking: async (tenantId: string, intent: any, customerPhone: string) => {
     try {
       // 1. Get Service ID
-      const { data: service } = await supabase
+      const { data: service } = await supabaseAdmin
         .from('services')
         .select('id, duration')
         .eq('tenant_id', tenantId)
@@ -219,7 +219,7 @@ export const aiAgentService = {
       const duration = service?.duration || 60;
       const endTime = new Date(new Date(startTime).getTime() + duration * 60 * 1000).toISOString();
 
-      const { data: appointment, error: appError } = await supabase
+      const { data: appointment, error: appError } = await supabaseAdmin
         .from('appointments')
         .insert({
           tenant_id: tenantId,
@@ -236,7 +236,7 @@ export const aiAgentService = {
       if (appError) throw appError;
 
       // 3. Sync with Google Calendar
-      const { data: tokens } = await supabase
+      const { data: tokens } = await supabaseAdmin
         .from('google_calendar_tokens')
         .select('*')
         .eq('tenant_id', tenantId)
@@ -258,7 +258,7 @@ export const aiAgentService = {
         }, tokens.calendar_id);
 
         if (gEvent?.id) {
-          await supabase
+          await supabaseAdmin
             .from('appointments')
             .update({ google_event_id: gEvent.id })
             .eq('id', appointment.id);
