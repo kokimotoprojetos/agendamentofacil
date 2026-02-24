@@ -1,12 +1,23 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Brain, MapPin, Clock, Lightbulb, Save } from 'lucide-react';
+import { Brain, MapPin, Clock, Save, CalendarDays, Scissors } from 'lucide-react';
+
+const DAYS_OF_WEEK = [
+    { id: 'mon', label: 'Segunda' },
+    { id: 'tue', label: 'Terça' },
+    { id: 'wed', label: 'Quarta' },
+    { id: 'thu', label: 'Quinta' },
+    { id: 'fri', label: 'Sexta' },
+    { id: 'sat', label: 'Sábado' },
+    { id: 'sun', label: 'Domingo' }
+];
 
 export default function AgentConfig() {
     const [config, setConfig] = useState({
         personality: "Amigável e profissional",
         location: "",
+        workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
         workingHours: {
             start: "09:00",
             end: "18:00"
@@ -27,6 +38,7 @@ export default function AgentConfig() {
                 setConfig({
                     personality: data.personality || "Amigável e profissional",
                     location: data.location || "",
+                    workingDays: data.workingDays || ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
                     workingHours: data.workingHours || { start: "09:00", end: "18:00" }
                 });
             }
@@ -45,121 +57,139 @@ export default function AgentConfig() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(config)
             });
-            if (res.ok) alert('Configurações salvas com sucesso!');
+            if (res.ok) {
+                // Notificação de sucesso
+            }
         } catch (error) {
             console.error('Erro ao salvar:', error);
-            alert('Falha ao salvar configurações.');
         } finally {
             setSaving(false);
         }
     };
 
+    const toggleDay = (dayId: string) => {
+        setConfig(prev => ({
+            ...prev,
+            workingDays: prev.workingDays.includes(dayId)
+                ? prev.workingDays.filter(d => d !== dayId)
+                : [...prev.workingDays, dayId]
+        }));
+    };
+
     if (loading) return (
         <div className="flex justify-center py-20">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
     );
 
     return (
-        <div className="max-w-5xl mx-auto pb-20 animate-fade-up">
-            <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="max-w-4xl mx-auto pb-20 animate-fade-up">
+            <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight mb-1">Configuração do Agente</h1>
-                    <p className="text-sm text-slate-400">Personalize o comportamento e as informações do seu assistente de IA.</p>
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="bg-indigo-600/10 text-indigo-400 p-2 rounded-lg">
+                            <Brain size={20} />
+                        </div>
+                        <h1 className="text-3xl font-bold text-white tracking-tight">Configuração do Agente</h1>
+                    </div>
+                    <p className="text-sm text-slate-400">Ajuste os dados essenciais para o funcionamento do assistente.</p>
                 </div>
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-bold text-sm rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50"
+                    className="flex items-center gap-2 px-8 py-3.5 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 transition-all active:scale-95 disabled:opacity-50"
                 >
                     <Save size={18} />
                     <span>{saving ? 'Salvando...' : 'Salvar Alterações'}</span>
                 </button>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-8">
-                    <section className="glass p-8 rounded-3xl border-white/5">
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/10">
-                                <Brain size={20} />
+            <div className="grid grid-cols-1 gap-6">
+                {/* Personalidade e Instruções */}
+                <section className="glass p-8 rounded-[2rem] border-white/5 bg-slate-900/40">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+                            <Brain size={20} />
+                        </div>
+                        <h3 className="text-lg font-bold text-white tracking-tight">Instruções da IA (Personalidade)</h3>
+                    </div>
+                    <textarea
+                        className="w-full px-4 py-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:outline-none focus:border-indigo-500/50 h-32 text-sm leading-relaxed resize-none"
+                        placeholder="Ex: Você é um assistente simpático de um salão de beleza..."
+                        value={config.personality}
+                        onChange={(e) => setConfig({ ...config, personality: e.target.value })}
+                    ></textarea>
+                </section>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Agenda de Operação */}
+                    <section className="glass p-8 rounded-[2rem] border-white/5 bg-slate-900/40">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+                                <CalendarDays size={20} />
                             </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-white tracking-tight">Personalidade e Tom</h3>
-                                <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Como o agente deve conversar</p>
-                            </div>
+                            <h3 className="text-lg font-bold text-white tracking-tight">Dias e Horários</h3>
                         </div>
 
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-400 mb-3">Instruções de Comportamento</label>
-                                <textarea
-                                    className="w-full px-4 py-3 bg-white/5 border border-white/5 text-white rounded-xl focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] h-48 transition-all placeholder:text-slate-600 text-sm leading-relaxed"
-                                    placeholder="Ex: Você é um assistente amigável, usa emojis e foca em agendar horários."
-                                    value={config.personality}
-                                    onChange={(e) => setConfig({ ...config, personality: e.target.value })}
-                                ></textarea>
-                                <p className="mt-3 text-[11px] text-slate-500 leading-relaxed">Estas diretrizes moldam a forma como a IA responde aos seus clientes no WhatsApp.</p>
+                                <label className="block text-[10px] font-black text-slate-500 mb-4 uppercase tracking-widest">Dias de Funcionamento</label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {DAYS_OF_WEEK.map(day => (
+                                        <button
+                                            key={day.id}
+                                            onClick={() => toggleDay(day.id)}
+                                            className={`py-2 text-[10px] font-bold rounded-lg border transition-all ${config.workingDays.includes(day.id) ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-white/5 border-white/5 text-slate-500 hover:border-white/10'}`}
+                                        >
+                                            {day.label.substring(0, 3)}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
-                            <div className="group">
-                                <label className="block text-xs font-semibold text-slate-400 mb-3">📍 Endereço da Unidade</label>
-                                <div className="relative">
+                            <div className="pt-6 border-t border-white/5 flex gap-4">
+                                <div className="flex-1 space-y-2">
+                                    <span className="text-[10px] text-slate-600 font-bold uppercase block text-center">Início</span>
                                     <input
-                                        type="text"
-                                        placeholder="Digite o endereço completo"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/5 text-white rounded-xl focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] transition-all text-sm pl-11"
-                                        value={config.location}
-                                        onChange={(e) => setConfig({ ...config, location: e.target.value })}
+                                        type="time"
+                                        className="w-full px-3 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:outline-none focus:border-indigo-500/50 transition-all text-xs font-bold text-center"
+                                        value={config.workingHours.start}
+                                        onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, start: e.target.value } })}
                                     />
-                                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                                </div>
+                                <div className="flex-1 space-y-2">
+                                    <span className="text-[10px] text-slate-600 font-bold uppercase block text-center">Término</span>
+                                    <input
+                                        type="time"
+                                        className="w-full px-3 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:outline-none focus:border-indigo-500/50 transition-all text-xs font-bold text-center"
+                                        value={config.workingHours.end}
+                                        onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, end: e.target.value } })}
+                                    />
                                 </div>
                             </div>
                         </div>
                     </section>
+
+                    {/* Endereço */}
+                    <section className="glass p-8 rounded-[2rem] border-white/5 bg-slate-900/40">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+                                <MapPin size={20} />
+                            </div>
+                            <h3 className="text-lg font-bold text-white tracking-tight">Localização</h3>
+                        </div>
+
+                        <div>
+                            <label className="block text-[10px] font-black text-slate-500 mb-3 uppercase tracking-widest text-center">Endereço do Estabelecimento</label>
+                            <textarea
+                                placeholder="Rua, Número, Bairro, Cidade..."
+                                className="w-full px-4 py-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:outline-none focus:border-indigo-500/50 transition-all text-sm h-32 resize-none leading-relaxed"
+                                value={config.location}
+                                onChange={(e) => setConfig({ ...config, location: e.target.value })}
+                            ></textarea>
+                        </div>
+                    </section>
                 </div>
-
-                <aside className="space-y-8">
-                    <section className="glass p-6 rounded-3xl border-white/5">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
-                                <Clock size={18} />
-                            </div>
-                            <h3 className="text-lg font-bold text-white tracking-tight">Horário de Atendimento</h3>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-400 mb-2">Início</label>
-                                <input
-                                    type="time"
-                                    className="w-full px-4 py-2.5 bg-white/5 border border-white/5 text-white rounded-xl focus:outline-none focus:border-primary/50 transition-all text-sm"
-                                    value={config.workingHours.start}
-                                    onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, start: e.target.value } })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-400 mb-2">Fim</label>
-                                <input
-                                    type="time"
-                                    className="w-full px-4 py-2.5 bg-white/5 border border-white/5 text-white rounded-xl focus:outline-none focus:border-primary/50 transition-all text-sm"
-                                    value={config.workingHours.end}
-                                    onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, end: e.target.value } })}
-                                />
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className="p-5 rounded-2xl bg-primary/5 border border-primary/10">
-                        <div className="flex gap-3">
-                            <Lightbulb className="text-primary shrink-0" size={20} />
-                            <div>
-                                <p className="text-xs font-bold text-white mb-1">Dica de IA</p>
-                                <p className="text-[11px] text-slate-400 leading-relaxed font-medium">Forneça detalhes específicos sobre os serviços mais procurados para que a IA possa vender melhor por você.</p>
-                            </div>
-                        </div>
-                    </section>
-                </aside>
             </div>
         </div>
     );

@@ -85,3 +85,32 @@ export async function DELETE(req: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
+
+export async function PUT(req: Request) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+
+        const body = await req.json();
+        const { id, name, price, duration, description } = body;
+
+        if (!id) return NextResponse.json({ error: 'ID não fornecido' }, { status: 400 });
+
+        const { data: service, error } = await supabaseAdmin
+            .from('services')
+            .update({
+                name,
+                price: parseFloat(price),
+                duration: parseInt(duration),
+                description: description || ''
+            })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return NextResponse.json(service);
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}

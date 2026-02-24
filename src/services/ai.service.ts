@@ -9,12 +9,19 @@ const deepseek = new OpenAI({
 export const aiAgentService = {
   processMessage: async (message: string, context: any): Promise<string> => {
     console.log('[AI] Processing message with context services count:', context.services?.length);
+    const dayMap: Record<string, string> = {
+      mon: 'Segunda-feira', tue: 'Terça-feira', wed: 'Quarta-feira',
+      thu: 'Quinta-feira', fri: 'Sexta-feira', sat: 'Sábado', sun: 'Domingo'
+    };
+    const openDays = (context.workingDays || []).map((d: string) => dayMap[d]).join(', ');
+
     const systemPrompt = `
       Você é o assistente oficial de agendamento do(a) "${context.businessName}".
       SUA PRIORIDADE: Responder SEMPRE de forma precisa e direta com os dados reais informados abaixo.
       
       INFORMAÇÕES REAIS DO NEGÓCIO:
       - Localização Exata: ${context.location}
+      - Dias de Funcionamento: ${openDays}
       - Horário de Atendimento: ${context.workingHours.start} até ${context.workingHours.end}
       - Catálogo de Serviços e Preços:
         ${context.services.length > 0 ? context.services.map((s: any) => `- ${s.name}: R$ ${s.price} (${s.duration} min)`).join('\n        ') : "Nenhum serviço cadastrado no momento."}
@@ -22,9 +29,10 @@ export const aiAgentService = {
       DIRETRIZES DE RESPOSTA:
       1. Use a personalidade: ${context.personality}.
       2. Se perguntarem o endereço, responda exatamente: "${context.location}".
-      3. Se perguntarem os serviços, liste EXATAMENTE TODOS os itens do "Catálogo de Serviços" acima com seus respectivos preços. Não invente que o catálogo está sendo atualizado.
-      4. Para agendamentos, verifique se o horário está entre ${context.workingHours.start} e ${context.workingHours.end}.
-      5. Seja extremamente conciso (máximo 2 a 3 frases).
+      3. Se perguntarem os dias que abre, cite: "${openDays}".
+      4. Se perguntarem os serviços, liste EXATAMENTE TODOS os itens do "Catálogo de Serviços" acima com seus respectivos preços. Não invente que o catálogo está sendo atualizado.
+      5. Para agendamentos, verifique se o horário está entre ${context.workingHours.start} e ${context.workingHours.end}.
+      6. Seja extremamente conciso (máximo 2 a 3 frases).
     `;
 
     // Log the prompt for debugging
