@@ -189,32 +189,22 @@ export const aiAgentService = {
 
   checkAvailability: async (tenantId: string, date: string, time: string) => {
     try {
-      const { data: tokens } = await supabaseAdmin
-        .from('google_calendar_tokens')
-        .select('*')
+      // Check internally in our appointments table for conflicts
+      const startTime = `${date}T${time}:00`;
+      const endTime = new Date(new Date(startTime).getTime() + 60 * 60 * 1000).toISOString();
+
+      const { count } = await supabaseAdmin
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
         .eq('tenant_id', tenantId)
-        .single();
+        .neq('status', 'cancelled')
+        .lt('start_time', endTime)
+        .gt('end_time', startTime);
 
-      if (!tokens) {
-        console.warn('Google Calendar tokens not found for tenant:', tenantId);
-        return true; // Fallback to allowing if no calendar connected
-      }
-
-      const { calendarService } = await import('./calendar.service');
-      calendarService.setCredentials({
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expiry_date: tokens.expiry_date
-      });
-
-      const start = `${date}T${time}:00Z`;
-      // Assume 1 hour duration if not specified
-      const end = new Date(new Date(start).getTime() + 60 * 60 * 1000).toISOString();
-
-      return await calendarService.checkAvailability(start, end, tokens.calendar_id);
+      return (count ?? 0) === 0; // true = available
     } catch (error) {
-      console.error('Error checking real availability:', error);
-      return true; // Fallback
+      console.error('Error checking availability:', error);
+      return true; // Fallback: allow booking
     }
   },
 
@@ -233,7 +223,7 @@ export const aiAgentService = {
 
   executeBooking: async (tenantId: string, intent: any, customerPhone: string) => {
     try {
-      // 1. Get Service ID
+      // 1. Get Service ID from catalog
       const { data: service } = await supabaseAdmin
         .from('services')
         .select('id, duration')
@@ -242,56 +232,26 @@ export const aiAgentService = {
         .limit(1)
         .single();
 
-      // 2. Create Appointment in DB
-      const startTime = `${intent.date}T${intent.time}:00Z`;
+      // 2. Calculate start/end times
+      const startTime = `${intent.date}T${intent.time}:00`;
       const duration = service?.duration || 60;
       const endTime = new Date(new Date(startTime).getTime() + duration * 60 * 1000).toISOString();
 
-      const { data: appointment, error: appError } = await supabaseAdmin
+      // 3. Create Appointment directly in Supabase (no Google Calendar needed)
+      const { error: appError } = await supabaseAdmin
         .from('appointments')
         .insert({
           tenant_id: tenantId,
-          service_id: service?.id,
-          customer_name: "Cliente WhatsApp",
+          service_id: service?.id || null,
+          customer_name: `WhatsApp: ${customerPhone}`,
           customer_phone: customerPhone,
           start_time: startTime,
           end_time: endTime,
-          status: 'scheduled'
-        })
-        .select()
-        .single();
-
-      if (appError) throw appError;
-
-      // 3. Sync with Google Calendar
-      const { data: tokens } = await supabaseAdmin
-        .from('google_calendar_tokens')
-        .select('*')
-        .eq('tenant_id', tenantId)
-        .single();
-
-      if (tokens) {
-        const { calendarService } = await import('./calendar.service');
-        calendarService.setCredentials({
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token,
-          expiry_date: tokens.expiry_date
+          status: 'scheduled',
+          notes: `Agendado automaticamente via IA - ${intent.serviceName}`
         });
 
-        const gEvent = await calendarService.createEvent({
-          title: `${intent.serviceName} - WhatsApp`,
-          description: `Agendamento via IA para ${customerPhone}`,
-          start: startTime,
-          end: endTime
-        }, tokens.calendar_id);
-
-        if (gEvent?.id) {
-          await supabaseAdmin
-            .from('appointments')
-            .update({ google_event_id: gEvent.id })
-            .eq('id', appointment.id);
-        }
-      }
+      if (appError) throw appError;
 
       return true;
     } catch (error) {
