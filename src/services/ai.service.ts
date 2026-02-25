@@ -100,17 +100,14 @@ export const aiAgentService = {
           const success = await this.executeCancellation(pendingCancellation.appointment_id);
           if (success) {
             aiResponse =
-              `✅ Agendamento cancelado com sucesso!\n\n` +
-              `✂️ *${pendingCancellation.service_name}*\n` +
-              `📅 ${pendingCancellation.date_formatted} às ${pendingCancellation.time}\n\n` +
-              `Se quiser remarcar, é só me avisar. 😊`;
+              `Prontinho! Agendamento cancelado. Se quiser marcar em outro dia, é só me falar 😊`;
           } else {
-            aiResponse = 'Não consegui cancelar. Pode tentar novamente?';
+            aiResponse = 'Hmm, não consegui cancelar aqui. Pode tentar de novo?';
           }
         } else {
           aiResponse = await this.generateResponse(
             context, chatHistory, messageText,
-            'O cliente desistiu de cancelar. Responda de forma amigável.',
+            'O cliente desistiu de cancelar. Responda de forma simples e amigável, sem listar nada.',
           );
         }
         updatedCtx = { ...updatedCtx, awaiting_cancellation: false, pending_cancellation: null };
@@ -123,15 +120,13 @@ export const aiAgentService = {
           const success = await this.executeBooking(tenantId, pendingBooking, customerPhone);
           if (success) {
             const dateFormatted = pendingBooking.date
-              ? new Date(pendingBooking.date + 'T12:00:00').toLocaleDateString('pt-BR')
+              ? new Date(pendingBooking.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
               : '';
+            const firstName = pendingBooking.customer_name?.split(' ')[0] || '';
             aiResponse =
-              `✅ Agendamento confirmado, ${pendingBooking.customer_name}!\n\n` +
-              `✂️ *${pendingBooking.service_name}*\n` +
-              `📅 ${dateFormatted} às ${pendingBooking.time}\n\n` +
-              `Te esperamos! 😊`;
+              `Agendado, ${firstName}! Te esperamos na ${dateFormatted} às ${pendingBooking.time} para ${pendingBooking.service_name}. Qualquer coisa é só chamar 😊`;
           } else {
-            aiResponse = 'Houve um problema técnico ao salvar. Pode tentar novamente?';
+            aiResponse = 'Hmm, tive um probleminha técnico aqui. Pode tentar de novo?';
           }
           updatedCtx = { ...updatedCtx, awaiting_confirmation: false, pending_booking: null };
 
@@ -166,10 +161,7 @@ export const aiAgentService = {
             const timeFormatted = new Date(appt.start_time)
               .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             aiResponse =
-              `⚠️ Você quer cancelar este agendamento?\n\n` +
-              `✂️ *${appt.service?.name || 'Serviço'}*\n` +
-              `📅 ${dateFormatted} às ${timeFormatted}\n\n` +
-              `Confirma o cancelamento? (Sim / Não)`;
+              `Você quer cancelar o agendamento de ${appt.service?.name || 'serviço'} na ${dateFormatted} às ${timeFormatted}? Confirma? (Sim / Não)`;
             updatedCtx = {
               ...updatedCtx,
               awaiting_cancellation: true,
@@ -234,7 +226,7 @@ export const aiAgentService = {
 
     } catch (error) {
       console.error('Erro no processamento da IA:', error);
-      return 'Desculpe, tive um problema técnico. Pode repetir?';
+      return 'Me dá um segundo, tive um problema técnico aqui. Pode repetir?';
     }
   },
 
@@ -251,39 +243,58 @@ export const aiAgentService = {
     };
     const openDays = (context.workingDays || []).map((d: string) => dayMap[d] || d).join(', ');
     const serviceList = (context.services || [])
-      .map((s: any) => `• ${s.name} — R$ ${s.price} (${s.duration} min)`)
-      .join('\n');
+      .map((s: any) => `${s.name} — R$ ${s.price}`)
+      .join(', ');
 
-    const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const now = new Date();
+    const hour = now.getHours();
+    const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+    const today = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
-    const systemPrompt = `Você é o atendente virtual do(a) "${context.businessName}".
-Personalidade: ${context.personality || 'amigável e profissional'}.
-Data de hoje: ${today}.
+    const personality = context.personality || 'amigável e descontraído';
+    const businessName = context.businessName || 'o salão';
+
+    const systemPrompt = `Você é a atendente do(a) "${businessName}".
+Sua personalidade é: ${personality}.
+Hoje é ${today}. Cumprimento-padrão para primeiro contato: "${greeting}!"
 
 INFORMAÇÕES DO NEGÓCIO:
 - Endereço: ${context.location || 'não informado'}
 - Dias de atendimento: ${openDays || 'não informado'}
 - Horário: ${context.workingHours?.start || '08:00'} às ${context.workingHours?.end || '18:00'}
-- Serviços:
-${serviceList || '  (nenhum serviço cadastrado)'}
+- Serviços: ${serviceList || 'sem cadastro'}
 
-COMO SE COMPORTAR:
-- Converse de forma NATURAL, como um atendente real de salão.
-- Use o histórico da conversa. NUNCA repita perguntas que já foram respondidas.
-- Se o cliente já disse o nome em algum momento, use-o.
-- Quando o cliente quiser agendar, colete naturalmente as informações que AINDA FALTAM: nome, serviço, data e horário.
-- Não liste serviços a menos que o cliente pergunte ou seja necessário para o agendamento.
-- Respostas curtas (1-4 frases). Sem listas desnecessárias.
-${extraInstruction ? `\nINSTRUÇÃO ESPECIAL: ${extraInstruction}` : ''}`;
+REGRAS ABSOLUTAS (nunca quebre essas regras):
+1. NUNCA comece com "Ótimo!", "Perfeito!", "Claro!" ou qualquer outro elogio vazio. Varie os começos.
+2. NUNCA liste serviços em forma de lista a menos que o cliente peça especificamente. Mencione-os de forma casual.
+3. NUNCA pergunte informações que já foram dadas na conversa. Leia o histórico ANTES de responder.
+4. Respostas curtas: máximo 3 frases, exceto quando precisar listar algo pedido.
+5. Não use estruturas de lista (hífen, números) para informações simples. Escreva em texto corrido.
+6. NUNCA diga que é uma IA, bot, ou atendente virtual. Aja como atendente humana.
+7. Use linguagem casual e warmth: "é só me falar", "pode deixar", "com certeza", "que bom!"
+8. Se o cliente já disse o nome, use-o naturalmente na resposta.
+9. Quando o cliente quiser agendar, colete SO AS INFORMAÇÕES QUE AINDA FALTAM — uma de cada vez, de forma natural.
+10. Emojis: apenas 1 por mensagem, e apenas quando genuinamente relevante. Não abuse.
+
+EXEMPLOS DE TOM CERTO:
+- "Que bom! Temos horário livre na quinta, te serve?"
+- "Pode ser sim! Me conta qual serviço você quer fazer."
+- "Âs 14h está ótimo. Fica para confirmar?"
+
+EXEMPLOS DE TOM ERRADO (nunca faça isso):
+- "Ótimo! Vou precisar das seguintes informações: 1) Nome 2) Serviço 3) Data..."
+- "Com prazer! Poderia me informar qual o nome completo?"
+- "Perfeito! Nossos serviços são: \n• Corte...\n• Tintura..."
+${extraInstruction ? `\nINSTRUÇÃO IMPORTANTE: ${extraInstruction}` : ''}`;
 
     try {
       return await callAI([
         { role: 'system', content: systemPrompt },
         ...history,
         { role: 'user', content: latestMessage },
-      ], { temp: 0.4 });
+      ], { temp: 0.7 });
     } catch {
-      return 'Desculpe, tive um problema técnico. Pode repetir?';
+      return 'Me dá um segundo, tive um problema técnico aqui. Pode repetir?';
     }
   },
 
