@@ -97,6 +97,15 @@ export default function AgendaPage() {
 
     useEffect(() => { fetchDayAppointments(selectedDate); }, [selectedDate, fetchDayAppointments]);
 
+    // ── Auto-refresh every 30s — picks up AI-made changes (bookings/cancellations) ──
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchDayAppointments(selectedDate);
+            fetchMonthCounts(currentMonth);
+        }, 30_000);
+        return () => clearInterval(interval);
+    }, [selectedDate, currentMonth, fetchDayAppointments, fetchMonthCounts]);
+
     // ── Month navigation ──────────────────────────────────────────────────────
     const prevMonth = () => setCurrentMonth(m => subMonths(m, 1));
     const nextMonth = () => setCurrentMonth(m => addMonths(m, 1));
@@ -339,7 +348,9 @@ export default function AgendaPage() {
                                                     <>
                                                         <span className="text-slate-700">·</span>
                                                         <Phone size={11} className="text-slate-500" />
-                                                        <span className="text-[11px] text-slate-500">{app.customer_phone}</span>
+                                                        <span className="text-[11px] text-slate-500">
+                                                            {app.customer_phone.replace(/@s\.whatsapp\.net|@g\.us/, '')}
+                                                        </span>
                                                     </>
                                                 )}
                                             </div>

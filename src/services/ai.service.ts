@@ -395,18 +395,19 @@ Retorne JSON:
   // ─── Find the next upcoming appointment for a phone number ───────────────────
   findNextAppointmentByPhone: async (tenantId: string, phone: string): Promise<any | null> => {
     try {
+      const cleanPhone = phone.replace(/@s\.whatsapp\.net|@g\.us/g, '').replace(/\D+$/, '');
       const now = new Date().toISOString();
+      // Search by clean number OR full JID (for backward compatibility)
       const { data } = await supabaseAdmin
         .from('appointments')
         .select('id, start_time, service:services(name)')
         .eq('tenant_id', tenantId)
-        .eq('customer_phone', phone)
+        .or(`customer_phone.eq.${cleanPhone},customer_phone.eq.${phone}`)
         .eq('status', 'scheduled')
         .gte('start_time', now)
         .order('start_time', { ascending: true })
-        .limit(1)
-        .single();
-      return data || null;
+        .limit(1);
+      return data?.[0] || null;
     } catch {
       return null;
     }
@@ -430,6 +431,9 @@ Retorne JSON:
   // ─── Create appointment in Supabase ───────────────────────────────────────────
   executeBooking: async (tenantId: string, booking: BookingExtract, customerPhone: string): Promise<boolean> => {
     try {
+      // Strip WhatsApp JID suffix — store clean phone number only
+      const cleanPhone = customerPhone.replace(/@s\.whatsapp\.net|@g\.us/g, '').replace(/\D+$/, '');
+
       const { data: service } = await supabaseAdmin
         .from('services')
         .select('id, duration')
@@ -447,8 +451,8 @@ Retorne JSON:
         .insert({
           tenant_id: tenantId,
           service_id: service?.id || null,
-          customer_name: booking.customer_name || `WhatsApp: ${customerPhone}`,
-          customer_phone: customerPhone,
+          customer_name: booking.customer_name || `WhatsApp: ${cleanPhone}`,
+          customer_phone: cleanPhone,
           start_time: startTime,
           end_time: endTime,
           status: 'scheduled',
