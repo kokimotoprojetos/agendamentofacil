@@ -43,27 +43,38 @@ export function Sidebar() {
         <aside className="fixed left-0 top-0 h-screen w-72 bg-[#020617] border-r border-white/5 flex flex-col z-50 overflow-hidden">
             <div className="p-8">
                 <div className="flex items-center gap-3">
-                    {/* Icon */}
-                    <div className="relative w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/40 overflow-hidden flex-shrink-0">
-                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700" />
-                        {/* Scissors SVG */}
-                        <svg viewBox="0 0 24 24" className="w-5 h-5 text-white relative z-10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="6" cy="6" r="3" />
-                            <circle cx="6" cy="18" r="3" />
-                            <line x1="20" y1="4" x2="8.12" y2="15.88" />
-                            <line x1="14.47" y1="14.48" x2="20" y2="20" />
-                            <line x1="8.12" y1="8.12" x2="12" y2="12" />
-                        </svg>
-                        {/* AI sparkle dot */}
-                        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-white rounded-full opacity-90" />
+                    {/* Icon badge */}
+                    <div className="relative flex-shrink-0" style={{ width: '44px', height: '44px' }}>
+                        {/* Outer glow ring */}
+                        <div className="absolute inset-0 rounded-[14px] bg-gradient-to-br from-indigo-500 to-violet-600 opacity-40 blur-[6px]" />
+                        {/* Main badge */}
+                        <div className="relative w-full h-full rounded-[14px] overflow-hidden flex items-center justify-center"
+                            style={{ background: 'linear-gradient(135deg,#4f46e5 0%,#7c3aed 55%,#9333ea 100%)' }}>
+                            {/* Shimmer */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent" />
+                            {/* Premium scissors SVG */}
+                            <svg viewBox="0 0 20 20" style={{ width: '22px', height: '22px' }} fill="none" className="relative z-10">
+                                {/* Handle circles */}
+                                <circle cx="4.5" cy="4.5" r="2.8" stroke="white" strokeWidth="1.5" fill="none" />
+                                <circle cx="4.5" cy="15.5" r="2.8" stroke="white" strokeWidth="1.5" fill="none" />
+                                {/* Blade 1 — top */}
+                                <line x1="6.8" y1="6" x2="17" y2="3" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                {/* Blade 2 — bottom */}
+                                <line x1="6.8" y1="14" x2="17" y2="17" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                {/* Pivot crossing */}
+                                <circle cx="10.5" cy="10" r="1" fill="white" opacity="0.9" />
+                            </svg>
+                            {/* Sparkle dot */}
+                            <span className="absolute top-[7px] right-[7px] w-[5px] h-[5px] bg-white rounded-full opacity-95" />
+                        </div>
                     </div>
                     {/* Wordmark */}
                     <div className="flex flex-col leading-none">
-                        <div className="flex items-baseline gap-0">
-                            <span className="text-[19px] font-black tracking-tight text-white">Beautfy</span>
-                            <span className="text-[19px] font-black tracking-tight bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">.ai</span>
+                        <div className="flex items-baseline">
+                            <span className="font-black text-white tracking-tight" style={{ fontSize: '20px', letterSpacing: '-0.3px' }}>Beautfy</span>
+                            <span className="font-black tracking-tight" style={{ fontSize: '20px', letterSpacing: '-0.3px', background: 'linear-gradient(90deg,#818cf8,#a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>.ai</span>
                         </div>
-                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.15em] mt-0.5">Salon &amp; Barber</span>
+                        <span className="text-[9.5px] font-semibold uppercase tracking-[0.18em] mt-[3px]" style={{ color: '#475569', letterSpacing: '0.18em' }}>Salon &amp; Barber</span>
                     </div>
                 </div>
             </div>
