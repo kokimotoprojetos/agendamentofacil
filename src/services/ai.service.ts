@@ -6,9 +6,9 @@ const deepseek = new OpenAI({
   baseURL: 'https://api.deepseek.com/v1',
 });
 
-// ─── Booking state machine stages ─────────────────────────────────────────────
+// ─── Booking state machine ─────────────────────────────────────────────────────
 // idle → collecting_name → collecting_service → collecting_date →
-// collecting_time → awaiting_confirmation → booked
+// collecting_time → awaiting_confirmation → (booked / back to idle)
 // ─────────────────────────────────────────────────────────────────────────────
 
 type BookingData = {
@@ -20,7 +20,7 @@ type BookingData = {
 };
 
 export const aiAgentService = {
-  // ─── Core LLM call (general conversation) ──────────────────────────────────
+  // ─── Core LLM call for free conversation ───────────────────────────────────
   processMessage: async (message: string, context: any): Promise<string> => {
     const dayMap: Record<string, string> = {
       mon: 'Segunda-feira', tue: 'Terça-feira', wed: 'Quarta-feira',
@@ -29,24 +29,23 @@ export const aiAgentService = {
     const openDays = (context.workingDays || []).map((d: string) => dayMap[d]).join(', ');
 
     const systemPrompt = `
-      Você é o assistente virtual de atendimento e agendamento do(a) "${context.businessName}".
-      Seu objetivo é ajudar os clientes de forma natural, amigável e eficiente, seguindo a personalidade: ${context.personality}.
+      Você é o assistente virtual de atendimento do(a) "${context.businessName}".
+      Personalidade: ${context.personality}.
 
-      INFORMAÇÕES DO NEGÓCIO (USE SOMENTE SE NECESSÁRIO):
+      INFORMAÇÕES DO NEGÓCIO (use APENAS quando o cliente perguntar):
       - Localização: ${context.location}
       - Dias de Funcionamento: ${openDays}
-      - Horário: ${context.workingHours.start} até ${context.workingHours.end}
-      - Catálogo de Serviços:
-        ${context.services.length > 0
-        ? context.services.map((s: any) => `- ${s.name}: R$ ${s.price} (${s.duration} min)`).join('\n        ')
+      - Horário: ${context.workingHours?.start} às ${context.workingHours?.end}
+      - Serviços:
+        ${context.services?.length > 0
+        ? context.services.map((s: any) => `• ${s.name} — R$ ${s.price} (${s.duration} min)`).join('\n        ')
         : 'Nenhum serviço cadastrado.'}
 
-      DIRETRIZES DE CONVERSA (MUITO IMPORTANTE):
-      1. NÃO envie todas as informações acima de uma vez. Responda apenas o que foi perguntado.
-      2. Se o cliente apenas cumprimentar (ex: "Oi", "Bom dia"), responda com uma saudação amigável e pergunte como pode ajudar.
-      3. Seja profissional mas amigável. Use a personalidade indicada.
-      4. Mantenha as respostas concisas (máximo 2 a 3 frases).
-      5. Somente liste os serviços se o cliente solicitar ou se for relevante para o fluxo de agendamento.
+      REGRAS IMPORTANTES:
+      1. Responda APENAS o que o cliente perguntou. Não liste serviços, preços ou endereços sem ser perguntado.
+      2. Em saudações simples ("Oi", "Bom dia"), responda de forma amigável e pergunte em que pode ajudar.
+      3. Respostas curtas e naturais (1-3 frases).
+      4. Não seja robótico. Converse como um atendente real.
     `;
 
     try {
@@ -57,12 +56,11 @@ export const aiAgentService = {
           ...(context.history || []),
           { role: 'user', content: message }
         ],
-        temperature: 0.2,
+        temperature: 0.4,
       });
       return response.choices[0].message.content || '';
-    } catch (error) {
-      console.error('Error processing AI message:', error);
-      return 'Desculpe, estou com uma instabilidade técnica momentânea. Pode repetir?';
+    } catch {
+      return 'Desculpe, tive uma instabilidade. Pode repetir?';
     }
   },
 
@@ -106,80 +104,118 @@ export const aiAgentService = {
         content: messageText
       });
 
-      // 4. Read current booking stage from conversation context
+      // 4. Read booking state
       const convCtx = (conversation.context as any) || {};
       const booking: BookingData = convCtx.booking || { stage: 'idle' };
 
       let aiResponse = '';
       let updatedBooking = { ...booking };
 
-      // ── BOOKING STATE MACHINE ──────────────────────────────────────────────
-      if (booking.stage === 'awaiting_confirmation') {
-        // Client is confirming or declining a complete booking
-        const confirmed = await this.checkConfirmation(messageText);
-        if (confirmed) {
-          const success = await this.executeBooking(tenantId, booking, customerPhone);
-          if (success) {
-            const dateFormatted = booking.date ? new Date(booking.date + 'T12:00:00').toLocaleDateString('pt-BR') : booking.date;
-            aiResponse = `✅ Perfeito, ${booking.customer_name}! Seu agendamento para *${booking.service_name}* no dia *${dateFormatted}* às *${booking.time}* foi confirmado! Até lá! 😊`;
+      // ── BOOKING STATE MACHINE ─────────────────────────────────────────────
+      switch (booking.stage) {
+
+        // ── Waiting for client confirmation ──────────────────────────────────
+        case 'awaiting_confirmation': {
+          const confirmed = await this.checkConfirmation(messageText);
+          if (confirmed) {
+            const success = await this.executeBooking(tenantId, booking, customerPhone);
+            if (success) {
+              const dateFormatted = booking.date
+                ? new Date(booking.date + 'T12:00:00').toLocaleDateString('pt-BR')
+                : booking.date;
+              aiResponse = `✅ Perfeito, ${booking.customer_name}! Agendamento confirmado:\n\n✂️ *${booking.service_name}*\n📅 ${dateFormatted} às ${booking.time}\n\nTe esperamos! 😊`;
+            } else {
+              aiResponse = 'Houve um problema ao salvar. Pode tentar novamente?';
+            }
             updatedBooking = { stage: 'idle' };
           } else {
-            aiResponse = 'Tive um problema ao finalizar o agendamento. Poderia tentar novamente?';
+            aiResponse = 'Sem problema! Deseja alterar alguma informação ou prefere não agendar agora?';
             updatedBooking = { stage: 'idle' };
           }
-        } else {
-          // Client declined or wants to change something
-          aiResponse = 'Tudo bem! Deseja alterar alguma informação ou prefere cancelar o agendamento?';
-          updatedBooking = { stage: 'idle' };
+          break;
         }
 
-      } else if (booking.stage === 'collecting_name') {
-        updatedBooking = { ...booking, customer_name: messageText.trim(), stage: 'collecting_service' };
-        const serviceList = context.services.map((s: any) => `• ${s.name} (R$ ${s.price})`).join('\n');
-        aiResponse = `Olá, ${messageText.trim()}! Nossos serviços disponíveis são:\n${serviceList}\n\nQual serviço você gostaria?`;
-
-      } else if (booking.stage === 'collecting_service') {
-        updatedBooking = { ...booking, service_name: messageText.trim(), stage: 'collecting_date' };
-        const dayMap: Record<string, string> = {
-          mon: 'Segunda', tue: 'Terça', wed: 'Quarta',
-          thu: 'Quinta', fri: 'Sexta', sat: 'Sábado', sun: 'Domingo'
-        };
-        const openDays = (context.workingDays || []).map((d: string) => dayMap[d] || d).join(', ');
-        aiResponse = `Ótima escolha! 😊 Atendemos nos dias: ${openDays}. Qual data você prefere? (Ex: 28/02/2026)`;
-
-      } else if (booking.stage === 'collecting_date') {
-        const parsedDate = await this.parseDate(messageText);
-        if (parsedDate) {
-          updatedBooking = { ...booking, date: parsedDate, stage: 'collecting_time' };
-          aiResponse = `Perfeito! E qual horário você prefere? Atendemos das ${context.workingHours?.start || '08:00'} às ${context.workingHours?.end || '18:00'}. (Ex: 14:00)`;
-        } else {
-          aiResponse = 'Não consegui entender a data. Pode informar no formato DD/MM/AAAA? Ex: 28/02/2026';
+        // ── Got the name, now ask WHAT they want (not listing services yet) ──
+        case 'collecting_name': {
+          const name = messageText.trim();
+          updatedBooking = { ...booking, customer_name: name, stage: 'collecting_service' };
+          // Ask about the service naturally, without dumping the whole list
+          aiResponse = `Prazer em falar com você, ${name}! 😊 O que você gostaria de fazer hoje?`;
+          break;
         }
 
-      } else if (booking.stage === 'collecting_time') {
-        const parsedTime = await this.parseTime(messageText);
-        if (parsedTime) {
-          const isAvailable = await this.checkAvailability(tenantId, booking.date!, parsedTime);
-          if (isAvailable) {
-            updatedBooking = { ...booking, time: parsedTime, stage: 'awaiting_confirmation' };
-            const dateFormatted = booking.date ? new Date(booking.date + 'T12:00:00').toLocaleDateString('pt-BR') : booking.date;
-            aiResponse = `📋 *Resumo do Agendamento:*\n👤 Nome: ${booking.customer_name}\n✂️ Serviço: ${booking.service_name}\n📅 Data: ${dateFormatted}\n🕐 Horário: ${parsedTime}\n\nPosso confirmar? (Sim/Não)`;
+        // ── Client responds about what they want — extract service naturally ─
+        case 'collecting_service': {
+          // Try to match a service from the catalog
+          const serviceMatch = await this.matchService(messageText, context.services || []);
+          if (serviceMatch) {
+            updatedBooking = { ...booking, service_name: serviceMatch, stage: 'collecting_date' };
+            const dayMap: Record<string, string> = {
+              mon: 'Segunda', tue: 'Terça', wed: 'Quarta',
+              thu: 'Quinta', fri: 'Sexta', sat: 'Sábado', sun: 'Domingo'
+            };
+            const openDays = (context.workingDays || []).map((d: string) => dayMap[d] || d).join(', ');
+            aiResponse = `Ótima escolha! Atendemos nos dias: ${openDays}. Qual data você prefere? (Ex: 28/02/2026)`;
           } else {
-            aiResponse = `Que pena! O horário das ${parsedTime} já está ocupado nesse dia. Pode me dizer outro horário?`;
+            // Client may have asked about services or said something vague
+            const serviceList = (context.services || []).map((s: any) => `• ${s.name} — R$ ${s.price}`).join('\n');
+            if (serviceList) {
+              aiResponse = `Aqui estão os nossos serviços:\n${serviceList}\n\nQual deles te interessa?`;
+            } else {
+              aiResponse = 'Quais serviços te interessam? Posso ajudar a escolher o melhor para você!';
+            }
           }
-        } else {
-          aiResponse = 'Não entendi o horário. Pode informar no formato HH:MM? Ex: 14:30';
+          break;
         }
 
-      } else {
-        // ── IDLE: check if client wants to book ────────────────────────────
-        const wantsToBook = await this.detectBookingIntent(messageText);
-        if (wantsToBook) {
-          updatedBooking = { stage: 'collecting_name' };
-          aiResponse = 'Que ótimo! Fico feliz em ajudar com o agendamento 😊 Para começar, qual o seu nome completo?';
-        } else {
-          // Normal conversation
-          aiResponse = await this.processMessage(messageText, { ...context, history: formattedHistory }) || 'Como posso ajudar?';
+        // ── Got the date ─────────────────────────────────────────────────────
+        case 'collecting_date': {
+          const parsedDate = await this.parseDate(messageText);
+          if (parsedDate) {
+            updatedBooking = { ...booking, date: parsedDate, stage: 'collecting_time' };
+            aiResponse = `Perfeito! Qual horário você prefere? Atendemos das ${context.workingHours?.start || '08:00'} às ${context.workingHours?.end || '18:00'}.`;
+          } else {
+            aiResponse = 'Não consegui identificar a data. Pode informar assim: 28/02/2026?';
+          }
+          break;
+        }
+
+        // ── Got the time ─────────────────────────────────────────────────────
+        case 'collecting_time': {
+          const parsedTime = await this.parseTime(messageText);
+          if (parsedTime) {
+            const available = await this.checkAvailability(tenantId, booking.date!, parsedTime);
+            if (available) {
+              updatedBooking = { ...booking, time: parsedTime, stage: 'awaiting_confirmation' };
+              const dateFormatted = booking.date
+                ? new Date(booking.date + 'T12:00:00').toLocaleDateString('pt-BR')
+                : booking.date;
+              aiResponse =
+                `📋 *Confirme seu agendamento:*\n\n` +
+                `👤 Nome: ${booking.customer_name}\n` +
+                `✂️ Serviço: ${booking.service_name}\n` +
+                `📅 Data: ${dateFormatted}\n` +
+                `🕐 Horário: ${parsedTime}\n\n` +
+                `Confirmar? (Sim / Não)`;
+            } else {
+              aiResponse = `Que pena! O horário das ${parsedTime} já está ocupado. Qual outro horário você prefere?`;
+            }
+          } else {
+            aiResponse = 'Não entendi o horário. Pode informar assim: 14:30?';
+          }
+          break;
+        }
+
+        // ── Idle: normal conversation or booking start ─────────────────────
+        default: {
+          const wantsToBook = await this.detectBookingIntent(messageText);
+          if (wantsToBook) {
+            updatedBooking = { stage: 'collecting_name' };
+            aiResponse = 'Fico feliz em ajudar! Para começar, qual é o seu nome completo?';
+          } else {
+            aiResponse = await this.processMessage(messageText, { ...context, history: formattedHistory }) || 'Como posso ajudar?';
+          }
+          break;
         }
       }
       // ─────────────────────────────────────────────────────────────────────
@@ -203,61 +239,69 @@ export const aiAgentService = {
     }
   },
 
-  // ─── Detect if client wants to book ────────────────────────────────────────
+  // ─── Detect booking intent ─────────────────────────────────────────────────
   detectBookingIntent: async (message: string): Promise<boolean> => {
-    const prompt = `Você deve detectar se o cliente quer fazer um agendamento, consulta, reserva, ou perguntar sobre horários disponíveis na mensagem: "${message}". Retorne apenas "true" ou "false".`;
+    const prompt = `O cliente quer fazer um agendamento, reserva, marcar horário ou perguntar sobre disponibilidade? Mensagem: "${message}". Responda apenas "true" ou "false".`;
     try {
-      const response = await deepseek.chat.completions.create({
+      const r = await deepseek.chat.completions.create({
         model: 'deepseek-chat',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0,
       });
-      return response.choices[0].message.content?.toLowerCase().includes('true') || false;
-    } catch {
-      return false;
-    }
+      return r.choices[0].message.content?.toLowerCase().includes('true') || false;
+    } catch { return false; }
   },
 
-  // ─── Parse date from natural language ──────────────────────────────────────
+  // ─── Match service from catalog ────────────────────────────────────────────
+  matchService: async (message: string, services: any[]): Promise<string | null> => {
+    if (!services.length) return null;
+    const list = services.map((s: any) => s.name).join(', ');
+    const prompt = `Dado o catálogo de serviços: [${list}], o cliente pediu: "${message}". Retorne APENAS o nome exato do serviço correspondente ou "null" se não houver correspondência clara.`;
+    try {
+      const r = await deepseek.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0,
+      });
+      const result = r.choices[0].message.content?.trim() || '';
+      return result === 'null' || result === '' ? null : result;
+    } catch { return null; }
+  },
+
+  // ─── Parse date ────────────────────────────────────────────────────────────
   parseDate: async (message: string): Promise<string | null> => {
     const today = new Date().toISOString().split('T')[0];
-    const prompt = `Converta a data mencionada na mensagem "${message}" para o formato YYYY-MM-DD. Hoje é ${today}. Retorne APENAS a data no formato YYYY-MM-DD ou null se não for possível identificar.`;
+    const prompt = `Converta a data da mensagem "${message}" para YYYY-MM-DD. Hoje é ${today}. Retorne APENAS a data YYYY-MM-DD ou "null".`;
     try {
-      const response = await deepseek.chat.completions.create({
+      const r = await deepseek.chat.completions.create({
         model: 'deepseek-chat',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0,
       });
-      const result = response.choices[0].message.content?.trim() || '';
-      // Validate format YYYY-MM-DD
+      const result = r.choices[0].message.content?.trim() || '';
       return /^\d{4}-\d{2}-\d{2}$/.test(result) ? result : null;
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   },
 
-  // ─── Parse time from natural language ──────────────────────────────────────
+  // ─── Parse time ────────────────────────────────────────────────────────────
   parseTime: async (message: string): Promise<string | null> => {
-    const prompt = `Converta o horário mencionado na mensagem "${message}" para o formato HH:MM (24h). Retorne APENAS o horário no formato HH:MM ou null se não for possível identificar.`;
+    const prompt = `Converta o horário da mensagem "${message}" para HH:MM (24h). Retorne APENAS HH:MM ou "null".`;
     try {
-      const response = await deepseek.chat.completions.create({
+      const r = await deepseek.chat.completions.create({
         model: 'deepseek-chat',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0,
       });
-      const result = response.choices[0].message.content?.trim() || '';
+      const result = r.choices[0].message.content?.trim() || '';
       return /^\d{2}:\d{2}$/.test(result) ? result : null;
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   },
 
-  // ─── Check for time slot conflicts ─────────────────────────────────────────
+  // ─── Check availability ────────────────────────────────────────────────────
   checkAvailability: async (tenantId: string, date: string, time: string): Promise<boolean> => {
     try {
       const startTime = `${date}T${time}:00`;
       const endTime = new Date(new Date(startTime).getTime() + 60 * 60 * 1000).toISOString();
-
       const { count } = await supabaseAdmin
         .from('appointments')
         .select('*', { count: 'exact', head: true })
@@ -265,29 +309,24 @@ export const aiAgentService = {
         .neq('status', 'cancelled')
         .lt('start_time', endTime)
         .gt('end_time', startTime);
-
       return (count ?? 0) === 0;
-    } catch {
-      return true; // Fallback: allow booking
-    }
+    } catch { return true; }
   },
 
-  // ─── Check if client confirmed ─────────────────────────────────────────────
+  // ─── Check confirmation ────────────────────────────────────────────────────
   checkConfirmation: async (message: string): Promise<boolean> => {
-    const prompt = `Avalie se a mensagem é uma confirmação positiva (ex: sim, claro, pode confirmar, ok, yes, confirmar): "${message}". Retorne apenas "true" ou "false".`;
+    const prompt = `A mensagem "${message}" é uma confirmação positiva (sim, ok, pode, confirmar, yes)? Retorne "true" ou "false".`;
     try {
-      const response = await deepseek.chat.completions.create({
+      const r = await deepseek.chat.completions.create({
         model: 'deepseek-chat',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0,
       });
-      return response.choices[0].message.content?.toLowerCase().includes('true') || false;
-    } catch {
-      return false;
-    }
+      return r.choices[0].message.content?.toLowerCase().includes('true') || false;
+    } catch { return false; }
   },
 
-  // ─── Create appointment in Supabase ────────────────────────────────────────
+  // ─── Save appointment ──────────────────────────────────────────────────────
   executeBooking: async (tenantId: string, booking: BookingData, customerPhone: string): Promise<boolean> => {
     try {
       const { data: service } = await supabaseAdmin
@@ -312,7 +351,7 @@ export const aiAgentService = {
           start_time: startTime,
           end_time: endTime,
           status: 'scheduled',
-          notes: `Agendado via IA pelo WhatsApp. Serviço solicitado: ${booking.service_name}`
+          notes: `Agendado via IA pelo WhatsApp. Serviço: ${booking.service_name}`
         });
 
       if (error) throw error;
