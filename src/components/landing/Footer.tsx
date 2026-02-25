@@ -6,12 +6,20 @@ export const Footer = () => {
             <div className="container px-4 mx-auto">
                 <div className="flex flex-wrap -mx-4">
                     <div className="w-full px-4 mb-12 lg:w-1/2 lg:mb-0">
-                        <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">
-                                B
+                        <div className="flex items-center gap-2.5 mb-6">
+                            <div className="relative w-9 h-9 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/40 overflow-hidden flex-shrink-0">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700" />
+                                <svg viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }} className="text-white relative z-10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="6" cy="6" r="3" />
+                                    <circle cx="6" cy="18" r="3" />
+                                    <line x1="20" y1="4" x2="8.12" y2="15.88" />
+                                    <line x1="14.47" y1="14.48" x2="20" y2="20" />
+                                    <line x1="8.12" y1="8.12" x2="12" y2="12" />
+                                </svg>
+                                <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-white rounded-full opacity-90" />
                             </div>
-                            <span className="text-xl font-bold text-white">
-                                Beautfy<span className="text-indigo-500">.ai</span>
+                            <span className="text-xl font-black text-white tracking-tight">
+                                Beautfy<span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">.ai</span>
                             </span>
                         </div>
                         <p className="max-w-sm text-slate-400 leading-relaxed">

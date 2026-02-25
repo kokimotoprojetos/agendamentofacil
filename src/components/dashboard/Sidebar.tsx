@@ -43,15 +43,28 @@ export function Sidebar() {
         <aside className="fixed left-0 top-0 h-screen w-72 bg-[#020617] border-r border-white/5 flex flex-col z-50 overflow-hidden">
             <div className="p-8">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-600/20 relative overflow-hidden group">
-                        <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 relative z-10" stroke="currentColor" strokeWidth="2.5">
-                            <path d="M12 3L4 9V21H20V9L12 3Z" className="opacity-20" fill="currentColor" />
-                            <path d="M12 3L20 9V21H4V9L12 3Z" strokeLinecap="round" strokeLinejoin="round" />
-                            <circle cx="12" cy="13" r="3" strokeLinecap="round" strokeLinejoin="round" />
+                    {/* Icon */}
+                    <div className="relative w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/40 overflow-hidden flex-shrink-0">
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700" />
+                        {/* Scissors SVG */}
+                        <svg viewBox="0 0 24 24" className="w-5 h-5 text-white relative z-10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="6" cy="6" r="3" />
+                            <circle cx="6" cy="18" r="3" />
+                            <line x1="20" y1="4" x2="8.12" y2="15.88" />
+                            <line x1="14.47" y1="14.48" x2="20" y2="20" />
+                            <line x1="8.12" y1="8.12" x2="12" y2="12" />
                         </svg>
-                        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-600 to-violet-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {/* AI sparkle dot */}
+                        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-white rounded-full opacity-90" />
                     </div>
-                    <span className="text-xl font-bold tracking-tight text-white">Beautfy.ai</span>
+                    {/* Wordmark */}
+                    <div className="flex flex-col leading-none">
+                        <div className="flex items-baseline gap-0">
+                            <span className="text-[19px] font-black tracking-tight text-white">Beautfy</span>
+                            <span className="text-[19px] font-black tracking-tight bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">.ai</span>
+                        </div>
+                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.15em] mt-0.5">Salon &amp; Barber</span>
+                    </div>
                 </div>
             </div>
 
