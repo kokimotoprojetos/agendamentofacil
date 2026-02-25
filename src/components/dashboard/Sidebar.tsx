@@ -67,12 +67,7 @@ export function Sidebar() {
                 })}
             </nav>
 
-            <div className="p-6 border-t border-white/5 bg-[#020617]">
-                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Versão</p>
-                    <p className="text-xs font-medium text-slate-300">v1.3.0 Professional</p>
-                </div>
-            </div>
+
         </aside>
     );
 }
