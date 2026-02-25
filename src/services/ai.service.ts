@@ -45,6 +45,17 @@ export const aiAgentService = {
     context: any,
   ): Promise<string> {
     try {
+      // 0. Guard — only respond if the tenant has at least one service registered ─
+      const { count: serviceCount } = await supabaseAdmin
+        .from('services')
+        .select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId);
+
+      if (!serviceCount || serviceCount === 0) {
+        console.log(`[ai] Tenant ${tenantId} has no services — skipping response.`);
+        return '';
+      }
+
       // 1. Get or create conversation ───────────────────────────────────────────
       let { data: conversation } = await supabaseAdmin
         .from('conversations')
