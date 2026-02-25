@@ -6,68 +6,38 @@ const deepseek = new OpenAI({
   baseURL: 'https://api.deepseek.com/v1',
 });
 
-// ─── Booking state machine ─────────────────────────────────────────────────────
-// idle → collecting_name → collecting_service → collecting_date →
-// collecting_time → awaiting_confirmation → (booked / back to idle)
-// ─────────────────────────────────────────────────────────────────────────────
-
-type BookingData = {
-  stage: string;
-  customer_name?: string;
-  service_name?: string;
-  date?: string;
-  time?: string;
+// ─── Types ─────────────────────────────────────────────────────────────────────
+type BookingExtract = {
+  hasIntent: boolean;
+  customer_name: string | null;
+  service_name: string | null;
+  date: string | null;  // YYYY-MM-DD
+  time: string | null;  // HH:MM
+  complete: boolean;    // true when all 4 fields are present
 };
 
+// ─── Helpers ───────────────────────────────────────────────────────────────────
+async function callAI(messages: any[], opts?: { json?: boolean; temp?: number }): Promise<string> {
+  const response = await deepseek.chat.completions.create({
+    model: 'deepseek-chat',
+    messages,
+    temperature: opts?.temp ?? 0.3,
+    ...(opts?.json ? { response_format: { type: 'json_object' } } : {}),
+  });
+  return response.choices[0].message.content || '';
+}
+
+// ─── Main service ──────────────────────────────────────────────────────────────
 export const aiAgentService = {
-  // ─── Core LLM call for free conversation ───────────────────────────────────
-  processMessage: async (message: string, context: any): Promise<string> => {
-    const dayMap: Record<string, string> = {
-      mon: 'Segunda-feira', tue: 'Terça-feira', wed: 'Quarta-feira',
-      thu: 'Quinta-feira', fri: 'Sexta-feira', sat: 'Sábado', sun: 'Domingo'
-    };
-    const openDays = (context.workingDays || []).map((d: string) => dayMap[d]).join(', ');
 
-    const systemPrompt = `
-      Você é o assistente virtual de atendimento do(a) "${context.businessName}".
-      Personalidade: ${context.personality}.
-
-      INFORMAÇÕES DO NEGÓCIO (use APENAS quando o cliente perguntar):
-      - Localização: ${context.location}
-      - Dias de Funcionamento: ${openDays}
-      - Horário: ${context.workingHours?.start} às ${context.workingHours?.end}
-      - Serviços:
-        ${context.services?.length > 0
-        ? context.services.map((s: any) => `• ${s.name} — R$ ${s.price} (${s.duration} min)`).join('\n        ')
-        : 'Nenhum serviço cadastrado.'}
-
-      REGRAS IMPORTANTES:
-      1. Responda APENAS o que o cliente perguntou. Não liste serviços, preços ou endereços sem ser perguntado.
-      2. Em saudações simples ("Oi", "Bom dia"), responda de forma amigável e pergunte em que pode ajudar.
-      3. Respostas curtas e naturais (1-3 frases).
-      4. Não seja robótico. Converse como um atendente real.
-    `;
-
+  async processResponse(
+    tenantId: string,
+    customerPhone: string,
+    messageText: string,
+    context: any,
+  ): Promise<string> {
     try {
-      const response = await deepseek.chat.completions.create({
-        model: 'deepseek-chat',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...(context.history || []),
-          { role: 'user', content: message }
-        ],
-        temperature: 0.4,
-      });
-      return response.choices[0].message.content || '';
-    } catch {
-      return 'Desculpe, tive uma instabilidade. Pode repetir?';
-    }
-  },
-
-  // ─── Main entry point ───────────────────────────────────────────────────────
-  async processResponse(tenantId: string, customerPhone: string, messageText: string, context: any): Promise<string> {
-    try {
-      // 1. Get or create conversation
+      // 1. Get or create conversation ───────────────────────────────────────────
       let { data: conversation } = await supabaseAdmin
         .from('conversations')
         .select('*')
@@ -84,220 +54,218 @@ export const aiAgentService = {
         conversation = newConv;
       }
 
-      // 2. Fetch message history
+      // 2. Fetch message history (last 20 messages) ─────────────────────────────
       const { data: history } = await supabaseAdmin
         .from('messages')
         .select('direction, content')
         .eq('conversation_id', conversation.id)
         .order('created_at', { ascending: false })
-        .limit(12);
+        .limit(20);
 
-      const formattedHistory = history?.reverse().map(msg => ({
+      const chatHistory = (history?.reverse() || []).map(msg => ({
         role: msg.direction === 'inbound' ? 'user' : 'assistant',
-        content: msg.content
-      })) || [];
+        content: msg.content,
+      }));
 
-      // 3. Save inbound message
+      // 3. Save inbound message ──────────────────────────────────────────────────
       await supabaseAdmin.from('messages').insert({
         conversation_id: conversation.id,
         direction: 'inbound',
-        content: messageText
+        content: messageText,
       });
 
-      // 4. Read booking state
+      // 4. Read conversation context ─────────────────────────────────────────────
       const convCtx = (conversation.context as any) || {};
-      const booking: BookingData = convCtx.booking || { stage: 'idle' };
+      const awaitingConfirmation: boolean = convCtx.awaiting_confirmation === true;
+      const pendingBooking: BookingExtract | null = convCtx.pending_booking || null;
 
       let aiResponse = '';
-      let updatedBooking = { ...booking };
+      let updatedCtx = { ...convCtx };
 
-      // ── BOOKING STATE MACHINE ─────────────────────────────────────────────
-      switch (booking.stage) {
+      // ── A: In confirmation stage ──────────────────────────────────────────────
+      if (awaitingConfirmation && pendingBooking) {
+        const confirmed = await this.checkConfirmation(messageText);
 
-        // ── Waiting for client confirmation ──────────────────────────────────
-        case 'awaiting_confirmation': {
-          const confirmed = await this.checkConfirmation(messageText);
-          if (confirmed) {
-            const success = await this.executeBooking(tenantId, booking, customerPhone);
-            if (success) {
-              const dateFormatted = booking.date
-                ? new Date(booking.date + 'T12:00:00').toLocaleDateString('pt-BR')
-                : booking.date;
-              aiResponse = `✅ Perfeito, ${booking.customer_name}! Agendamento confirmado:\n\n✂️ *${booking.service_name}*\n📅 ${dateFormatted} às ${booking.time}\n\nTe esperamos! 😊`;
-            } else {
-              aiResponse = 'Houve um problema ao salvar. Pode tentar novamente?';
-            }
-            updatedBooking = { stage: 'idle' };
+        if (confirmed) {
+          const success = await this.executeBooking(tenantId, pendingBooking, customerPhone);
+          if (success) {
+            const dateFormatted = pendingBooking.date
+              ? new Date(pendingBooking.date + 'T12:00:00').toLocaleDateString('pt-BR')
+              : '';
+            aiResponse =
+              `✅ Agendamento confirmado, ${pendingBooking.customer_name}!\n\n` +
+              `✂️ *${pendingBooking.service_name}*\n` +
+              `📅 ${dateFormatted} às ${pendingBooking.time}\n\n` +
+              `Te esperamos! 😊`;
           } else {
-            aiResponse = 'Sem problema! Deseja alterar alguma informação ou prefere não agendar agora?';
-            updatedBooking = { stage: 'idle' };
+            aiResponse = 'Houve um problema técnico ao salvar. Pode tentar novamente?';
           }
-          break;
+          updatedCtx = { ...updatedCtx, awaiting_confirmation: false, pending_booking: null };
+
+        } else {
+          // Client said no or wants to change something — let LLM handle naturally
+          updatedCtx = { ...updatedCtx, awaiting_confirmation: false, pending_booking: null };
+          aiResponse = await this.generateResponse(
+            context,
+            chatHistory,
+            messageText,
+            'O cliente recusou ou quer alterar o agendamento. Pergunte o que ele gostaria de mudar ou se prefere cancelar.',
+          );
         }
 
-        // ── Got the name, now ask WHAT they want (not listing services yet) ──
-        case 'collecting_name': {
-          const name = messageText.trim();
-          updatedBooking = { ...booking, customer_name: name, stage: 'collecting_service' };
-          // Ask about the service naturally, without dumping the whole list
-          aiResponse = `Prazer em falar com você, ${name}! 😊 O que você gostaria de fazer hoje?`;
-          break;
-        }
+      } else {
+        // ── B: Normal conversation — LLM drives ────────────────────────────────
+        aiResponse = await this.generateResponse(context, chatHistory, messageText);
 
-        // ── Client responds about what they want — extract service naturally ─
-        case 'collecting_service': {
-          // Try to match a service from the catalog
-          const serviceMatch = await this.matchService(messageText, context.services || []);
-          if (serviceMatch) {
-            updatedBooking = { ...booking, service_name: serviceMatch, stage: 'collecting_date' };
-            const dayMap: Record<string, string> = {
-              mon: 'Segunda', tue: 'Terça', wed: 'Quarta',
-              thu: 'Quinta', fri: 'Sexta', sat: 'Sábado', sun: 'Domingo'
+        // ── C: Try to extract booking data from the FULL conversation ──────────
+        // (Runs after LLM response, no extra roundtrip for the user)
+        const allMessages = [
+          ...chatHistory,
+          { role: 'user', content: messageText },
+          { role: 'assistant', content: aiResponse },
+        ];
+        const extract = await this.extractBookingData(allMessages, context.services || []);
+
+        if (extract.complete && extract.hasIntent) {
+          // Check availability
+          const available = await this.checkAvailability(tenantId, extract.date!, extract.time!);
+          if (available) {
+            // Overwrite response with confirmation summary
+            const dateFormatted = extract.date
+              ? new Date(extract.date + 'T12:00:00').toLocaleDateString('pt-BR')
+              : '';
+            aiResponse =
+              `📋 *Confirmação do Agendamento:*\n\n` +
+              `👤 ${extract.customer_name}\n` +
+              `✂️ ${extract.service_name}\n` +
+              `📅 ${dateFormatted} às ${extract.time}\n\n` +
+              `Posso confirmar? (Sim / Não)`;
+            updatedCtx = {
+              ...updatedCtx,
+              awaiting_confirmation: true,
+              pending_booking: extract,
             };
-            const openDays = (context.workingDays || []).map((d: string) => dayMap[d] || d).join(', ');
-            aiResponse = `Ótima escolha! Atendemos nos dias: ${openDays}. Qual data você prefere? (Ex: 28/02/2026)`;
           } else {
-            // Client may have asked about services or said something vague
-            const serviceList = (context.services || []).map((s: any) => `• ${s.name} — R$ ${s.price}`).join('\n');
-            if (serviceList) {
-              aiResponse = `Aqui estão os nossos serviços:\n${serviceList}\n\nQual deles te interessa?`;
-            } else {
-              aiResponse = 'Quais serviços te interessam? Posso ajudar a escolher o melhor para você!';
-            }
+            // Slot is taken — ask for another time
+            aiResponse = await this.generateResponse(
+              context,
+              allMessages.slice(0, -1),
+              messageText,
+              `O horário das ${extract.time} em ${extract.date} está ocupado. Informe isso de forma amigável e sugira que o cliente escolha outro horário.`,
+            );
           }
-          break;
-        }
-
-        // ── Got the date ─────────────────────────────────────────────────────
-        case 'collecting_date': {
-          const parsedDate = await this.parseDate(messageText);
-          if (parsedDate) {
-            updatedBooking = { ...booking, date: parsedDate, stage: 'collecting_time' };
-            aiResponse = `Perfeito! Qual horário você prefere? Atendemos das ${context.workingHours?.start || '08:00'} às ${context.workingHours?.end || '18:00'}.`;
-          } else {
-            aiResponse = 'Não consegui identificar a data. Pode informar assim: 28/02/2026?';
-          }
-          break;
-        }
-
-        // ── Got the time ─────────────────────────────────────────────────────
-        case 'collecting_time': {
-          const parsedTime = await this.parseTime(messageText);
-          if (parsedTime) {
-            const available = await this.checkAvailability(tenantId, booking.date!, parsedTime);
-            if (available) {
-              updatedBooking = { ...booking, time: parsedTime, stage: 'awaiting_confirmation' };
-              const dateFormatted = booking.date
-                ? new Date(booking.date + 'T12:00:00').toLocaleDateString('pt-BR')
-                : booking.date;
-              aiResponse =
-                `📋 *Confirme seu agendamento:*\n\n` +
-                `👤 Nome: ${booking.customer_name}\n` +
-                `✂️ Serviço: ${booking.service_name}\n` +
-                `📅 Data: ${dateFormatted}\n` +
-                `🕐 Horário: ${parsedTime}\n\n` +
-                `Confirmar? (Sim / Não)`;
-            } else {
-              aiResponse = `Que pena! O horário das ${parsedTime} já está ocupado. Qual outro horário você prefere?`;
-            }
-          } else {
-            aiResponse = 'Não entendi o horário. Pode informar assim: 14:30?';
-          }
-          break;
-        }
-
-        // ── Idle: normal conversation or booking start ─────────────────────
-        default: {
-          const wantsToBook = await this.detectBookingIntent(messageText);
-          if (wantsToBook) {
-            updatedBooking = { stage: 'collecting_name' };
-            aiResponse = 'Fico feliz em ajudar! Para começar, qual é o seu nome completo?';
-          } else {
-            aiResponse = await this.processMessage(messageText, { ...context, history: formattedHistory }) || 'Como posso ajudar?';
-          }
-          break;
         }
       }
-      // ─────────────────────────────────────────────────────────────────────
 
-      // 5. Persist updated booking state
-      await supabaseAdmin.from('conversations').update({
-        context: { ...convCtx, booking: updatedBooking }
-      }).eq('id', conversation.id);
+      // 5. Persist context ────────────────────────────────────────────────────────
+      await supabaseAdmin
+        .from('conversations')
+        .update({ context: updatedCtx })
+        .eq('id', conversation.id);
 
-      // 6. Save outbound message
+      // 6. Save outbound message ─────────────────────────────────────────────────
       await supabaseAdmin.from('messages').insert({
         conversation_id: conversation.id,
         direction: 'outbound',
-        content: aiResponse
+        content: aiResponse,
       });
 
       return aiResponse;
+
     } catch (error) {
       console.error('Erro no processamento da IA:', error);
       return 'Desculpe, tive um problema técnico. Pode repetir?';
     }
   },
 
-  // ─── Detect booking intent ─────────────────────────────────────────────────
-  detectBookingIntent: async (message: string): Promise<boolean> => {
-    const prompt = `O cliente quer fazer um agendamento, reserva, marcar horário ou perguntar sobre disponibilidade? Mensagem: "${message}". Responda apenas "true" ou "false".`;
+  // ─── Generate a natural response using the full conversation history ──────────
+  generateResponse: async (
+    context: any,
+    history: any[],
+    latestMessage: string,
+    extraInstruction: string = '',
+  ): Promise<string> => {
+    const dayMap: Record<string, string> = {
+      mon: 'Segunda', tue: 'Terça', wed: 'Quarta',
+      thu: 'Quinta', fri: 'Sexta', sat: 'Sábado', sun: 'Domingo',
+    };
+    const openDays = (context.workingDays || []).map((d: string) => dayMap[d] || d).join(', ');
+    const serviceList = (context.services || [])
+      .map((s: any) => `• ${s.name} — R$ ${s.price} (${s.duration} min)`)
+      .join('\n');
+
+    const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    const systemPrompt = `Você é o atendente virtual do(a) "${context.businessName}".
+Personalidade: ${context.personality || 'amigável e profissional'}.
+Data de hoje: ${today}.
+
+INFORMAÇÕES DO NEGÓCIO:
+- Endereço: ${context.location || 'não informado'}
+- Dias de atendimento: ${openDays || 'não informado'}
+- Horário: ${context.workingHours?.start || '08:00'} às ${context.workingHours?.end || '18:00'}
+- Serviços:
+${serviceList || '  (nenhum serviço cadastrado)'}
+
+COMO SE COMPORTAR:
+- Converse de forma NATURAL, como um atendente real de salão.
+- Use o histórico da conversa. NUNCA repita perguntas que já foram respondidas.
+- Se o cliente já disse o nome em algum momento, use-o.
+- Quando o cliente quiser agendar, colete naturalmente as informações que AINDA FALTAM: nome, serviço, data e horário.
+- Não liste serviços a menos que o cliente pergunte ou seja necessário para o agendamento.
+- Respostas curtas (1-4 frases). Sem listas desnecessárias.
+${extraInstruction ? `\nINSTRUÇÃO ESPECIAL: ${extraInstruction}` : ''}`;
+
     try {
-      const r = await deepseek.chat.completions.create({
-        model: 'deepseek-chat',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0,
-      });
-      return r.choices[0].message.content?.toLowerCase().includes('true') || false;
-    } catch { return false; }
+      return await callAI([
+        { role: 'system', content: systemPrompt },
+        ...history,
+        { role: 'user', content: latestMessage },
+      ], { temp: 0.4 });
+    } catch {
+      return 'Desculpe, tive um problema técnico. Pode repetir?';
+    }
   },
 
-  // ─── Match service from catalog ────────────────────────────────────────────
-  matchService: async (message: string, services: any[]): Promise<string | null> => {
-    if (!services.length) return null;
-    const list = services.map((s: any) => s.name).join(', ');
-    const prompt = `Dado o catálogo de serviços: [${list}], o cliente pediu: "${message}". Retorne APENAS o nome exato do serviço correspondente ou "null" se não houver correspondência clara.`;
-    try {
-      const r = await deepseek.chat.completions.create({
-        model: 'deepseek-chat',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0,
-      });
-      const result = r.choices[0].message.content?.trim() || '';
-      return result === 'null' || result === '' ? null : result;
-    } catch { return null; }
-  },
-
-  // ─── Parse date ────────────────────────────────────────────────────────────
-  parseDate: async (message: string): Promise<string | null> => {
+  // ─── Extract structured booking data from conversation ────────────────────────
+  // Returns all fields if found in the conversation, marks complete=true when all present
+  extractBookingData: async (
+    conversationMessages: any[],
+    services: any[],
+  ): Promise<BookingExtract> => {
     const today = new Date().toISOString().split('T')[0];
-    const prompt = `Converta a data da mensagem "${message}" para YYYY-MM-DD. Hoje é ${today}. Retorne APENAS a data YYYY-MM-DD ou "null".`;
+    const serviceNames = services.map((s: any) => s.name).join(', ');
+    const conversationText = conversationMessages
+      .map(m => `${m.role === 'user' ? 'Cliente' : 'Agente'}: ${m.content}`)
+      .join('\n');
+
+    const prompt = `Analise esta conversa e extraia dados de agendamento SE o cliente tiver demonstrado intenção de marcar.
+Hoje é ${today}.
+Serviços disponíveis: ${serviceNames || 'não especificado'}.
+
+CONVERSA:
+${conversationText}
+
+Retorne JSON com:
+{
+  "hasIntent": true/false,         // cliente quer agendar?
+  "customer_name": "nome completo ou null",
+  "service_name": "nome do serviço ou null",
+  "date": "YYYY-MM-DD ou null",
+  "time": "HH:MM ou null",
+  "complete": true/false           // true somente se TODOS os 4 campos acima forem não-nulos
+}`;
+
     try {
-      const r = await deepseek.chat.completions.create({
-        model: 'deepseek-chat',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0,
-      });
-      const result = r.choices[0].message.content?.trim() || '';
-      return /^\d{4}-\d{2}-\d{2}$/.test(result) ? result : null;
-    } catch { return null; }
+      const raw = await callAI([{ role: 'user', content: prompt }], { json: true, temp: 0 });
+      const parsed = JSON.parse(raw);
+      return parsed as BookingExtract;
+    } catch {
+      return { hasIntent: false, customer_name: null, service_name: null, date: null, time: null, complete: false };
+    }
   },
 
-  // ─── Parse time ────────────────────────────────────────────────────────────
-  parseTime: async (message: string): Promise<string | null> => {
-    const prompt = `Converta o horário da mensagem "${message}" para HH:MM (24h). Retorne APENAS HH:MM ou "null".`;
-    try {
-      const r = await deepseek.chat.completions.create({
-        model: 'deepseek-chat',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0,
-      });
-      const result = r.choices[0].message.content?.trim() || '';
-      return /^\d{2}:\d{2}$/.test(result) ? result : null;
-    } catch { return null; }
-  },
-
-  // ─── Check availability ────────────────────────────────────────────────────
+  // ─── Check for conflicting appointments ───────────────────────────────────────
   checkAvailability: async (tenantId: string, date: string, time: string): Promise<boolean> => {
     try {
       const startTime = `${date}T${time}:00`;
@@ -310,24 +278,26 @@ export const aiAgentService = {
         .lt('start_time', endTime)
         .gt('end_time', startTime);
       return (count ?? 0) === 0;
-    } catch { return true; }
+    } catch {
+      return true;
+    }
   },
 
-  // ─── Check confirmation ────────────────────────────────────────────────────
+  // ─── Check if message is a confirmation ───────────────────────────────────────
   checkConfirmation: async (message: string): Promise<boolean> => {
-    const prompt = `A mensagem "${message}" é uma confirmação positiva (sim, ok, pode, confirmar, yes)? Retorne "true" ou "false".`;
     try {
-      const r = await deepseek.chat.completions.create({
-        model: 'deepseek-chat',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0,
-      });
-      return r.choices[0].message.content?.toLowerCase().includes('true') || false;
-    } catch { return false; }
+      const result = await callAI([{
+        role: 'user',
+        content: `A mensagem "${message}" é uma confirmação positiva (sim, ok, pode, confirmar, s, yes)? Responda apenas "true" ou "false".`
+      }], { temp: 0 });
+      return result.toLowerCase().includes('true');
+    } catch {
+      return false;
+    }
   },
 
-  // ─── Save appointment ──────────────────────────────────────────────────────
-  executeBooking: async (tenantId: string, booking: BookingData, customerPhone: string): Promise<boolean> => {
+  // ─── Create appointment in Supabase ───────────────────────────────────────────
+  executeBooking: async (tenantId: string, booking: BookingExtract, customerPhone: string): Promise<boolean> => {
     try {
       const { data: service } = await supabaseAdmin
         .from('services')
@@ -351,7 +321,7 @@ export const aiAgentService = {
           start_time: startTime,
           end_time: endTime,
           status: 'scheduled',
-          notes: `Agendado via IA pelo WhatsApp. Serviço: ${booking.service_name}`
+          notes: `Agendado via WhatsApp. Serviço: ${booking.service_name}`,
         });
 
       if (error) throw error;
@@ -360,5 +330,5 @@ export const aiAgentService = {
       console.error('Error executing booking:', error);
       return false;
     }
-  }
+  },
 };
