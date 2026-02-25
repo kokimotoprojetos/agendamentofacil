@@ -103,8 +103,9 @@ export const aiAgentService = {
       // Detect state from last bot message in history (crash-resistant)
       const lastBotContent = [...chatHistory].reverse().find(m => m.role === 'assistant')?.content || '';
       const historyShowsAwaitingCancellation =
-        lastBotContent.includes('quer cancelar') ||
-        (lastBotContent.toLowerCase().includes('cancelar') && lastBotContent.includes('Confirma'));
+        lastBotContent.includes('Você quer cancelar') ||
+        lastBotContent.includes('quer cancelar o agendamento') ||
+        (lastBotContent.toLowerCase().includes('cancelar') && lastBotContent.toLowerCase().includes('confirma'));
       const historyShowsAwaitingBooking =
         lastBotContent.includes('Posso confirmar') || lastBotContent.includes('Confirma') && lastBotContent.includes('Agendamento');
 
@@ -126,7 +127,7 @@ export const aiAgentService = {
           const appointmentId = appt?.id || pendingCancellation?.appointment_id;
 
           if (appointmentId) {
-            const success = await this.executeCancellation(appointmentId);
+            const success = await this.executeCancellation(appointmentId, tenantId);
             if (success) {
               aiResponse = `Prontinho! Agendamento cancelado. Se quiser marcar outro dia, é só me falar 😊`;
             } else {
@@ -186,7 +187,8 @@ export const aiAgentService = {
         ];
 
         // ── C1: Keyword-first cancellation detection (fast + reliable) ───────────
-        const hasCancelKeyword = /cancelar|desmarcar|não vou|nao vou mais|desistir do agendamento/i.test(messageText);
+        // BR-PT: cover every natural way someone says "I want to cancel"
+        const hasCancelKeyword = /cancelar|desmarcar|desmarque|cancela|cancele|nao vou mais|não vou mais|nao vou comparecer|não vou comparecer|desistir do agendamento|remover meu agendamento|remove meu agendamento|me tira do horario|me tira do horário|tirar meu horario|tirar meu horário|quero desmarcar|quero cancelar|pode cancelar|pode desmarcar|muda meu horario|muda meu horário|desmarca|desmarcamento/i.test(messageText);
         const cancelIntent = hasCancelKeyword || await this.detectCancellationIntent(messageText);
 
         if (cancelIntent) {
@@ -428,36 +430,49 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
   },
 
   // ─── Find the next upcoming appointment for a phone number ───────────────────
+  // Tries multiple phone formats to maximise match chances:
+  // - raw JID (55119999@s.whatsapp.net), clean (55119999), without country code (119999)
   findNextAppointmentByPhone: async (tenantId: string, phone: string): Promise<any | null> => {
     try {
-      const cleanPhone = phone.replace(/@s\.whatsapp\.net|@g\.us/g, '').replace(/\D+$/, '');
+      const jid = phone.trim();
+      // Strip @s.whatsapp.net / @g.us suffix
+      const withCountry = jid.replace(/@s\.whatsapp\.net|@g\.us/gi, '').replace(/\D/g, '');
+      // Also try without Brazilian country code (55)
+      const withoutCountry = withCountry.startsWith('55') ? withCountry.slice(2) : withCountry;
+      const phoneCandidates = [...new Set([jid, withCountry, withoutCountry])];
+
       const now = new Date().toISOString();
-      // Search by clean number OR full JID (for backward compatibility)
-      const { data } = await supabaseAdmin
-        .from('appointments')
-        .select('id, start_time, service:services(name)')
-        .eq('tenant_id', tenantId)
-        .or(`customer_phone.eq.${cleanPhone},customer_phone.eq.${phone}`)
-        .eq('status', 'scheduled')
-        .gte('start_time', now)
-        .order('start_time', { ascending: true })
-        .limit(1);
-      return data?.[0] || null;
+
+      for (const candidate of phoneCandidates) {
+        const { data } = await supabaseAdmin
+          .from('appointments')
+          .select('id, start_time, service:services(name)')
+          .eq('tenant_id', tenantId)
+          .eq('customer_phone', candidate)
+          .eq('status', 'scheduled')
+          .gte('start_time', now)
+          .order('start_time', { ascending: true })
+          .limit(1);
+        if (data && data.length > 0) return data[0];
+      }
+      return null;
     } catch {
       return null;
     }
   },
 
   // ─── Mark appointment as cancelled in Supabase ───────────────────────────────
-  executeCancellation: async (appointmentId: string): Promise<boolean> => {
+  // tenantId guard ensures cross-tenant cancellation is impossible
+  executeCancellation: async (appointmentId: string, tenantId?: string): Promise<boolean> => {
     try {
       if (!appointmentId) throw new Error('appointmentId is required');
-      // Use .select('id') so we can verify the row was actually updated
-      const { data, error } = await supabaseAdmin
+      let query = supabaseAdmin
         .from('appointments')
         .update({ status: 'cancelled' })
-        .eq('id', appointmentId)
-        .select('id');
+        .eq('id', appointmentId);
+      // Always scope to tenant when provided (security)
+      if (tenantId) query = query.eq('tenant_id', tenantId);
+      const { data, error } = await query.select('id');
       if (error) throw error;
       if (!data || data.length === 0) throw new Error(`No rows updated for id=${appointmentId}`);
       console.log(`[cancel] ✅ Appointment ${appointmentId} cancelled`);
