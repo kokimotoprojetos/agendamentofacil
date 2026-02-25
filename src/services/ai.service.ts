@@ -9,11 +9,12 @@ const deepseek = new OpenAI({
 // ─── Types ─────────────────────────────────────────────────────────────────────
 type BookingExtract = {
   hasIntent: boolean;
+  activeNow: boolean;   // true only if client is ACTIVELY trying to book right now
   customer_name: string | null;
   service_name: string | null;
   date: string | null;  // YYYY-MM-DD
   time: string | null;  // HH:MM
-  complete: boolean;    // true when all 4 fields are present
+  complete: boolean;    // true when all 4 fields are present AND activeNow is true
 };
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -126,7 +127,7 @@ export const aiAgentService = {
         ];
         const extract = await this.extractBookingData(allMessages, context.services || []);
 
-        if (extract.complete && extract.hasIntent) {
+        if (extract.complete && extract.hasIntent && extract.activeNow) {
           // Check availability
           const available = await this.checkAvailability(tenantId, extract.date!, extract.time!);
           if (available) {
@@ -228,32 +229,44 @@ ${extraInstruction ? `\nINSTRUÇÃO ESPECIAL: ${extraInstruction}` : ''}`;
   },
 
   // ─── Extract structured booking data from conversation ────────────────────────
-  // Returns all fields if found in the conversation, marks complete=true when all present
+  // Checks the FULL history for data, but only marks activeNow=true if booking
+  // intent appears in the LAST 4 messages (so mid-conversation questions don't interrupt).
   extractBookingData: async (
     conversationMessages: any[],
     services: any[],
   ): Promise<BookingExtract> => {
     const today = new Date().toISOString().split('T')[0];
     const serviceNames = services.map((s: any) => s.name).join(', ');
-    const conversationText = conversationMessages
+
+    // Full conversation for data extraction
+    const fullText = conversationMessages
       .map(m => `${m.role === 'user' ? 'Cliente' : 'Agente'}: ${m.content}`)
       .join('\n');
 
-    const prompt = `Analise esta conversa e extraia dados de agendamento SE o cliente tiver demonstrado intenção de marcar.
-Hoje é ${today}.
-Serviços disponíveis: ${serviceNames || 'não especificado'}.
+    // Only the most recent 4 messages to check active intent
+    const recentMessages = conversationMessages.slice(-4);
+    const recentText = recentMessages
+      .map(m => `${m.role === 'user' ? 'Cliente' : 'Agente'}: ${m.content}`)
+      .join('\n');
 
-CONVERSA:
-${conversationText}
+    const prompt = `Você é um extrator de dados de agendamento.
+Hoje é ${today}. Serviços: ${serviceNames || 'não especificado'}.
 
-Retorne JSON com:
+CONVERSA COMPLETA (para extração de dados):
+${fullText}
+
+MENSAGENS RECENTES (para verificar intenção ativa):
+${recentText}
+
+Retorne JSON:
 {
-  "hasIntent": true/false,         // cliente quer agendar?
-  "customer_name": "nome completo ou null",
+  "hasIntent": true/false,
+  "activeNow": true/false,  // TRUE somente se nas MENSAGENS RECENTES o cliente está ATIVAMENTE tentando agendar (pedindo data, horário, ou confirmando serviço). FALSE se o cliente está fazendo outra pergunta qualquer.
+  "customer_name": "nome ou null",
   "service_name": "nome do serviço ou null",
   "date": "YYYY-MM-DD ou null",
   "time": "HH:MM ou null",
-  "complete": true/false           // true somente se TODOS os 4 campos acima forem não-nulos
+  "complete": true/false  // true SOMENTE se hasIntent=true, activeNow=true E todos os 4 campos não forem nulos
 }`;
 
     try {
@@ -261,7 +274,7 @@ Retorne JSON com:
       const parsed = JSON.parse(raw);
       return parsed as BookingExtract;
     } catch {
-      return { hasIntent: false, customer_name: null, service_name: null, date: null, time: null, complete: false };
+      return { hasIntent: false, activeNow: false, customer_name: null, service_name: null, date: null, time: null, complete: false };
     }
   },
 

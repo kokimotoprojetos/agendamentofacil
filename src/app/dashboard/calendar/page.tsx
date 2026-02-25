@@ -210,6 +210,7 @@ export default function AgendaPage() {
                         {calendarDays.map((day, i) => {
                             const dayStr = format(day, 'yyyy-MM-dd');
                             const count = monthCounts[dayStr] || 0;
+                            const hasAppts = count > 0;
                             const isSelected = isSameDay(day, selectedDate);
                             const isCurrentMonth = isSameMonth(day, currentMonth);
                             const today = isToday(day);
@@ -220,34 +221,32 @@ export default function AgendaPage() {
                                     onClick={() => handleDayClick(day)}
                                     className={`
                                         relative flex flex-col items-center pt-3 pb-4 min-h-[72px] transition-all border-b border-r border-white/[0.03]
-                                        ${isSelected ? 'bg-indigo-600/20' : 'hover:bg-white/[0.03]'}
+                                        ${isSelected && hasAppts ? 'bg-emerald-600/25' : ''}
+                                        ${isSelected && !hasAppts ? 'bg-indigo-600/20' : ''}
+                                        ${!isSelected && hasAppts ? 'bg-emerald-500/10 hover:bg-emerald-500/20' : ''}
+                                        ${!isSelected && !hasAppts ? 'hover:bg-white/[0.03]' : ''}
                                         ${!isCurrentMonth ? 'opacity-30' : ''}
                                     `}
                                 >
                                     {/* Day number */}
                                     <span className={`
                                         w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all
-                                        ${isSelected ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : ''}
-                                        ${today && !isSelected ? 'ring-2 ring-indigo-500 text-indigo-400' : ''}
-                                        ${!today && !isSelected ? 'text-slate-300' : ''}
+                                        ${isSelected && hasAppts ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/40' : ''}
+                                        ${isSelected && !hasAppts ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : ''}
+                                        ${!isSelected && hasAppts ? 'ring-2 ring-emerald-500/70 text-emerald-300' : ''}
+                                        ${today && !isSelected && !hasAppts ? 'ring-2 ring-indigo-500 text-indigo-400' : ''}
+                                        ${!today && !isSelected && !hasAppts ? 'text-slate-300' : ''}
                                     `}>
                                         {format(day, 'd')}
                                     </span>
 
-                                    {/* Appointment dots */}
-                                    {count > 0 && (
-                                        <div className="flex gap-0.5 mt-1.5 flex-wrap justify-center px-1">
-                                            {Array.from({ length: Math.min(count, 3) }).map((_, idx) => (
-                                                <span key={idx} className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                                            ))}
-                                            {count > 3 && <span className="text-[9px] text-indigo-400 font-bold">+{count - 3}</span>}
-                                        </div>
-                                    )}
-
-                                    {/* Count badge for many appointments */}
-                                    {count >= 4 && (
-                                        <span className="absolute top-2 right-2 text-[9px] bg-indigo-600 text-white rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                                            {count}
+                                    {/* Appointment count indicator */}
+                                    {hasAppts && (
+                                        <span className={`
+                                            mt-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-black
+                                            ${isSelected ? 'bg-emerald-500/30 text-emerald-200' : 'bg-emerald-500/20 text-emerald-400'}
+                                        `}>
+                                            {count} {count === 1 ? 'horário' : 'horários'}
                                         </span>
                                     )}
                                 </button>
