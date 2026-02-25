@@ -30,6 +30,7 @@ export async function GET(req: Request) {
             .from('appointments')
             .select('*, service:services(name, duration, price)')
             .eq('tenant_id', tenantId)
+            .neq('status', 'cancelled')
             .order('start_time', { ascending: true });
 
         if (date) {
