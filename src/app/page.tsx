@@ -1,7 +1,6 @@
 import React from 'react';
 import { Hero } from '@/components/landing/Hero';
 import { Features } from '@/components/landing/Features';
-import { Pricing } from '@/components/landing/Pricing';
 import { Footer } from '@/components/landing/Footer';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 
@@ -17,7 +16,6 @@ export default function LandingPage() {
 
           <div className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Funcionalidades</a>
-            <a href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Preços</a>
             <a href="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Login</a>
             <a href="/register" className="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
               Começar Agora
@@ -29,7 +27,6 @@ export default function LandingPage() {
       <main>
         <Hero />
         <Features />
-        <Pricing />
       </main>
 
       <Footer />
