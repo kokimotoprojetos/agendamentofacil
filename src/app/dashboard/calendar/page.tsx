@@ -295,85 +295,93 @@ export default function AgendaPage() {
                         </p>
                     </div>
 
-                    {/* Appointments list */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    {/* Timeline view */}
+                    <div className="flex-1 overflow-y-auto bg-slate-900/40 relative">
                         {loading ? (
                             <div className="flex justify-center py-12">
                                 <div className="w-7 h-7 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                             </div>
-                        ) : appointments.length === 0 ? (
-                            <div className="text-center py-12">
-                                <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                                    <Clock size={22} className="text-indigo-400" />
-                                </div>
-                                <p className="text-slate-400 text-sm font-medium">Dia livre</p>
-                                <p className="text-slate-600 text-xs mt-1 mb-4">Nenhum agendamento para esta data</p>
-                                <button
-                                    onClick={handleOpenModal}
-                                    className="px-5 py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 transition-all"
-                                >
-                                    Agendar agora
-                                </button>
-                            </div>
                         ) : (
-                            appointments.map(app => {
-                                const st = STATUS_MAP[app.status] || STATUS_MAP.pending;
-                                const startHour = format(parseISO(app.start_time), 'HH:mm');
-                                const endHour = format(parseISO(app.end_time), 'HH:mm');
-                                const initials = app.customer_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-
-                                return (
-                                    <div
-                                        key={app.id}
-                                        className="p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-2xl border border-white/5 transition-all group"
-                                    >
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <div className="w-8 h-8 flex-shrink-0 rounded-xl bg-indigo-500/10 text-indigo-300 flex items-center justify-center font-bold text-xs">
-                                                {initials}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-bold text-white truncate">{app.customer_name}</p>
-                                                <p className="text-[11px] text-slate-400">{app.service?.name}</p>
-                                            </div>
-                                            <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border flex-shrink-0 ${st.badge}`}>
-                                                {st.label}
+                            <div className="relative min-h-full py-4">
+                                {/* Hour Lines */}
+                                {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21].map(hour => (
+                                    <div key={hour} className="flex group border-b border-white/[0.03] h-20 items-start relative">
+                                        <div className="w-16 flex-shrink-0 text-center -mt-2">
+                                            <span className="text-[10px] font-bold text-slate-500 group-hover:text-slate-400 transition-colors">
+                                                {String(hour).padStart(2, '0')}:00
                                             </span>
                                         </div>
+                                        <div className="flex-1" />
+                                    </div>
+                                ))}
 
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-1.5">
-                                                <Clock size={11} className="text-slate-500" />
-                                                <span className="text-[11px] text-slate-400">{startHour} – {endHour}</span>
-                                                {app.customer_phone && (
-                                                    <>
-                                                        <span className="text-slate-700">·</span>
-                                                        <Phone size={11} className="text-slate-500" />
-                                                        <span className="text-[11px] text-slate-500">
-                                                            {app.customer_phone.replace(/@s\.whatsapp\.net|@g\.us/, '')}
+                                {/* Appointments positioned on timeline */}
+                                {appointments.map(app => {
+                                    const st = STATUS_MAP[app.status] || STATUS_MAP.pending;
+                                    const dateObj = parseISO(app.start_time);
+                                    const hour = dateObj.getHours();
+                                    const minutes = dateObj.getMinutes();
+                                    const startHourIdx = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21].indexOf(hour);
+
+                                    if (startHourIdx === -1) return null; // Outside display range
+
+                                    const topPos = (startHourIdx * 80) + (minutes * 80 / 60) + 16;
+                                    const duration = app.service?.duration || 60;
+                                    const heightPos = (duration * 80 / 60) - 4; // -4 for spacing
+
+                                    const initials = app.customer_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+                                    return (
+                                        <div
+                                            key={app.id}
+                                            style={{ top: `${topPos}px`, height: `${heightPos}px` }}
+                                            className={`
+                                                absolute left-16 right-4 rounded-xl border-l-4 p-3 transition-all cursor-pointer group hover:z-20
+                                                shadow-xl shadow-black/20 backdrop-blur-sm
+                                                ${app.status === 'cancelled' ? 'bg-slate-800/40 border-slate-600 opacity-60' :
+                                                    app.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/50' :
+                                                        'bg-indigo-500/10 border-indigo-500/50 hover:bg-indigo-500/20'}
+                                            `}
+                                        >
+                                            <div className="flex items-start justify-between gap-2 overflow-hidden h-full">
+                                                <div className="min-w-0">
+                                                    <div className="flex items-center gap-2 mb-0.5">
+                                                        <span className="text-[10px] font-black text-white/50 uppercase tracking-widest leading-none">
+                                                            {format(dateObj, 'HH:mm')}
                                                         </span>
-                                                    </>
-                                                )}
-                                            </div>
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
+                                                    </div>
+                                                    <h4 className="text-[13px] font-bold text-white leading-tight truncate">
+                                                        {app.customer_name}
+                                                    </h4>
+                                                    <p className="text-[10px] font-medium text-slate-400 truncate opacity-80">
+                                                        {app.service?.name} ({duration}m)
+                                                    </p>
+                                                </div>
 
-                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                                {app.status !== 'completed' && (
-                                                    <button onClick={() => handleStatus(app.id, 'completed')} className="p-1.5 text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all" title="Concluído">
-                                                        <Check size={13} />
+                                                <div className="flex flex-col gap-1 items-end flex-shrink-0 opacity-0 group-hover:opacity-100 transition-all">
+                                                    <button onClick={(e) => { e.stopPropagation(); handleStatus(app.id, 'completed'); }} title="Finalizar" className="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500 hover:text-white transition-all">
+                                                        <Check size={12} strokeWidth={3} />
                                                     </button>
-                                                )}
-                                                {app.status !== 'cancelled' && (
-                                                    <button onClick={() => handleStatus(app.id, 'cancelled')} className="p-1.5 text-amber-400 hover:bg-amber-500/10 rounded-lg transition-all" title="Cancelar">
-                                                        <X size={13} />
+                                                    <button onClick={(e) => { e.stopPropagation(); handleDelete(app.id); }} title="Excluir" className="p-1.5 bg-rose-500/20 text-rose-400 rounded-lg hover:bg-rose-500 hover:text-white transition-all">
+                                                        <Trash2 size={12} strokeWidth={3} />
                                                     </button>
-                                                )}
-                                                <button onClick={() => handleDelete(app.id)} className="p-1.5 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all" title="Excluir">
-                                                    <Trash2 size={13} />
-                                                </button>
+                                                </div>
                                             </div>
                                         </div>
+                                    );
+                                })}
+
+                                {/* Empty state if no appointments */}
+                                {appointments.length === 0 && (
+                                    <div className="absolute inset-x-16 inset-y-0 flex items-center justify-center pointer-events-none">
+                                        <div className="text-center opacity-20">
+                                            <Clock size={40} className="mx-auto mb-2 text-slate-500" />
+                                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Horários Livres</p>
+                                        </div>
                                     </div>
-                                );
-                            })
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>
