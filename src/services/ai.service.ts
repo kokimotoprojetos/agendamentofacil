@@ -17,6 +17,13 @@ type BookingExtract = {
   complete: boolean;    // true when all 4 fields are present AND activeNow is true
 };
 
+type CancellationCtx = {
+  appointment_id: string;
+  service_name: string;
+  date_formatted: string;
+  time: string;
+};
+
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 async function callAI(messages: any[], opts?: { json?: boolean; temp?: number }): Promise<string> {
   const response = await deepseek.chat.completions.create({
@@ -79,12 +86,37 @@ export const aiAgentService = {
       const convCtx = (conversation.context as any) || {};
       const awaitingConfirmation: boolean = convCtx.awaiting_confirmation === true;
       const pendingBooking: BookingExtract | null = convCtx.pending_booking || null;
+      const awaitingCancellation: boolean = convCtx.awaiting_cancellation === true;
+      const pendingCancellation: CancellationCtx | null = convCtx.pending_cancellation || null;
 
       let aiResponse = '';
       let updatedCtx = { ...convCtx };
 
-      // ── A: In confirmation stage ──────────────────────────────────────────────
-      if (awaitingConfirmation && pendingBooking) {
+      // ── A0: Awaiting cancellation confirmation ─────────────────────────────────
+      if (awaitingCancellation && pendingCancellation) {
+        const confirmed = await this.checkConfirmation(messageText);
+
+        if (confirmed) {
+          const success = await this.executeCancellation(pendingCancellation.appointment_id);
+          if (success) {
+            aiResponse =
+              `✅ Agendamento cancelado com sucesso!\n\n` +
+              `✂️ *${pendingCancellation.service_name}*\n` +
+              `📅 ${pendingCancellation.date_formatted} às ${pendingCancellation.time}\n\n` +
+              `Se quiser remarcar, é só me avisar. 😊`;
+          } else {
+            aiResponse = 'Não consegui cancelar. Pode tentar novamente?';
+          }
+        } else {
+          aiResponse = await this.generateResponse(
+            context, chatHistory, messageText,
+            'O cliente desistiu de cancelar. Responda de forma amigável.',
+          );
+        }
+        updatedCtx = { ...updatedCtx, awaiting_cancellation: false, pending_cancellation: null };
+
+        // ── A: In booking confirmation stage ─────────────────────────────────────
+      } else if (awaitingConfirmation && pendingBooking) {
         const confirmed = await this.checkConfirmation(messageText);
 
         if (confirmed) {
@@ -118,42 +150,69 @@ export const aiAgentService = {
         // ── B: Normal conversation — LLM drives ────────────────────────────────
         aiResponse = await this.generateResponse(context, chatHistory, messageText);
 
-        // ── C: Try to extract booking data from the FULL conversation ──────────
-        // (Runs after LLM response, no extra roundtrip for the user)
         const allMessages = [
           ...chatHistory,
           { role: 'user', content: messageText },
           { role: 'assistant', content: aiResponse },
         ];
-        const extract = await this.extractBookingData(allMessages, context.services || []);
 
-        if (extract.complete && extract.hasIntent && extract.activeNow) {
-          // Check availability
-          const available = await this.checkAvailability(tenantId, extract.date!, extract.time!);
-          if (available) {
-            // Overwrite response with confirmation summary
-            const dateFormatted = extract.date
-              ? new Date(extract.date + 'T12:00:00').toLocaleDateString('pt-BR')
-              : '';
+        // ── C1: Check for CANCELLATION intent first ────────────────────────────
+        const cancelIntent = await this.detectCancellationIntent(messageText);
+        if (cancelIntent) {
+          const appt = await this.findNextAppointmentByPhone(tenantId, customerPhone);
+          if (appt) {
+            const dateFormatted = new Date(appt.start_time)
+              .toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+            const timeFormatted = new Date(appt.start_time)
+              .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             aiResponse =
-              `📋 *Confirmação do Agendamento:*\n\n` +
-              `👤 ${extract.customer_name}\n` +
-              `✂️ ${extract.service_name}\n` +
-              `📅 ${dateFormatted} às ${extract.time}\n\n` +
-              `Posso confirmar? (Sim / Não)`;
+              `⚠️ Você quer cancelar este agendamento?\n\n` +
+              `✂️ *${appt.service?.name || 'Serviço'}*\n` +
+              `📅 ${dateFormatted} às ${timeFormatted}\n\n` +
+              `Confirma o cancelamento? (Sim / Não)`;
             updatedCtx = {
               ...updatedCtx,
-              awaiting_confirmation: true,
-              pending_booking: extract,
+              awaiting_cancellation: true,
+              pending_cancellation: {
+                appointment_id: appt.id,
+                service_name: appt.service?.name || 'Serviço',
+                date_formatted: `${dateFormatted}`,
+                time: timeFormatted,
+              },
             };
           } else {
-            // Slot is taken — ask for another time
             aiResponse = await this.generateResponse(
-              context,
-              allMessages.slice(0, -1),
-              messageText,
-              `O horário das ${extract.time} em ${extract.date} está ocupado. Informe isso de forma amigável e sugira que o cliente escolha outro horário.`,
+              context, allMessages.slice(0, -1), messageText,
+              'O cliente quer cancelar mas não há agendamentos futuros para o número dele. Informe isso de forma amigável.',
             );
+          }
+
+          // ── C2: Check for BOOKING intent ─────────────────────────────────────
+        } else {
+          const extract = await this.extractBookingData(allMessages, context.services || []);
+          if (extract.complete && extract.hasIntent && extract.activeNow) {
+            const available = await this.checkAvailability(tenantId, extract.date!, extract.time!);
+            if (available) {
+              const dateFormatted = extract.date
+                ? new Date(extract.date + 'T12:00:00').toLocaleDateString('pt-BR')
+                : '';
+              aiResponse =
+                `📋 *Confirmação do Agendamento:*\n\n` +
+                `👤 ${extract.customer_name}\n` +
+                `✂️ ${extract.service_name}\n` +
+                `📅 ${dateFormatted} às ${extract.time}\n\n` +
+                `Posso confirmar? (Sim / Não)`;
+              updatedCtx = {
+                ...updatedCtx,
+                awaiting_confirmation: true,
+                pending_booking: extract,
+              };
+            } else {
+              aiResponse = await this.generateResponse(
+                context, allMessages.slice(0, -1), messageText,
+                `O horário das ${extract.time} em ${extract.date} está ocupado. Informe de forma amigável e sugira outro horário.`,
+              );
+            }
           }
         }
       }
@@ -305,6 +364,54 @@ Retorne JSON:
       }], { temp: 0 });
       return result.toLowerCase().includes('true');
     } catch {
+      return false;
+    }
+  },
+
+  // ─── Detect cancellation intent in a message ────────────────────────────────
+  detectCancellationIntent: async (message: string): Promise<boolean> => {
+    try {
+      const result = await callAI([{
+        role: 'user',
+        content: `A mensagem "${message}" expressa intenção de CANCELAR um agendamento existente (cancelar, desmarcar, remover, não vou mais, etc.)? Responda apenas "true" ou "false".`
+      }], { temp: 0 });
+      return result.toLowerCase().includes('true');
+    } catch {
+      return false;
+    }
+  },
+
+  // ─── Find the next upcoming appointment for a phone number ───────────────────
+  findNextAppointmentByPhone: async (tenantId: string, phone: string): Promise<any | null> => {
+    try {
+      const now = new Date().toISOString();
+      const { data } = await supabaseAdmin
+        .from('appointments')
+        .select('id, start_time, service:services(name)')
+        .eq('tenant_id', tenantId)
+        .eq('customer_phone', phone)
+        .eq('status', 'scheduled')
+        .gte('start_time', now)
+        .order('start_time', { ascending: true })
+        .limit(1)
+        .single();
+      return data || null;
+    } catch {
+      return null;
+    }
+  },
+
+  // ─── Mark appointment as cancelled in Supabase ───────────────────────────────
+  executeCancellation: async (appointmentId: string): Promise<boolean> => {
+    try {
+      const { error } = await supabaseAdmin
+        .from('appointments')
+        .update({ status: 'cancelled' })
+        .eq('id', appointmentId);
+      if (error) throw error;
+      return true;
+    } catch (err) {
+      console.error('Error cancelling appointment:', err);
       return false;
     }
   },
