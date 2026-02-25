@@ -213,7 +213,23 @@ export default function AgendaPage() {
                             const hasAppts = count > 0;
                             const isSelected = isSameDay(day, selectedDate);
                             const isCurrentMonth = isSameMonth(day, currentMonth);
-                            const today = isToday(day);
+                            const isTodays = isToday(day);
+
+                            // Background color priority: selected+appts > appts > selected > today > default
+                            const bgClass =
+                                isSelected && hasAppts ? 'bg-emerald-600/20' :
+                                    hasAppts ? 'bg-emerald-500/8 hover:bg-emerald-500/15' :
+                                        isSelected ? 'bg-white/8' :
+                                            'hover:bg-white/[0.04]';
+
+                            // Number circle priority: selected+appts > appts > selected > today > default
+                            const numClass =
+                                isSelected && hasAppts ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/40' :
+                                    hasAppts && !isSelected ? 'ring-2 ring-emerald-500 text-emerald-300' :
+                                        isSelected && isTodays ? 'bg-white text-slate-900 font-black' :
+                                            isSelected ? 'bg-white/90 text-slate-900 font-bold' :
+                                                isTodays ? 'ring-1 ring-white/50 text-white font-bold' :
+                                                    'text-slate-400';
 
                             return (
                                 <button
@@ -221,26 +237,26 @@ export default function AgendaPage() {
                                     onClick={() => handleDayClick(day)}
                                     className={`
                                         relative flex flex-col items-center pt-3 pb-4 min-h-[72px] transition-all border-b border-r border-white/[0.03]
-                                        ${isSelected && hasAppts ? 'bg-emerald-600/25' : ''}
-                                        ${isSelected && !hasAppts ? 'bg-indigo-600/20' : ''}
-                                        ${!isSelected && hasAppts ? 'bg-emerald-500/10 hover:bg-emerald-500/20' : ''}
-                                        ${!isSelected && !hasAppts ? 'hover:bg-white/[0.03]' : ''}
-                                        ${!isCurrentMonth ? 'opacity-30' : ''}
+                                        ${bgClass}
+                                        ${!isCurrentMonth ? 'opacity-25' : ''}
                                     `}
                                 >
+                                    {/* Today label */}
+                                    {isTodays && (
+                                        <span className="absolute top-1 left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-400 uppercase tracking-widest">
+                                            hoje
+                                        </span>
+                                    )}
+
                                     {/* Day number */}
                                     <span className={`
-                                        w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all
-                                        ${isSelected && hasAppts ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/40' : ''}
-                                        ${isSelected && !hasAppts ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : ''}
-                                        ${!isSelected && hasAppts ? 'ring-2 ring-emerald-500/70 text-emerald-300' : ''}
-                                        ${today && !isSelected && !hasAppts ? 'ring-2 ring-indigo-500 text-indigo-400' : ''}
-                                        ${!today && !isSelected && !hasAppts ? 'text-slate-300' : ''}
+                                        w-8 h-8 flex items-center justify-center rounded-full text-sm transition-all mt-1
+                                        ${numClass}
                                     `}>
                                         {format(day, 'd')}
                                     </span>
 
-                                    {/* Appointment count indicator */}
+                                    {/* Appointment count badge */}
                                     {hasAppts && (
                                         <span className={`
                                             mt-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-black
