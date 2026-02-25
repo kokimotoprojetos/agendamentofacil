@@ -79,95 +79,98 @@ export default function ServicesPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto pb-20 animate-fade-up">
-            <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Catálogo de Serviços</h1>
-                    <p className="text-sm text-slate-400">Gerencie os tratamentos e serviços oferecidos pela sua unidade.</p>
-                </div>
-                <button
-                    onClick={() => handleOpenModal()}
-                    className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/20 hover:bg-indigo-500 transition-all active:scale-95"
-                >
-                    <Plus size={18} />
-                    <span>Adicionar Serviço</span>
-                </button>
-            </header>
-
-            {loading ? (
-                <div className="flex justify-center py-20">
-                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                </div>
-            ) : services.length === 0 ? (
-                <div className="glass p-16 rounded-[2rem] border-dashed border-white/5 text-center bg-white/[0.02]">
-                    <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <Briefcase size={32} className="text-indigo-400" />
+        <>
+            {/* ── PAGE CONTENT ─────────────────────────────────────────────────── */}
+            <div className="max-w-7xl mx-auto pb-20 animate-fade-up">
+                <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div>
+                        <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Catálogo de Serviços</h1>
+                        <p className="text-sm text-slate-400">Gerencie os tratamentos e serviços oferecidos pela sua unidade.</p>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Nenhum serviço cadastrado</h3>
-                    <p className="text-slate-500 text-sm max-w-sm mx-auto mb-8">Cadastre seus serviços para que o Agente IA possa apresentar opções e realizar agendamentos automáticos.</p>
                     <button
                         onClick={() => handleOpenModal()}
-                        className="px-8 py-3 bg-white/5 text-white font-bold text-sm rounded-xl hover:bg-white/10 transition-all border border-white/10"
+                        className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/20 hover:bg-indigo-500 transition-all active:scale-95"
                     >
-                        Começar agora
+                        <Plus size={18} />
+                        <span>Adicionar Serviço</span>
                     </button>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {services.map((service) => (
-                        <div
-                            key={service.id}
-                            className="glass p-6 rounded-2xl border-white/5 hover:border-indigo-500/30 transition-all group relative bg-slate-900/40"
+                </header>
+
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                ) : services.length === 0 ? (
+                    <div className="glass p-16 rounded-[2rem] border-dashed border-white/5 text-center bg-white/[0.02]">
+                        <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <Briefcase size={32} className="text-indigo-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Nenhum serviço cadastrado</h3>
+                        <p className="text-slate-500 text-sm max-w-sm mx-auto mb-8">Cadastre seus serviços para que o Agente IA possa apresentar opções e realizar agendamentos automáticos.</p>
+                        <button
+                            onClick={() => handleOpenModal()}
+                            className="px-8 py-3 bg-white/5 text-white font-bold text-sm rounded-xl hover:bg-white/10 transition-all border border-white/10"
                         >
-                            <div className="flex justify-between items-start mb-5">
-                                <div className="p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all transform group-hover:rotate-3">
-                                    <Briefcase size={20} />
-                                </div>
-                                <div className="flex gap-1">
-                                    <button
-                                        onClick={() => handleOpenModal(service)}
-                                        className="p-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                                        title="Editar"
-                                    >
-                                        <Edit2 size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(service.id)}
-                                        className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
-                                        title="Excluir"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="mb-6">
-                                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors line-clamp-1">{service.name}</h3>
-                                <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 h-8">{service.description || 'Nenhuma descrição detalhada para este serviço.'}</p>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-5 border-t border-white/5">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Preço Sugerido</span>
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-xs text-indigo-400 font-bold">R$</span>
-                                        <span className="text-2xl font-bold text-white tracking-tight">{service.price}</span>
+                            Começar agora
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {services.map((service) => (
+                            <div
+                                key={service.id}
+                                className="glass p-6 rounded-2xl border-white/5 hover:border-indigo-500/30 transition-all group relative bg-slate-900/40"
+                            >
+                                <div className="flex justify-between items-start mb-5">
+                                    <div className="p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all transform group-hover:rotate-3">
+                                        <Briefcase size={20} />
+                                    </div>
+                                    <div className="flex gap-1">
+                                        <button
+                                            onClick={() => handleOpenModal(service)}
+                                            className="p-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                                            title="Editar"
+                                        >
+                                            <Edit2 size={16} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(service.id)}
+                                            className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
+                                            title="Excluir"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 rounded-full border border-white/5 text-slate-400">
-                                    <Clock size={12} className="text-indigo-400" />
-                                    <span className="text-[11px] font-bold text-slate-300">{service.duration} min</span>
+
+                                <div className="mb-6">
+                                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors line-clamp-1">{service.name}</h3>
+                                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 h-8">{service.description || 'Nenhuma descrição detalhada para este serviço.'}</p>
                                 </div>
+
+                                <div className="flex items-center justify-between pt-5 border-t border-white/5">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Preço Sugerido</span>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-xs text-indigo-400 font-bold">R$</span>
+                                            <span className="text-2xl font-bold text-white tracking-tight">{service.price}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 rounded-full border border-white/5 text-slate-400">
+                                        <Clock size={12} className="text-indigo-400" />
+                                        <span className="text-[11px] font-bold text-slate-300">{service.duration} min</span>
+                                    </div>
+                                </div>
+
+                                {/* Decorative element */}
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 blur-3xl rounded-full -mr-12 -mt-12 group-hover:bg-indigo-500/10 transition-all"></div>
                             </div>
+                        ))}
+                    </div>
+                )}
+            </div>
 
-                            {/* Decorative element */}
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 blur-3xl rounded-full -mr-12 -mt-12 group-hover:bg-indigo-500/10 transition-all"></div>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {/* Modal de Cadastro/Edição */}
+            {/* ── MODAL — fora do animate-fade-up para fixed inset-0 cobrir toda a tela ── */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="bg-[#0f172a] border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
@@ -277,6 +280,6 @@ export default function ServicesPage() {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }
