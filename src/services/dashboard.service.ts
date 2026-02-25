@@ -54,6 +54,7 @@ export const dashboardService = {
             .from('appointments')
             .select('*, customer_name, start_time, status, service:services(name)')
             .eq('tenant_id', tenantId)
+            .neq('status', 'cancelled')
             .order('created_at', { ascending: false })
             .limit(4);
 
@@ -61,7 +62,7 @@ export const dashboardService = {
             name: item.customer_name || "Cliente",
             service: item.service?.name || "Serviço",
             time: item.start_time ? new Date(item.start_time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : "--:--",
-            status: item.status === 'scheduled' ? 'Confirmado' : 'Pendente'
+            status: item.status === 'scheduled' ? 'Confirmado' : item.status === 'completed' ? 'Concluído' : 'Pendente'
         })) || [];
     }
 };
