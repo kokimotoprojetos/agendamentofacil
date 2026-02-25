@@ -82,37 +82,63 @@ export const aiAgentService = {
         content: messageText,
       });
 
-      // 4. Read conversation context ─────────────────────────────────────────────
+      // 4. State detection — use CONVERSATION HISTORY as primary signal ──────────
+      // This is more reliable than context because it doesn't depend on a
+      // successful DB write between messages.
       const convCtx = (conversation.context as any) || {};
-      const awaitingConfirmation: boolean = convCtx.awaiting_confirmation === true;
       const pendingBooking: BookingExtract | null = convCtx.pending_booking || null;
-      const awaitingCancellation: boolean = convCtx.awaiting_cancellation === true;
       const pendingCancellation: CancellationCtx | null = convCtx.pending_cancellation || null;
+
+      // Detect state from last bot message in history (crash-resistant)
+      const lastBotContent = [...chatHistory].reverse().find(m => m.role === 'assistant')?.content || '';
+      const historyShowsAwaitingCancellation =
+        lastBotContent.includes('quer cancelar') ||
+        (lastBotContent.toLowerCase().includes('cancelar') && lastBotContent.includes('Confirma'));
+      const historyShowsAwaitingBooking =
+        lastBotContent.includes('Posso confirmar') || lastBotContent.includes('Confirma') && lastBotContent.includes('Agendamento');
+
+      // Merge context flags with conversation history evidence
+      const awaitingCancellation = convCtx.awaiting_cancellation === true || historyShowsAwaitingCancellation;
+      const awaitingConfirmation = (convCtx.awaiting_confirmation === true || historyShowsAwaitingBooking) && !!pendingBooking;
 
       let aiResponse = '';
       let updatedCtx = { ...convCtx };
 
       // ── A0: Awaiting cancellation confirmation ─────────────────────────────────
-      if (awaitingCancellation && pendingCancellation) {
-        const confirmed = await this.checkConfirmation(messageText);
+      if (awaitingCancellation) {
+        const isKeywordConfirmation = /^(sim|s|pode|pode ser|confirma|confirmar|ok|yes|claro|vai|vai sim|cancelar|pode cancelar|sim pode)/i.test(messageText.trim());
+        const confirmed = isKeywordConfirmation || await this.checkConfirmation(messageText);
 
         if (confirmed) {
-          const success = await this.executeCancellation(pendingCancellation.appointment_id);
-          if (success) {
-            aiResponse =
-              `Prontinho! Agendamento cancelado. Se quiser marcar em outro dia, é só me falar 😊`;
+          // Re-fetch the appointment live (most reliable — avoids stale IDs in context)
+          const appt = await this.findNextAppointmentByPhone(tenantId, customerPhone);
+          const appointmentId = appt?.id || pendingCancellation?.appointment_id;
+
+          if (appointmentId) {
+            const success = await this.executeCancellation(appointmentId);
+            if (success) {
+              aiResponse = `Prontinho! Agendamento cancelado. Se quiser marcar outro dia, é só me falar 😊`;
+            } else {
+              aiResponse = 'Hmm, não consegui cancelar. Pode tentar de novo?';
+            }
           } else {
-            aiResponse = 'Hmm, não consegui cancelar aqui. Pode tentar de novo?';
+            aiResponse = await this.generateResponse(
+              context, chatHistory, messageText,
+              'O cliente confirmou cancelamento mas não encontramos nenhum agendamento futuro para ele. Informe isso de forma amigável.',
+            );
           }
+          updatedCtx = { ...updatedCtx, awaiting_cancellation: false, pending_cancellation: null };
+
         } else {
+          // Declined or changed mind
           aiResponse = await this.generateResponse(
             context, chatHistory, messageText,
-            'O cliente desistiu de cancelar. Responda de forma simples e amigável, sem listar nada.',
+            'O cliente desistiu de cancelar. Responda de forma simples e amigável.',
           );
+          updatedCtx = { ...updatedCtx, awaiting_cancellation: false, pending_cancellation: null };
         }
-        updatedCtx = { ...updatedCtx, awaiting_cancellation: false, pending_cancellation: null };
 
-        // ── A: In booking confirmation stage ─────────────────────────────────────
+        // ── A: Awaiting booking confirmation ────────────────────────────────────────
       } else if (awaitingConfirmation && pendingBooking) {
         const confirmed = await this.checkConfirmation(messageText);
 
@@ -124,25 +150,22 @@ export const aiAgentService = {
               : '';
             const firstName = pendingBooking.customer_name?.split(' ')[0] || '';
             aiResponse =
-              `Agendado, ${firstName}! Te esperamos na ${dateFormatted} às ${pendingBooking.time} para ${pendingBooking.service_name}. Qualquer coisa é só chamar 😊`;
+              `Agendado, ${firstName}! Te esperamos ${dateFormatted} às ${pendingBooking.time} para ${pendingBooking.service_name}. Qualquer coisa é só chamar 😊`;
           } else {
-            aiResponse = 'Hmm, tive um probleminha técnico aqui. Pode tentar de novo?';
+            aiResponse = 'Hmm, tive um probleminha técnico. Pode tentar de novo?';
           }
           updatedCtx = { ...updatedCtx, awaiting_confirmation: false, pending_booking: null };
 
         } else {
-          // Client said no or wants to change something — let LLM handle naturally
           updatedCtx = { ...updatedCtx, awaiting_confirmation: false, pending_booking: null };
           aiResponse = await this.generateResponse(
-            context,
-            chatHistory,
-            messageText,
-            'O cliente recusou ou quer alterar o agendamento. Pergunte o que ele gostaria de mudar ou se prefere cancelar.',
+            context, chatHistory, messageText,
+            'O cliente recusou ou quer alterar o agendamento. Pergunte o que ele gostaria de mudar.',
           );
         }
 
       } else {
-        // ── B: Normal conversation — LLM drives ────────────────────────────────
+        // ── B: Normal conversation — LLM drives ─────────────────────────────────
         aiResponse = await this.generateResponse(context, chatHistory, messageText);
 
         const allMessages = [
@@ -151,8 +174,10 @@ export const aiAgentService = {
           { role: 'assistant', content: aiResponse },
         ];
 
-        // ── C1: Check for CANCELLATION intent first ────────────────────────────
-        const cancelIntent = await this.detectCancellationIntent(messageText);
+        // ── C1: Keyword-first cancellation detection (fast + reliable) ───────────
+        const hasCancelKeyword = /cancelar|desmarcar|não vou|nao vou mais|desistir do agendamento/i.test(messageText);
+        const cancelIntent = hasCancelKeyword || await this.detectCancellationIntent(messageText);
+
         if (cancelIntent) {
           const appt = await this.findNextAppointmentByPhone(tenantId, customerPhone);
           if (appt) {
@@ -168,7 +193,7 @@ export const aiAgentService = {
               pending_cancellation: {
                 appointment_id: appt.id,
                 service_name: appt.service?.name || 'Serviço',
-                date_formatted: `${dateFormatted}`,
+                date_formatted: dateFormatted,
                 time: timeFormatted,
               },
             };
@@ -177,9 +202,10 @@ export const aiAgentService = {
               context, allMessages.slice(0, -1), messageText,
               'O cliente quer cancelar mas não há agendamentos futuros para o número dele. Informe isso de forma amigável.',
             );
+            updatedCtx = { ...updatedCtx, awaiting_cancellation: false, pending_cancellation: null };
           }
 
-          // ── C2: Check for BOOKING intent ─────────────────────────────────────
+          // ── C2: Booking intent ───────────────────────────────────────────────────
         } else {
           const extract = await this.extractBookingData(allMessages, context.services || []);
           if (extract.complete && extract.hasIntent && extract.activeNow) {
@@ -209,7 +235,7 @@ export const aiAgentService = {
         }
       }
 
-      // 5. Persist context ────────────────────────────────────────────────────────
+      // 5. Persist context ───────────────────────────────────────────────────────
       await supabaseAdmin
         .from('conversations')
         .update({ context: updatedCtx })
@@ -416,14 +442,19 @@ Retorne JSON:
   // ─── Mark appointment as cancelled in Supabase ───────────────────────────────
   executeCancellation: async (appointmentId: string): Promise<boolean> => {
     try {
-      const { error } = await supabaseAdmin
+      if (!appointmentId) throw new Error('appointmentId is required');
+      // Use .select('id') so we can verify the row was actually updated
+      const { data, error } = await supabaseAdmin
         .from('appointments')
         .update({ status: 'cancelled' })
-        .eq('id', appointmentId);
+        .eq('id', appointmentId)
+        .select('id');
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error(`No rows updated for id=${appointmentId}`);
+      console.log(`[cancel] ✅ Appointment ${appointmentId} cancelled`);
       return true;
     } catch (err) {
-      console.error('Error cancelling appointment:', err);
+      console.error('[cancel] ❌ Error cancelling appointment:', err);
       return false;
     }
   },
