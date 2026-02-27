@@ -136,9 +136,9 @@ export async function POST(req: Request) {
       personality: tenant?.settings?.personality || "Amigável e profissional",
       location: tenant?.settings?.location || tenant?.settings?.address || "Endereço sob consulta",
       workingHours: tenant?.settings?.workingHours || { start: "09:00", end: "18:00" },
-      workingDays: tenant?.settings?.workingDays || ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
       services: services || [],
-      history: []
+      history: [],
+      instanceName: instance
     };
 
     // Log contextual debug info

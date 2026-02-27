@@ -38,6 +38,35 @@ async function callAI(messages: any[], opts?: { json?: boolean; temp?: number })
   return response.choices[0].message.content || '';
 }
 
+async function callDeepSeek(messages: any[], opts?: { json?: boolean; temp?: number }): Promise<string> {
+  try {
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    if (!apiKey) {
+      console.warn('[deepseek] API key not found, falling back to GPT-4o for notification formatting');
+      return callAI(messages, opts);
+    }
+
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages,
+        temperature: opts?.temp ?? 0.7,
+      })
+    });
+
+    const data = await response.json();
+    return data.choices[0].message.content || '';
+  } catch (error) {
+    console.error('[deepseek] Error calling DeepSeek:', error);
+    return callAI(messages, opts);
+  }
+}
+
 // ─── Audio transcription ───────────────────────────────────────────────────────
 async function transcribeAudio(audioBuffer: Buffer, mimeType: string = 'audio/ogg'): Promise<string> {
   try {
@@ -197,7 +226,7 @@ export const aiAgentService = {
 
         if (confirmed) {
           console.log(`[booking] Confirmed! Executing booking for tenant ${tenantId}:`, pendingBooking);
-          const success = await this.executeBooking(tenantId, pendingBooking, customerPhone);
+          const success = await this.executeBooking(tenantId, pendingBooking, customerPhone, context.instanceName);
           if (success) {
             const dateFormatted = pendingBooking.date
               ? new Date(pendingBooking.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
@@ -546,7 +575,7 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
   },
 
   // ─── Create appointment in Supabase ───────────────────────────────────────────
-  executeBooking: async (tenantId: string, booking: BookingExtract, customerPhone: string): Promise<boolean> => {
+  executeBooking: async (tenantId: string, booking: BookingExtract, customerPhone: string, instanceName?: string): Promise<boolean> => {
     try {
       // Strip WhatsApp JID suffix — store clean phone number only
       const cleanPhone = customerPhone.replace(/@s\.whatsapp\.net|@g\.us/g, '').replace(/\D+$/, '');
@@ -554,7 +583,7 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
       console.log(`[booking] Looking for service "${booking.service_name}" in tenant ${tenantId}`);
       const { data: service, error: serviceError } = await supabaseAdmin
         .from('services')
-        .select('id, duration')
+        .select('id, duration, price')
         .eq('tenant_id', tenantId)
         .ilike('name', `%${booking.service_name}%`)
         .limit(1)
@@ -581,16 +610,70 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
       };
       console.log(`[booking] Inserting appointment:`, JSON.stringify(insertData));
 
-      const { error } = await supabaseAdmin
+      const { data: appointment, error } = await supabaseAdmin
         .from('appointments')
-        .insert(insertData);
+        .insert(insertData)
+        .select()
+        .single();
 
       if (error) throw error;
       console.log(`[booking] ✅ Appointment created successfully!`);
+
+      // ─── Trigger dynamic notification to owner ───────────────────────────────
+      if (instanceName) {
+        this.notifyOwnerOfBooking(tenantId, instanceName, {
+          customer_name: insertData.customer_name,
+          service_name: booking.service_name || 'Serviço',
+          date: booking.date || '',
+          time: booking.time || '',
+          price: service?.price || 0
+        }).catch(err => console.error('[booking] Error notifying owner:', err));
+      }
+
       return true;
     } catch (error) {
       console.error('[booking] ❌ Error executing booking:', error);
       return false;
     }
   },
+
+  notifyOwnerOfBooking: async (tenantId: string, instanceName: string, data: any) => {
+    try {
+      // 1. Get the instance owner's number (the "me" number)
+      const evolutionUrl = process.env.EVOLUTION_API_URL;
+      const evolutionKey = process.env.EVOLUTION_API_KEY;
+
+      const res = await fetch(`${evolutionUrl}/instance/connectionState/${instanceName}`, {
+        headers: { 'apikey': evolutionKey! }
+      });
+      const state = await res.json();
+      const ownerNumber = state?.instance?.owner?.replace(/\D/g, '');
+
+      if (!ownerNumber) {
+        console.warn(`[notify] Could not find owner number for instance ${instanceName}`);
+        return;
+      }
+
+      // 2. Format message with DeepSeek
+      const prompt = `Formate uma notificação curta e animada para o dono de um salão de beleza sobre um novo agendamento. Seja direto e use emojis.
+DADOS:
+- Cliente: ${data.customer_name}
+- Serviço: ${data.service_name}
+- Data: ${data.date}
+- Horário: ${data.time}
+- Valor: R$ ${data.price}
+
+Exemplo: "Ei! 🎉 Novo agendamento: Maria Silva marcou Corte para amanhã às 14h. R$ 50."`;
+
+      const humanizedMessage = await callDeepSeek([{ role: 'user', content: prompt }]);
+
+      // 3. Send message
+      const { whatsappService } = await import('./whatsapp.service');
+      await whatsappService.sendMessage(instanceName, ownerNumber, humanizedMessage);
+      console.log(`[notify] Owner notified at ${ownerNumber}`);
+
+    } catch (error) {
+      console.error('[notify] Error in owner notification:', error);
+    }
+  }
 };
