@@ -1,9 +1,13 @@
 import OpenAI from 'openai';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let _openai: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return _openai;
+}
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 type BookingExtract = {
@@ -25,7 +29,7 @@ type CancellationCtx = {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 async function callAI(messages: any[], opts?: { json?: boolean; temp?: number }): Promise<string> {
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: 'gpt-5.2',
     messages,
     temperature: opts?.temp ?? 0.3,
@@ -52,7 +56,7 @@ async function transcribeAudio(audioBuffer: Buffer, mimeType: string = 'audio/og
     const uint8 = new Uint8Array(audioBuffer);
     const file = new File([uint8], `audio.${ext}`, { type: mimeType });
 
-    const transcription = await openai.audio.transcriptions.create({
+    const transcription = await getOpenAI().audio.transcriptions.create({
       file,
       model: 'whisper-1',
       language: 'pt',
