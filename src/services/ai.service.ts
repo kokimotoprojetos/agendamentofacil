@@ -196,16 +196,16 @@ export const aiAgentService = {
         const confirmed = await this.checkConfirmation(messageText);
 
         if (confirmed) {
+          console.log(`[booking] Confirmed! Executing booking for tenant ${tenantId}:`, pendingBooking);
           const success = await this.executeBooking(tenantId, pendingBooking, customerPhone);
           if (success) {
             const dateFormatted = pendingBooking.date
               ? new Date(pendingBooking.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
               : '';
             const firstName = pendingBooking.customer_name?.split(' ')[0] || '';
-            aiResponse =
-              `Agendado, ${firstName}! Te esperamos ${dateFormatted} às ${pendingBooking.time} para ${pendingBooking.service_name}. Qualquer coisa é só chamar 😊`;
+            aiResponse = `agendado ${firstName}! te espero ${dateFormatted} às ${pendingBooking.time} pra ${pendingBooking.service_name} 😊 qualquer coisa me chama`;
           } else {
-            aiResponse = 'Hmm, tive um probleminha técnico. Pode tentar de novo?';
+            aiResponse = 'hmm deu um probleminha aqui, tenta de novo?';
           }
           updatedCtx = { ...updatedCtx, awaiting_confirmation: false, pending_booking: null };
 
@@ -262,18 +262,16 @@ export const aiAgentService = {
           // ── C2: Booking intent ───────────────────────────────────────────────────
         } else {
           const extract = await this.extractBookingData(allMessages, context.services || []);
+          console.log(`[booking] Extract result:`, JSON.stringify(extract));
           if (extract.complete && extract.hasIntent && extract.activeNow) {
             const available = await this.checkAvailability(tenantId, extract.date!, extract.time!);
+            console.log(`[booking] Availability for ${extract.date} ${extract.time}: ${available}`);
             if (available) {
               const dateFormatted = extract.date
-                ? new Date(extract.date + 'T12:00:00').toLocaleDateString('pt-BR')
+                ? new Date(extract.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
                 : '';
-              aiResponse =
-                `📋 *Confirmação do Agendamento:*\n\n` +
-                `👤 ${extract.customer_name}\n` +
-                `✂️ ${extract.service_name}\n` +
-                `📅 ${dateFormatted} às ${extract.time}\n\n` +
-                `Posso confirmar? (Sim / Não)`;
+              const firstName = extract.customer_name?.split(' ')[0] || '';
+              aiResponse = `${firstName}, deixa eu confirmar: ${extract.service_name} ${dateFormatted} às ${extract.time}, certo? posso agendar?`;
               updatedCtx = {
                 ...updatedCtx,
                 awaiting_confirmation: true,
@@ -549,7 +547,8 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
       // Strip WhatsApp JID suffix — store clean phone number only
       const cleanPhone = customerPhone.replace(/@s\.whatsapp\.net|@g\.us/g, '').replace(/\D+$/, '');
 
-      const { data: service } = await supabaseAdmin
+      console.log(`[booking] Looking for service "${booking.service_name}" in tenant ${tenantId}`);
+      const { data: service, error: serviceError } = await supabaseAdmin
         .from('services')
         .select('id, duration')
         .eq('tenant_id', tenantId)
@@ -557,27 +556,36 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
         .limit(1)
         .single();
 
+      if (serviceError) {
+        console.log(`[booking] Service lookup warning:`, serviceError.message);
+      }
+      console.log(`[booking] Service found:`, service ? `${service.id} (duration: ${service.duration})` : 'none (using defaults)');
+
       const startTime = `${booking.date}T${booking.time}:00`;
       const duration = service?.duration || 60;
       const endTime = new Date(new Date(startTime).getTime() + duration * 60 * 1000).toISOString();
 
+      const insertData = {
+        tenant_id: tenantId,
+        service_id: service?.id || null,
+        customer_name: booking.customer_name || `WhatsApp: ${cleanPhone}`,
+        customer_phone: cleanPhone,
+        start_time: startTime,
+        end_time: endTime,
+        status: 'scheduled',
+        notes: `Agendado via WhatsApp. Serviço: ${booking.service_name}`,
+      };
+      console.log(`[booking] Inserting appointment:`, JSON.stringify(insertData));
+
       const { error } = await supabaseAdmin
         .from('appointments')
-        .insert({
-          tenant_id: tenantId,
-          service_id: service?.id || null,
-          customer_name: booking.customer_name || `WhatsApp: ${cleanPhone}`,
-          customer_phone: cleanPhone,
-          start_time: startTime,
-          end_time: endTime,
-          status: 'scheduled',
-          notes: `Agendado via WhatsApp. Serviço: ${booking.service_name}`,
-        });
+        .insert(insertData);
 
       if (error) throw error;
+      console.log(`[booking] ✅ Appointment created successfully!`);
       return true;
     } catch (error) {
-      console.error('Error executing booking:', error);
+      console.error('[booking] ❌ Error executing booking:', error);
       return false;
     }
   },
