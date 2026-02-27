@@ -37,9 +37,17 @@ export default function WhatsAppPage() {
             const data = await res.json();
 
             if (res.ok) {
-                setInstanceInfo(data);
+                // API returns { status: "open"|"close"|..., details: { instance: {...} } }
+                const details = data.details?.instance || {};
+                setInstanceInfo({
+                    instanceName: details.instanceName || '',
+                    owner: details.owner || '',
+                    profileName: details.profileName || details.profilePicUrl ? details.profileName : '',
+                    profilePictureUrl: details.profilePicUrl || undefined,
+                    state: (data.status || 'unknown') as ConnectionState,
+                });
                 setError(null);
-                if (data?.state === 'open') setQrCode(null);
+                if (data.status === 'open') setQrCode(null);
             } else {
                 setError(data.error || 'Erro ao buscar status');
             }
