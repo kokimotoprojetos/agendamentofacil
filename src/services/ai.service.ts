@@ -405,8 +405,8 @@ ${extraInstruction ? `\nINSTRUÇÃO EXTRA: ${extraInstruction}` : ''}`;
       .map(m => `${m.role === 'user' ? 'Cliente' : 'Agente'}: ${m.content}`)
       .join('\n');
 
-    // Only the most recent 4 messages to check active intent
-    const recentMessages = conversationMessages.slice(-4);
+    // Only the most recent 8 messages to check active intent (covers step-by-step booking flow)
+    const recentMessages = conversationMessages.slice(-8);
     const recentText = recentMessages
       .map(m => `${m.role === 'user' ? 'Cliente' : 'Agente'}: ${m.content}`)
       .join('\n');
@@ -417,21 +417,25 @@ Hoje é ${today}. Serviços disponíveis: ${serviceNames || 'não especificado'}
 CONVERSA COMPLETA:
 ${fullText}
 
-MENSAGENS RECENTES (últimas 4):
+MENSAGENS RECENTES (últimas 8):
 ${recentText}
 
 REGRAS:
-- "hasIntent": true APENAS se o cliente usou palavras explícitas como "quero marcar", "quero agendar", "reservar", "me marca", "agenda pra mim". Perguntas sobre preço ou informações = false.
-- "activeNow": true APENAS SE nas MENSAGENS RECENTES o cliente disse explicitamente que quer agendar. Pergunta sobre preço, horário de funcionamento, endereço ou qualquer dúvida = SEMPRE false. Em dúvida = false.
-- "customer_name": nome do cliente ou null
-- "service_name": serviço pedido ou null
-- "date": YYYY-MM-DD ou null
+- "hasIntent": true se em QUALQUER momento da conversa o cliente expressou intenção de agendar (ex: "quero marcar", "quero agendar", "reservar", "me marca", "agenda pra mim", "quero um horário"). Perguntas APENAS sobre preço sem intenção de agendar = false.
+- "activeNow": true se o FLUXO DE AGENDAMENTO está em andamento. Isso inclui:
+  * O cliente pediu pra agendar E o agente está perguntando nome/serviço/dia/horário
+  * O cliente está RESPONDENDO perguntas do agente sobre o agendamento (ex: dando o nome, escolhendo serviço, dizendo o dia/horário)
+  * O cliente acabou de fornecer a última informação que faltava
+  activeNow = false SOMENTE se a conversa mudou de assunto ou se o cliente APENAS fez pergunta informativa sem querer agendar.
+- "customer_name": nome do cliente mencionado na conversa ou null
+- "service_name": serviço pedido ou null (deve corresponder a um dos serviços disponíveis)
+- "date": YYYY-MM-DD ou null (interprete "amanhã", "sexta", etc. com base na data de hoje)
 - "time": HH:MM ou null
-- "complete": true SOMENTE se hasIntent=true AND activeNow=true AND todos os 4 campos acima não são null
+- "complete": true SOMENTE se hasIntent=true AND activeNow=true AND customer_name, service_name, date E time não são null
 
-EXEMPLOS (siga exatamente):
+EXEMPLOS:
 Pergunta "Quanto custa chapinha?" → {"hasIntent":false,"activeNow":false,"complete":false,"customer_name":null,"service_name":null,"date":null,"time":null}
-Pergunta "Vocês trabalham sábado?" → {"hasIntent":false,"activeNow":false,"complete":false,"customer_name":null,"service_name":null,"date":null,"time":null}
+Conversa onde agendamento já começou e cliente responde "14h" → {"hasIntent":true,"activeNow":true,...}
 Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"activeNow":true,"complete":true,"customer_name":"João","service_name":"chapinha","date":"YYYY-MM-DD","time":"10:00"}`;
 
     try {
