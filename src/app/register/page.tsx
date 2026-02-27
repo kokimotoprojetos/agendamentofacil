@@ -61,7 +61,7 @@ export default function RegisterPage() {
                     <div className="flex justify-center mb-4">
                         <BrandLogo size="md" />
                     </div>
-                    <p className="mt-2 text-sm text-slate-500">Crie sua conta e comece a automatizar seus agendamentos</p>
+                    <p className="mt-2 text-sm text-slate-600">Crie sua conta e comece a automatizar seus agendamentos</p>
                 </div>
 
                 <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
@@ -70,7 +70,7 @@ export default function RegisterPage() {
                         <input
                             {...register('name')}
                             type="text"
-                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.name ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-400`}
+                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.name ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500`}
                             placeholder="João Silva"
                         />
                         {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
@@ -81,7 +81,7 @@ export default function RegisterPage() {
                         <input
                             {...register('businessName')}
                             type="text"
-                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.businessName ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-400`}
+                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.businessName ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500`}
                             placeholder="Barbearia Imperial"
                         />
                         {errors.businessName && <p className="mt-1 text-xs text-red-500">{errors.businessName.message}</p>}
@@ -92,7 +92,7 @@ export default function RegisterPage() {
                         <input
                             {...register('email')}
                             type="email"
-                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.email ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-400`}
+                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.email ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500`}
                             placeholder="contato@empresa.com"
                         />
                         {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
@@ -103,7 +103,7 @@ export default function RegisterPage() {
                         <input
                             {...register('password')}
                             type="password"
-                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.password ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-400`}
+                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.password ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500`}
                             placeholder="••••••••"
                         />
                         {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
@@ -119,7 +119,7 @@ export default function RegisterPage() {
                     </button>
                 </form>
 
-                <p className="text-center text-sm text-slate-500">
+                <p className="text-center text-sm text-slate-600">
                     Já tem uma conta? <a href="/login" className="font-bold text-indigo-600 hover:underline">Entre aqui</a>
                 </p>
             </div>

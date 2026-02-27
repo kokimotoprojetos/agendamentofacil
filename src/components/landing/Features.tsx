@@ -203,7 +203,7 @@ export const Features = () => {
                             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
                         }}>esses problemas ainda estarão lá.</span>
                     </h2>
-                    <p className="text-slate-500 max-w-2xl mx-auto text-lg leading-relaxed">
+                    <p className="text-slate-600 max-w-2xl mx-auto text-lg leading-relaxed">
                         Cada dia sem automação é dinheiro saindo pelo ralo. Veja o que acontece nos bastidores
                         do seu salão enquanto você tenta fazer tudo manualmente.
                     </p>
@@ -304,7 +304,7 @@ export const Features = () => {
                                 <path d="M4 9h10M10 5l4 4-4 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                         </a>
-                        <p className="text-xs text-slate-500">Sem cartão de crédito · Cancele quando quiser</p>
+                        <p className="text-xs text-slate-600">Sem cartão de crédito · Cancele quando quiser</p>
                     </div>
                 </div>
             </div>

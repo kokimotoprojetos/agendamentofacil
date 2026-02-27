@@ -89,7 +89,7 @@ export default function ChatsPage() {
         <div className="max-w-7xl mx-auto pb-10">
             <div className="mb-6">
                 <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Conversas</h1>
-                <p className="text-sm text-slate-500 mt-1">Acompanhe as interações do agente IA com seus clientes.</p>
+                <p className="text-sm text-slate-600 mt-1">Acompanhe as interações do agente IA com seus clientes.</p>
             </div>
 
             <div className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm" style={{ height: 'calc(100vh - 200px)' }}>
@@ -98,13 +98,13 @@ export default function ChatsPage() {
                     <div className={`${selectedConvo ? 'hidden md:flex' : 'flex'} flex-col border-r border-slate-200 w-full md:w-[360px]`}>
                         <div className="p-4 border-b border-slate-100">
                             <div className="relative">
-                                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                                 <input
                                     type="text"
                                     placeholder="Buscar conversa..."
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 pl-10 pr-4 py-2.5 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-indigo-400 placeholder:text-slate-400 transition-all"
+                                    className="w-full bg-slate-50 border border-slate-200 pl-10 pr-4 py-2.5 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-indigo-400 placeholder:text-slate-500 transition-all"
                                 />
                             </div>
                         </div>
@@ -116,7 +116,7 @@ export default function ChatsPage() {
                                 </div>
                             ) : filtered.length === 0 ? (
                                 <div className="text-center py-16 px-8">
-                                    <p className="text-sm text-slate-400">Nenhuma conversa ainda</p>
+                                    <p className="text-sm text-slate-500">Nenhuma conversa ainda</p>
                                 </div>
                             ) : (
                                 filtered.map(convo => (
@@ -134,9 +134,9 @@ export default function ChatsPage() {
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between gap-2 mb-0.5">
                                                     <h4 className="text-sm font-bold text-slate-900 truncate">{convo.customer_name || convo.customer_phone || 'Desconhecido'}</h4>
-                                                    <span className="text-[10px] text-slate-400 flex-shrink-0">{formatTime(convo.last_message_at)}</span>
+                                                    <span className="text-[10px] text-slate-500 flex-shrink-0">{formatTime(convo.last_message_at)}</span>
                                                 </div>
-                                                <p className="text-xs text-slate-500 truncate">{convo.last_message}</p>
+                                                <p className="text-xs text-slate-600 truncate">{convo.last_message}</p>
                                             </div>
                                             {convo.unread_count > 0 && (
                                                 <span className="w-5 h-5 bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -168,7 +168,7 @@ export default function ChatsPage() {
                                     </div>
                                     <div>
                                         <h3 className="text-sm font-bold text-slate-900">{selectedConvo.customer_name || 'Desconhecido'}</h3>
-                                        <p className="text-[10px] text-slate-400">{formatPhone(selectedConvo.remote_jid || selectedConvo.customer_phone || '')}</p>
+                                        <p className="text-[10px] text-slate-500">{formatPhone(selectedConvo.remote_jid || selectedConvo.customer_phone || '')}</p>
                                     </div>
                                 </div>
 
@@ -187,7 +187,7 @@ export default function ChatsPage() {
                                                         }`}
                                                 >
                                                     <p className="whitespace-pre-wrap">{msg.content}</p>
-                                                    <p className={`text-[9px] mt-1 ${msg.direction === 'outbound' ? 'text-indigo-200' : 'text-slate-400'}`}>
+                                                    <p className={`text-[9px] mt-1 ${msg.direction === 'outbound' ? 'text-indigo-200' : 'text-slate-500'}`}>
                                                         {new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                                                     </p>
                                                 </div>
@@ -198,7 +198,7 @@ export default function ChatsPage() {
 
                                 <div className="px-6 py-4 border-t border-slate-100 bg-white">
                                     <div className="flex items-center gap-2 px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
-                                        <span className="text-xs text-slate-400 italic">Respostas gerenciadas pelo Agente IA</span>
+                                        <span className="text-xs text-slate-500 italic">Respostas gerenciadas pelo Agente IA</span>
                                     </div>
                                 </div>
                             </>
@@ -207,7 +207,7 @@ export default function ChatsPage() {
                                 <div className="text-center max-w-xs">
                                     <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><Search size={28} className="text-indigo-400" /></div>
                                     <h3 className="font-bold text-slate-700 mb-1">Selecione uma conversa</h3>
-                                    <p className="text-xs text-slate-400">Escolha uma conversa para ver o histórico completo de interações.</p>
+                                    <p className="text-xs text-slate-500">Escolha uma conversa para ver o histórico completo de interações.</p>
                                 </div>
                             </div>
                         )}

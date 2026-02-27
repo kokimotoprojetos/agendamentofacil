@@ -44,7 +44,7 @@ const STATUS_MAP: Record<string, { label: string; dot: string; badge: string }> 
     cancelled: {
         label: 'Cancelado',
         dot: 'bg-slate-400',
-        badge: 'text-slate-500 bg-slate-50 border-slate-200'
+        badge: 'text-slate-600 bg-slate-50 border-slate-200'
     },
 };
 
@@ -171,7 +171,7 @@ export default function AgendaPage() {
             <header className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Agenda</h1>
-                    <p className="text-sm text-slate-500 mt-1">Clique em um dia para ver e gerenciar os agendamentos.</p>
+                    <p className="text-sm text-slate-600 mt-1">Clique em um dia para ver e gerenciar os agendamentos.</p>
                 </div>
                 <button
                     onClick={handleOpenModal}
@@ -186,19 +186,19 @@ export default function AgendaPage() {
                 <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
                     <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
                         <button onClick={prevMonth} className="p-2 hover:bg-slate-50 rounded-xl transition-all">
-                            <ChevronLeft size={18} className="text-slate-500" />
+                            <ChevronLeft size={18} className="text-slate-600" />
                         </button>
                         <h2 className="text-base font-bold text-slate-900 capitalize">
                             {format(currentMonth, "MMMM 'de' yyyy", { locale: ptBR })}
                         </h2>
                         <button onClick={nextMonth} className="p-2 hover:bg-slate-50 rounded-xl transition-all">
-                            <ChevronRight size={18} className="text-slate-500" />
+                            <ChevronRight size={18} className="text-slate-600" />
                         </button>
                     </div>
 
                     <div className="grid grid-cols-7 border-b border-slate-100">
                         {WEEK_DAYS.map(d => (
-                            <div key={d} className="py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                            <div key={d} className="py-3 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">
                                 {d}
                             </div>
                         ))}
@@ -267,13 +267,13 @@ export default function AgendaPage() {
                 {/* DAY PANEL */}
                 <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden flex flex-col">
                     <div className="px-6 py-5 border-b border-slate-100">
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+                        <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">
                             {isToday(selectedDate) ? 'Hoje' : format(selectedDate, "EEEE", { locale: ptBR })}
                         </p>
                         <h3 className="text-2xl font-bold text-slate-900">
                             {format(selectedDate, "d 'de' MMMM", { locale: ptBR })}
                         </h3>
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-slate-500 mt-1">
                             {appointments.length === 0 ? 'Nenhum agendamento' : `${appointments.length} agendamento(s)`}
                         </p>
                     </div>
@@ -288,7 +288,7 @@ export default function AgendaPage() {
                                 {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21].map(hour => (
                                     <div key={hour} className="flex group border-b border-slate-100 h-20 items-start relative">
                                         <div className="w-16 flex-shrink-0 text-center -mt-2">
-                                            <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors">
+                                            <span className="text-[10px] font-bold text-slate-500 group-hover:text-slate-600 transition-colors">
                                                 {String(hour).padStart(2, '0')}:00
                                             </span>
                                         </div>
@@ -324,7 +324,7 @@ export default function AgendaPage() {
                                             <div className="flex items-start justify-between gap-2 overflow-hidden h-full">
                                                 <div className="min-w-0">
                                                     <div className="flex items-center gap-2 mb-0.5">
-                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">
                                                             {format(dateObj, 'HH:mm')}
                                                         </span>
                                                         <div className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
@@ -332,7 +332,7 @@ export default function AgendaPage() {
                                                     <h4 className="text-[13px] font-bold text-slate-900 leading-tight truncate">
                                                         {app.customer_name}
                                                     </h4>
-                                                    <p className="text-[10px] font-medium text-slate-500 truncate opacity-80">
+                                                    <p className="text-[10px] font-medium text-slate-600 truncate opacity-80">
                                                         {app.service?.name} ({duration}m)
                                                     </p>
                                                 </div>
@@ -353,8 +353,8 @@ export default function AgendaPage() {
                                 {appointments.length === 0 && (
                                     <div className="absolute inset-x-16 inset-y-0 flex items-center justify-center pointer-events-none">
                                         <div className="text-center opacity-30">
-                                            <Clock size={40} className="mx-auto mb-2 text-slate-400" />
-                                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Horários Livres</p>
+                                            <Clock size={40} className="mx-auto mb-2 text-slate-500" />
+                                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Horários Livres</p>
                                         </div>
                                     </div>
                                 )}
@@ -374,16 +374,16 @@ export default function AgendaPage() {
                                     <div className="w-7 h-7 bg-indigo-500 rounded-lg flex items-center justify-center"><Plus size={14} className="text-white" /></div>
                                     <h2 className="text-xl font-bold text-slate-900">Novo Agendamento</h2>
                                 </div>
-                                <p className="text-[11px] text-slate-400 uppercase tracking-widest">Registrar atendimento</p>
+                                <p className="text-[11px] text-slate-500 uppercase tracking-widest">Registrar atendimento</p>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 rounded-xl text-slate-400 hover:text-slate-700 transition-all">
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 rounded-xl text-slate-500 hover:text-slate-700 transition-all">
                                 <X size={18} />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-8 space-y-4">
                             <div>
-                                <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Serviço</label>
+                                <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Serviço</label>
                                 <select required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.service_id} onChange={e => setFormData({ ...formData, service_id: e.target.value })}>
                                     <option value="">Selecione...</option>
                                     {services.map(s => (
@@ -393,34 +393,34 @@ export default function AgendaPage() {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Nome do Cliente</label>
+                                <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Nome do Cliente</label>
                                 <div className="relative">
-                                    <User size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <User size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                                     <input required type="text" placeholder="Ex: Maria Silva" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.customer_name} onChange={e => setFormData({ ...formData, customer_name: e.target.value })} />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Telefone</label>
+                                <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Telefone</label>
                                 <div className="relative">
-                                    <Phone size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <Phone size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                                     <input type="text" placeholder="(11) 99999-9999" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.customer_phone} onChange={e => setFormData({ ...formData, customer_phone: e.target.value })} />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Data</label>
+                                    <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Data</label>
                                     <input required type="date" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Horário</label>
+                                    <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Horário</label>
                                     <input required type="time" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })} />
                                 </div>
                             </div>
 
                             <div className="flex gap-4 pt-2">
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-500 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">Cancelar</button>
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">Cancelar</button>
                                 <button type="submit" disabled={saving} className="flex-[2] py-4 bg-indigo-600 text-white font-bold text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-indigo-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
                                     {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Save size={15} /> Agendar</>}
                                 </button>

@@ -57,10 +57,10 @@ export function Sidebar() {
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                                 ? 'bg-indigo-50 text-indigo-700'
-                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                                 }`}
                         >
-                            <Icon size={20} className={isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-700'} />
+                            <Icon size={20} className={isActive ? 'text-indigo-600' : 'text-slate-500 group-hover:text-slate-700'} />
                             <span className="text-sm font-medium">{item.label}</span>
                         </Link>
                     );

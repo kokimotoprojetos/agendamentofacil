@@ -92,7 +92,7 @@ export default function AgentConfig() {
                         </div>
                         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Configuração do Agente</h1>
                     </div>
-                    <p className="text-sm text-slate-500">Ajuste os dados essenciais para o funcionamento do assistente.</p>
+                    <p className="text-sm text-slate-600">Ajuste os dados essenciais para o funcionamento do assistente.</p>
                 </div>
                 <button
                     onClick={handleSave}
@@ -133,13 +133,13 @@ export default function AgentConfig() {
 
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest">Dias de Funcionamento</label>
+                                <label className="block text-[10px] font-black text-slate-500 mb-4 uppercase tracking-widest">Dias de Funcionamento</label>
                                 <div className="grid grid-cols-4 gap-2">
                                     {DAYS_OF_WEEK.map(day => (
                                         <button
                                             key={day.id}
                                             onClick={() => toggleDay(day.id)}
-                                            className={`py-2 text-[10px] font-bold rounded-lg border transition-all ${config.workingDays.includes(day.id) ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300'}`}
+                                            className={`py-2 text-[10px] font-bold rounded-lg border transition-all ${config.workingDays.includes(day.id) ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'}`}
                                         >
                                             {day.label.substring(0, 3)}
                                         </button>
@@ -149,7 +149,7 @@ export default function AgentConfig() {
 
                             <div className="pt-6 border-t border-slate-100 flex gap-4">
                                 <div className="flex-1 space-y-2">
-                                    <span className="text-[10px] text-slate-400 font-bold uppercase block text-center">Início</span>
+                                    <span className="text-[10px] text-slate-500 font-bold uppercase block text-center">Início</span>
                                     <input
                                         type="time"
                                         className="w-full px-3 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:border-indigo-400 transition-all text-xs font-bold text-center"
@@ -158,7 +158,7 @@ export default function AgentConfig() {
                                     />
                                 </div>
                                 <div className="flex-1 space-y-2">
-                                    <span className="text-[10px] text-slate-400 font-bold uppercase block text-center">Término</span>
+                                    <span className="text-[10px] text-slate-500 font-bold uppercase block text-center">Término</span>
                                     <input
                                         type="time"
                                         className="w-full px-3 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:border-indigo-400 transition-all text-xs font-bold text-center"
@@ -180,7 +180,7 @@ export default function AgentConfig() {
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest text-center">Endereço do Estabelecimento</label>
+                            <label className="block text-[10px] font-black text-slate-500 mb-3 uppercase tracking-widest text-center">Endereço do Estabelecimento</label>
                             <textarea
                                 placeholder="Rua, Número, Bairro, Cidade..."
                                 className="w-full px-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:outline-none focus:border-indigo-400 transition-all text-sm h-32 resize-none leading-relaxed"

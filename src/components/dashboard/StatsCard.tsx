@@ -22,7 +22,7 @@ export const StatsCard = ({ label, value, icon, color, trend }: StatsCardProps) 
     return (
         <div className="bg-white p-6 rounded-3xl border border-slate-200 transition-all duration-300 hover:border-slate-300 hover:shadow-md group">
             <div className="flex items-center justify-between mb-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${colorMap[color] || 'text-slate-500 bg-slate-50'}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${colorMap[color] || 'text-slate-600 bg-slate-50'}`}>
                     {icon}
                 </div>
                 {trend && (
@@ -34,7 +34,7 @@ export const StatsCard = ({ label, value, icon, color, trend }: StatsCardProps) 
             </div>
 
             <div>
-                <p className="text-xs text-slate-500 font-medium mb-1">{label}</p>
+                <p className="text-xs text-slate-600 font-medium mb-1">{label}</p>
                 <h3 className="text-2xl font-bold text-slate-900 tabular-nums tracking-tight">
                     {value}
                 </h3>

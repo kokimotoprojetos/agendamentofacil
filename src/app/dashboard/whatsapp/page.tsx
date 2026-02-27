@@ -128,7 +128,7 @@ export default function WhatsAppPage() {
             };
             default: return {
                 label: 'Desconectado',
-                color: 'text-slate-500',
+                color: 'text-slate-600',
                 bg: 'bg-slate-50',
                 border: 'border-slate-200',
                 dot: 'bg-slate-400',
@@ -156,7 +156,7 @@ export default function WhatsAppPage() {
                     </div>
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">WhatsApp</h1>
                 </div>
-                <p className="text-sm text-slate-500">Gerencie a conexão do seu número com o agente de IA.</p>
+                <p className="text-sm text-slate-600">Gerencie a conexão do seu número com o agente de IA.</p>
             </header>
 
             {error && (
@@ -230,11 +230,11 @@ export default function WhatsAppPage() {
                 <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden mb-6">
                     <div className="p-8 text-center">
                         <h3 className="text-lg font-bold text-slate-900 mb-2">Escaneie o QR Code</h3>
-                        <p className="text-sm text-slate-500 mb-8">Abra o WhatsApp → Menu (⋮) → Aparelhos Conectados → Conectar.</p>
+                        <p className="text-sm text-slate-600 mb-8">Abra o WhatsApp → Menu (⋮) → Aparelhos Conectados → Conectar.</p>
                         <div className="inline-block p-4 bg-white rounded-2xl border border-slate-200 shadow-lg">
                             <img src={qrCode} alt="QR Code WhatsApp" className="w-64 h-64" />
                         </div>
-                        <p className="text-xs text-slate-400 mt-6">O QR Code expira em 60 segundos. Gere outro se necessário.</p>
+                        <p className="text-xs text-slate-500 mt-6">O QR Code expira em 60 segundos. Gere outro se necessário.</p>
                     </div>
                 </div>
             )}

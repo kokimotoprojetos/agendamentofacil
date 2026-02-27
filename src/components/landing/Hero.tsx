@@ -14,7 +14,7 @@ export const Hero = () => {
                         Seu salão no piloto automático com <span className="text-indigo-600">Beautfy.ai</span>
                     </h1>
 
-                    <p className="text-lg md:text-xl text-slate-500 mb-12 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-lg md:text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed">
                         Atenda seus clientes, tire dúvidas e realize agendamentos sincronizados com sua agenda 24 horas por dia, 7 dias por semana, direto no WhatsApp.
                     </p>
 

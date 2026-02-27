@@ -32,7 +32,7 @@ export default async function DashboardPage() {
     if (!profile?.tenant_id) {
         return (
             <div className="flex items-center justify-center min-h-[50vh]">
-                <p className="text-slate-500">Perfil ou Tenant não configurado.</p>
+                <p className="text-slate-600">Perfil ou Tenant não configurado.</p>
             </div>
         );
     }
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
             <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-1">Visão Geral</h1>
-                    <p className="text-sm text-slate-500">Acompanhe o desempenho do seu salão em tempo real.</p>
+                    <p className="text-sm text-slate-600">Acompanhe o desempenho do seu salão em tempo real.</p>
                 </div>
                 <div className="px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-medium text-emerald-700 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -111,7 +111,7 @@ export default async function DashboardPage() {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-slate-900">{item.name}</p>
-                                                <p className="text-[11px] text-slate-500">{item.service} • Hoje às {item.time}</p>
+                                                <p className="text-[11px] text-slate-600">{item.service} • Hoje às {item.time}</p>
                                             </div>
                                         </div>
                                         <span className={`px-3 py-1 text-[10px] font-bold rounded-full border ${item.status === 'Confirmado'
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
                                 ))
                             ) : (
                                 <div className="text-center py-12">
-                                    <p className="text-slate-400 text-sm">Nenhuma atividade recente.</p>
+                                    <p className="text-slate-500 text-sm">Nenhuma atividade recente.</p>
                                 </div>
                             )}
                         </div>
@@ -141,7 +141,7 @@ export default async function DashboardPage() {
                                 </div>
                                 <div>
                                     <p className="font-bold text-slate-900 text-sm">Agente IA</p>
-                                    <p className="text-[10px] text-slate-400 font-medium">Configurações</p>
+                                    <p className="text-[10px] text-slate-500 font-medium">Configurações</p>
                                 </div>
                             </Link>
 
@@ -151,7 +151,7 @@ export default async function DashboardPage() {
                                 </div>
                                 <div>
                                     <p className="font-bold text-slate-900 text-sm">WhatsApp</p>
-                                    <p className="text-[10px] text-slate-400 font-medium">Conectividade</p>
+                                    <p className="text-[10px] text-slate-500 font-medium">Conectividade</p>
                                 </div>
                             </Link>
                         </div>
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
                     <section className="bg-white p-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-indigo-50/50 to-transparent relative overflow-hidden group">
                         <div className="relative z-10">
                             <h3 className="text-lg font-bold text-slate-900 mb-2">Suporte</h3>
-                            <p className="text-slate-500 text-[11px] font-medium mb-6">Precisa de ajuda com o sistema?</p>
+                            <p className="text-slate-600 text-[11px] font-medium mb-6">Precisa de ajuda com o sistema?</p>
                             <button className="w-full py-3 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 hover:bg-indigo-500 transition-all">
                                 Abrir Chamado
                             </button>

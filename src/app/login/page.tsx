@@ -81,7 +81,7 @@ export default function LoginPage() {
                         <div className="flex justify-center mb-4">
                             <BrandLogo size="md" />
                         </div>
-                        <p className="text-sm text-slate-500">Entre na sua conta para gerenciar seus agendamentos</p>
+                        <p className="text-sm text-slate-600">Entre na sua conta para gerenciar seus agendamentos</p>
                     </div>
 
                     {/* Google Login */}
@@ -104,7 +104,7 @@ export default function LoginPage() {
                     {/* Divider */}
                     <div className="relative flex items-center">
                         <div className="flex-1 h-px" style={{ background: 'rgba(0,0,0,0.08)' }} />
-                        <span className="px-4 text-xs text-slate-400 font-medium">ou entre com email</span>
+                        <span className="px-4 text-xs text-slate-500 font-medium">ou entre com email</span>
                         <div className="flex-1 h-px" style={{ background: 'rgba(0,0,0,0.08)' }} />
                     </div>
 
@@ -115,7 +115,7 @@ export default function LoginPage() {
                             <input
                                 {...register('email')}
                                 type="email"
-                                className="block w-full px-4 py-3 rounded-xl text-slate-900 placeholder:text-slate-400 outline-none transition-all"
+                                className="block w-full px-4 py-3 rounded-xl text-slate-900 placeholder:text-slate-500 outline-none transition-all"
                                 style={{
                                     background: '#f8fafc',
                                     border: `1.5px solid ${errors.email ? '#ef4444' : 'rgba(0,0,0,0.08)'}`,
@@ -130,7 +130,7 @@ export default function LoginPage() {
                             <input
                                 {...register('password')}
                                 type="password"
-                                className="block w-full px-4 py-3 rounded-xl text-slate-900 placeholder:text-slate-400 outline-none transition-all"
+                                className="block w-full px-4 py-3 rounded-xl text-slate-900 placeholder:text-slate-500 outline-none transition-all"
                                 style={{
                                     background: '#f8fafc',
                                     border: `1.5px solid ${errors.password ? '#ef4444' : 'rgba(0,0,0,0.08)'}`,
@@ -154,7 +154,7 @@ export default function LoginPage() {
                     </form>
 
                     {/* Footer link */}
-                    <p className="text-center text-sm text-slate-500">
+                    <p className="text-center text-sm text-slate-600">
                         Não tem uma conta?{' '}
                         <a href="/register" className="font-bold text-indigo-600 hover:text-indigo-500 transition-colors">
                             Cadastre-se

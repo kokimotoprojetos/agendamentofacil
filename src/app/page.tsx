@@ -14,8 +14,8 @@ export default function LandingPage() {
           </a>
 
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Funcionalidades</a>
-            <a href="/login" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Login</a>
+            <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Funcionalidades</a>
+            <a href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Login</a>
             <a href="/register" className="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
               Começar Agora
             </a>
