@@ -238,27 +238,6 @@ export default function WhatsAppPage() {
                     </div>
                 </div>
             )}
-
-            {/* Connected Info */}
-            {state === 'open' && instanceInfo && (
-                <div className="bg-white rounded-3xl border border-slate-200 p-8">
-                    <h3 className="text-lg font-bold text-slate-900 mb-6">Informações da Conexão</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Instância</p>
-                            <p className="text-sm font-bold text-slate-900 truncate">{instanceInfo.instanceName}</p>
-                        </div>
-                        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Número</p>
-                            <p className="text-sm font-bold text-slate-900">{instanceInfo.owner || 'N/A'}</p>
-                        </div>
-                        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Perfil</p>
-                            <p className="text-sm font-bold text-slate-900">{instanceInfo.profileName || 'N/A'}</p>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
