@@ -621,8 +621,8 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
 
       // ─── Trigger dynamic notification to owner ───────────────────────────────
       if (instanceName) {
-        this.notifyOwnerOfBooking(tenantId, instanceName, {
-          customer_name: insertData.customer_name,
+        aiAgentService.notifyOwnerOfBooking(tenantId, instanceName, {
+          customer_name: insertData.customer_name || 'Cliente',
           service_name: booking.service_name || 'Serviço',
           date: booking.date || '',
           time: booking.time || '',
