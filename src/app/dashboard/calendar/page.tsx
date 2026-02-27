@@ -307,33 +307,41 @@ export default function AgendaPage() {
 
                                     const topPos = (startHourIdx * 80) + (minutes * 80 / 60) + 16;
                                     const duration = app.service?.duration || 60;
-                                    const heightPos = (duration * 80 / 60) - 4;
+                                    const heightPos = Math.max(45, (duration * 80 / 60) - 4);
+                                    const isShort = duration < 45;
 
                                     return (
                                         <div
                                             key={app.id}
                                             style={{ top: `${topPos}px`, height: `${heightPos}px` }}
                                             className={`
-                                                absolute left-16 right-4 rounded-xl border-l-4 p-3 transition-all cursor-pointer group hover:z-20
-                                                shadow-sm
+                                                absolute left-16 right-4 rounded-xl border-l-4 p-2.5 transition-all cursor-pointer group hover:z-20
+                                                shadow-sm flex flex-col justify-center
                                                 ${app.status === 'cancelled' ? 'bg-slate-100 border-slate-300 opacity-60' :
                                                     app.status === 'completed' ? 'bg-emerald-50 border-emerald-400' :
                                                         'bg-indigo-50 border-indigo-400 hover:bg-indigo-100'}
                                             `}
                                         >
-                                            <div className="flex items-start justify-between gap-2 overflow-hidden h-full">
-                                                <div className="min-w-0">
-                                                    <div className="flex items-center gap-2 mb-0.5">
+                                            <div className="flex items-start justify-between gap-2 overflow-hidden h-full w-full">
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                                                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">
                                                             {format(dateObj, 'HH:mm')}
                                                         </span>
                                                         <div className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
+                                                        {isShort && (
+                                                            <span className="text-[12px] font-bold text-slate-900 truncate flex-1">
+                                                                {app.customer_name}
+                                                            </span>
+                                                        )}
                                                     </div>
-                                                    <h4 className="text-[13px] font-bold text-slate-900 leading-tight truncate">
-                                                        {app.customer_name}
-                                                    </h4>
-                                                    <p className="text-[10px] font-medium text-slate-600 truncate opacity-80">
-                                                        {app.service?.name} ({duration}m)
+                                                    {!isShort && (
+                                                        <h4 className="text-[13px] font-bold text-slate-900 leading-tight truncate">
+                                                            {app.customer_name}
+                                                        </h4>
+                                                    )}
+                                                    <p className="text-[10px] font-bold text-slate-700 truncate opacity-90">
+                                                        {app.service?.name} {isShort ? '' : `(${duration}m)`}
                                                     </p>
                                                 </div>
 
