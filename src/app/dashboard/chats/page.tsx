@@ -7,6 +7,7 @@ type Conversation = {
     id: string;
     remote_jid: string;
     customer_name: string;
+    customer_phone: string;
     last_message: string;
     last_message_at: string;
     unread_count: number;
@@ -37,8 +38,8 @@ export default function ChatsPage() {
 
     useEffect(() => {
         if (selectedConvo) {
-            fetchMessages(selectedConvo.remote_jid);
-            const interval = setInterval(() => fetchMessages(selectedConvo.remote_jid), 10_000);
+            fetchMessages(selectedConvo.id);
+            const interval = setInterval(() => fetchMessages(selectedConvo.id), 10_000);
             return () => clearInterval(interval);
         }
     }, [selectedConvo]);
@@ -57,10 +58,10 @@ export default function ChatsPage() {
         }
     };
 
-    const fetchMessages = async (remoteJid: string) => {
+    const fetchMessages = async (conversationId: string) => {
         setMessagesLoading(true);
         try {
-            const res = await fetch(`/api/conversations/messages?remoteJid=${remoteJid}`);
+            const res = await fetch(`/api/conversations/${conversationId}/messages`);
             const data = await res.json();
             setMessages(Array.isArray(data) ? data : []);
         } finally {
@@ -69,8 +70,8 @@ export default function ChatsPage() {
     };
 
     const filtered = conversations.filter(c =>
-        c.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-        c.remote_jid.includes(search)
+        (c.customer_name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (c.remote_jid || '').includes(search)
     );
 
     const formatPhone = (jid: string) => jid.replace('@s.whatsapp.net', '');
@@ -127,12 +128,12 @@ export default function ChatsPage() {
                                         <div className="flex items-start gap-3">
                                             <div className="w-10 h-10 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center flex-shrink-0">
                                                 <span className="text-sm font-bold text-indigo-700">
-                                                    {convo.customer_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                                    {(convo.customer_name || '?').split(' ').map(n => n[0]).join('').slice(0, 2)}
                                                 </span>
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between gap-2 mb-0.5">
-                                                    <h4 className="text-sm font-bold text-slate-900 truncate">{convo.customer_name}</h4>
+                                                    <h4 className="text-sm font-bold text-slate-900 truncate">{convo.customer_name || convo.customer_phone || 'Desconhecido'}</h4>
                                                     <span className="text-[10px] text-slate-400 flex-shrink-0">{formatTime(convo.last_message_at)}</span>
                                                 </div>
                                                 <p className="text-xs text-slate-500 truncate">{convo.last_message}</p>
@@ -162,12 +163,12 @@ export default function ChatsPage() {
                                     </button>
                                     <div className="w-10 h-10 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center">
                                         <span className="text-sm font-bold text-indigo-700">
-                                            {selectedConvo.customer_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                            {(selectedConvo.customer_name || '?').split(' ').map(n => n[0]).join('').slice(0, 2)}
                                         </span>
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-bold text-slate-900">{selectedConvo.customer_name}</h3>
-                                        <p className="text-[10px] text-slate-400">{formatPhone(selectedConvo.remote_jid)}</p>
+                                        <h3 className="text-sm font-bold text-slate-900">{selectedConvo.customer_name || 'Desconhecido'}</h3>
+                                        <p className="text-[10px] text-slate-400">{formatPhone(selectedConvo.remote_jid || selectedConvo.customer_phone || '')}</p>
                                     </div>
                                 </div>
 
