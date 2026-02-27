@@ -2,24 +2,26 @@
 
 :root {
   --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: rgba(255, 255, 255, 0.85);
-  --card-foreground: #0f172a;
+  --foreground: #020617;
+  /* Slate 950 - Strong almost black */
+  --card: rgba(255, 255, 255, 0.95);
+  --card-foreground: #020617;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #6366f1;
+  --popover-foreground: #020617;
+  --primary: #4f46e5;
   --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
   --muted: #f1f5f9;
-  --muted-foreground: #475569;
+  --muted-foreground: #0f172a;
+  /* Changed from Slate 600 to Slate 900 for high visibility */
   --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
+  --accent-foreground: #020617;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.08);
-  --input: rgba(0, 0, 0, 0.04);
-  --ring: #6366f1;
+  --border: rgba(0, 0, 0, 0.12);
+  --input: rgba(0, 0, 0, 0.08);
+  --ring: #4f46e5;
   --radius: 1rem;
 }
 
