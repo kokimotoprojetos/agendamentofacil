@@ -63,6 +63,7 @@ export default function AgendaPage() {
         service_id: '', customer_name: '', customer_phone: '',
         date: format(new Date(), 'yyyy-MM-dd'), time: '09:00',
     });
+    const [selectedApp, setSelectedApp] = useState<Appointment | null>(null);
 
     useEffect(() => {
         fetch('/api/services').then(r => r.json()).then(d => {
@@ -307,19 +308,20 @@ export default function AgendaPage() {
 
                                     const topPos = (startHourIdx * 80) + (minutes * 80 / 60) + 16;
                                     const duration = app.service?.duration || 60;
-                                    const heightPos = Math.max(45, (duration * 80 / 60) - 4);
+                                    const heightPos = Math.max(54, (duration * 80 / 60) - 4);
                                     const isShort = duration < 45;
 
                                     return (
                                         <div
                                             key={app.id}
+                                            onClick={() => setSelectedApp(app)}
                                             style={{ top: `${topPos}px`, height: `${heightPos}px` }}
                                             className={`
                                                 absolute left-16 right-4 rounded-xl border-l-4 p-2.5 transition-all cursor-pointer group hover:z-20
                                                 shadow-sm flex flex-col justify-center
                                                 ${app.status === 'cancelled' ? 'bg-slate-100 border-slate-300 opacity-60' :
                                                     app.status === 'completed' ? 'bg-emerald-50 border-emerald-400' :
-                                                        'bg-indigo-50 border-indigo-400 hover:bg-indigo-100'}
+                                                        'bg-indigo-50 border-indigo-400 hover:bg-indigo-100 hover:shadow-md'}
                                             `}
                                         >
                                             <div className="flex items-start justify-between gap-2 overflow-hidden h-full w-full">
@@ -371,6 +373,102 @@ export default function AgendaPage() {
                     </div>
                 </div>
             </div>
+
+            {/* DETAILS MODAL */}
+            {selectedApp && (
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white border border-slate-200 w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden">
+                        <div className="bg-gradient-to-br from-indigo-50 to-transparent p-8 border-b border-slate-100 flex justify-between items-start">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900">Detalhes do Agendamento</h2>
+                                <p className="text-[11px] text-slate-500 uppercase tracking-widest mt-1">Status: {STATUS_MAP[selectedApp.status]?.label || selectedApp.status}</p>
+                            </div>
+                            <button onClick={() => setSelectedApp(null)} className="p-2 bg-slate-100 rounded-xl text-slate-500 hover:text-slate-700 transition-all">
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                        <User size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Cliente</p>
+                                        <p className="text-base font-bold text-slate-900">{selectedApp.customer_name}</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                                        <Phone size={20} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Telefone</p>
+                                        <p className="text-base font-bold text-slate-900">{selectedApp.customer_phone || 'Não informado'}</p>
+                                    </div>
+                                    {selectedApp.customer_phone && (
+                                        <button
+                                            onClick={() => navigator.clipboard.writeText(selectedApp.customer_phone)}
+                                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold rounded-lg transition-all"
+                                        >
+                                            COPIAR
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+                                        <Clock size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Horário</p>
+                                        <p className="text-base font-bold text-slate-900">
+                                            {format(parseISO(selectedApp.start_time), "HH:mm")} às {format(parseISO(selectedApp.end_time), "HH:mm")}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Serviço solicitado</p>
+                                    <div className="flex justify-between items-end">
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-900">{selectedApp.service?.name}</p>
+                                            <p className="text-xs text-slate-500">{selectedApp.service?.duration} minutos</p>
+                                        </div>
+                                        <p className="text-lg font-black text-indigo-600">R$ {selectedApp.service?.price}</p>
+                                    </div>
+                                </div>
+
+                                {selectedApp.notes && (
+                                    <div className="bg-indigo-50/30 rounded-2xl p-4 border border-indigo-100/50">
+                                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Observações</p>
+                                        <p className="text-xs text-slate-700 italic">"{selectedApp.notes}"</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex gap-4 pt-2">
+                                <button
+                                    onClick={() => { handleDelete(selectedApp.id); setSelectedApp(null); }}
+                                    className="flex-1 py-4 bg-rose-50 text-rose-600 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-rose-100 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <Trash2 size={14} /> Excluir
+                                </button>
+                                {selectedApp.status !== 'completed' && (
+                                    <button
+                                        onClick={() => { handleStatus(selectedApp.id, 'completed'); setSelectedApp(null); }}
+                                        className="flex-[2] py-4 bg-emerald-600 text-white font-bold text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <Check size={16} /> Finalizar
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* NEW APPOINTMENT MODAL */}
             {isModalOpen && (
