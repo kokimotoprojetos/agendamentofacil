@@ -30,7 +30,7 @@ type CancellationCtx = {
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 async function callAI(messages: any[], opts?: { json?: boolean; temp?: number }): Promise<string> {
   const response = await getOpenAI().chat.completions.create({
-    model: 'gpt-5.2',
+    model: 'gpt-4o',
     messages,
     temperature: opts?.temp ?? 0.3,
     ...(opts?.json ? { response_format: { type: 'json_object' } } : {}),
