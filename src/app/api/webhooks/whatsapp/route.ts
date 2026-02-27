@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { aiAgentService } from '@/services/ai.service';
 import { whatsappService } from '@/services/whatsapp.service';
+import axios from 'axios';
 
 export async function POST(req: Request) {
   try {
@@ -34,21 +35,70 @@ export async function POST(req: Request) {
     }
 
     const customerPhone = key?.remoteJid;
-    // In this Evolution API version, message text is under data.message.conversation
-    const messageText = data?.message?.conversation ||
-      data?.message?.extendedTextMessage?.text ||
-      data?.conversation ||
-      data?.text ||
-      "";
+
+    // ── Detect message type ──────────────────────────────────────────────────
+    const audioMessage = data?.message?.audioMessage;
+    let messageText = '';
+    let isAudio = false;
+
+    if (audioMessage) {
+      // Audio message — download and transcribe
+      isAudio = true;
+      try {
+        const messageId = key?.id;
+        const mimeType = audioMessage.mimetype || 'audio/ogg; codecs=opus';
+
+        // Download audio from Evolution API base64 endpoint
+        const evolutionUrl = process.env.EVOLUTION_API_URL;
+        const evolutionKey = process.env.EVOLUTION_API_KEY;
+
+        const mediaRes = await axios.post(
+          `${evolutionUrl}/chat/getBase64FromMediaMessage/${instance}`,
+          { message: { key, message: data.message } },
+          { headers: { apikey: evolutionKey!, 'Content-Type': 'application/json' } }
+        );
+
+        const base64Data = mediaRes.data?.base64;
+        if (base64Data) {
+          const audioBuffer = Buffer.from(base64Data, 'base64');
+          messageText = await aiAgentService.transcribeAudio(audioBuffer, mimeType);
+
+          await supabaseAdmin.from('agent_logs').insert({
+            event_type: 'audio_transcribed',
+            description: `Áudio de ${customerPhone} transcrito: "${messageText.substring(0, 80)}"`,
+            metadata: { customerPhone, audioSize: audioBuffer.length, mimeType, transcription: messageText }
+          });
+        } else {
+          await supabaseAdmin.from('agent_logs').insert({
+            event_type: 'audio_download_failed',
+            description: `Falha ao baixar áudio de ${customerPhone} — sem base64`,
+            metadata: { customerPhone, messageId }
+          });
+        }
+      } catch (audioError: any) {
+        await supabaseAdmin.from('agent_logs').insert({
+          event_type: 'audio_error',
+          description: `Erro ao processar áudio: ${audioError.message}`,
+          metadata: { customerPhone, error: audioError.message }
+        });
+      }
+    } else {
+      // Text message
+      messageText = data?.message?.conversation ||
+        data?.message?.extendedTextMessage?.text ||
+        data?.conversation ||
+        data?.text ||
+        '';
+    }
 
     await supabaseAdmin.from('agent_logs').insert({
       event_type: 'webhook_parsed',
-      description: `Mensagem recebida de ${customerPhone}: "${messageText.substring(0, 50)}"`,
-      metadata: { customerPhone, messageText, instance }
+      description: `${isAudio ? '🎤 Áudio' : '💬 Texto'} de ${customerPhone}: "${messageText.substring(0, 50)}"`,
+      metadata: { customerPhone, messageText, instance, isAudio }
     });
 
     if (!messageText || !customerPhone) {
-      return NextResponse.json({ status: 'ignored', reason: 'invalid_payload' });
+      return NextResponse.json({ status: 'ignored', reason: isAudio ? 'transcription_failed' : 'invalid_payload' });
     }
 
     // 1. Resolve Tenant from Instance Name

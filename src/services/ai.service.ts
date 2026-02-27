@@ -1,9 +1,8 @@
 import OpenAI from 'openai';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
-const deepseek = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: 'https://api.deepseek.com/v1',
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -26,8 +25,8 @@ type CancellationCtx = {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 async function callAI(messages: any[], opts?: { json?: boolean; temp?: number }): Promise<string> {
-  const response = await deepseek.chat.completions.create({
-    model: 'deepseek-chat',
+  const response = await openai.chat.completions.create({
+    model: 'gpt-5.2',
     messages,
     temperature: opts?.temp ?? 0.3,
     ...(opts?.json ? { response_format: { type: 'json_object' } } : {}),
@@ -35,8 +34,46 @@ async function callAI(messages: any[], opts?: { json?: boolean; temp?: number })
   return response.choices[0].message.content || '';
 }
 
+// ─── Audio transcription ───────────────────────────────────────────────────────
+async function transcribeAudio(audioBuffer: Buffer, mimeType: string = 'audio/ogg'): Promise<string> {
+  try {
+    // Map common MIME types to file extensions
+    const extMap: Record<string, string> = {
+      'audio/ogg': 'ogg',
+      'audio/ogg; codecs=opus': 'ogg',
+      'audio/mpeg': 'mp3',
+      'audio/mp4': 'mp4',
+      'audio/wav': 'wav',
+      'audio/webm': 'webm',
+    };
+    const ext = extMap[mimeType] || 'ogg';
+
+    // Create a File-like object from the buffer for the OpenAI SDK
+    const uint8 = new Uint8Array(audioBuffer);
+    const file = new File([uint8], `audio.${ext}`, { type: mimeType });
+
+    const transcription = await openai.audio.transcriptions.create({
+      file,
+      model: 'whisper-1',
+      language: 'pt',
+    });
+
+    console.log(`[audio] Transcribed ${audioBuffer.length} bytes → "${transcription.text.substring(0, 80)}..."`);
+    return transcription.text;
+  } catch (error) {
+    console.error('[audio] Transcription failed:', error);
+    return '';
+  }
+}
+
 // ─── Main service ──────────────────────────────────────────────────────────────
 export const aiAgentService = {
+
+  /**
+   * Transcribe an audio buffer to text using OpenAI Whisper.
+   * Exposed so the webhook can call it before processResponse.
+   */
+  transcribeAudio,
 
   async processResponse(
     tenantId: string,

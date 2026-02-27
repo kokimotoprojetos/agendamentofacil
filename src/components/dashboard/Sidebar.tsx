@@ -41,7 +41,7 @@ export function Sidebar() {
     const pathname = usePathname();
 
     return (
-        <aside className="fixed left-0 top-0 h-screen w-72 bg-[#020617] border-r border-white/5 flex flex-col z-50 overflow-hidden">
+        <aside className="fixed left-0 top-0 h-screen w-72 bg-white border-r border-slate-200 flex flex-col z-50 overflow-hidden">
             <div className="px-7 py-8">
                 <BrandLogo size="md" showTagline />
             </div>
@@ -56,18 +56,16 @@ export function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                ? 'bg-indigo-600/10 text-white'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                ? 'bg-indigo-50 text-indigo-700'
+                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                                 }`}
                         >
-                            <Icon size={20} className={isActive ? 'text-indigo-400' : 'text-slate-400 group-hover:text-white'} />
+                            <Icon size={20} className={isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-700'} />
                             <span className="text-sm font-medium">{item.label}</span>
                         </Link>
                     );
                 })}
             </nav>
-
-
         </aside>
     );
 }

@@ -23,7 +23,6 @@ export default async function DashboardPage() {
     const session = await getServerSession(authOptions);
     if (!session?.user) return null;
 
-    // Fetch profile to get tenant_id
     const { data: profile } = await supabaseAdmin
         .from('profiles')
         .select('tenant_id')
@@ -33,7 +32,7 @@ export default async function DashboardPage() {
     if (!profile?.tenant_id) {
         return (
             <div className="flex items-center justify-center min-h-[50vh]">
-                <p className="text-slate-400">Perfil ou Tenant não configurado.</p>
+                <p className="text-slate-500">Perfil ou Tenant não configurado.</p>
             </div>
         );
     }
@@ -48,7 +47,7 @@ export default async function DashboardPage() {
             value: statsData.appointmentsToday.toString(),
             icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>,
             color: "indigo",
-            trend: { value: "12%", positive: true } // Manter estático por agora ou remover
+            trend: { value: "12%", positive: true }
         },
         {
             label: "Conversas Ativas",
@@ -74,13 +73,13 @@ export default async function DashboardPage() {
     ];
 
     return (
-        <div className="max-w-6xl mx-auto pb-12 animate-fade-up">
+        <div className="max-w-6xl mx-auto pb-12">
             <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight mb-1">Visão Geral</h1>
-                    <p className="text-sm text-slate-400">Acompanhe o desempenho do seu salão em tempo real.</p>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-1">Visão Geral</h1>
+                    <p className="text-sm text-slate-500">Acompanhe o desempenho do seu salão em tempo real.</p>
                 </div>
-                <div className="px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-xs font-medium text-slate-400 flex items-center gap-2">
+                <div className="px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-medium text-emerald-700 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                     Sistemas Ativos
                 </div>
@@ -94,10 +93,10 @@ export default async function DashboardPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
-                    <section className="glass p-8 rounded-3xl border-white/5">
+                    <section className="bg-white p-8 rounded-3xl border border-slate-200">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-xl font-bold text-white tracking-tight">Atividade Recente</h3>
-                            <Link href="/dashboard/calendar" className="text-xs font-semibold text-primary hover:underline transition-all">
+                            <h3 className="text-xl font-bold text-slate-900 tracking-tight">Atividade Recente</h3>
+                            <Link href="/dashboard/calendar" className="text-xs font-semibold text-indigo-600 hover:underline transition-all">
                                 Ver Agenda Completa
                             </Link>
                         </div>
@@ -105,19 +104,19 @@ export default async function DashboardPage() {
                         <div className="space-y-3">
                             {recentActivity.length > 0 ? (
                                 recentActivity.map((item, i) => (
-                                    <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] hover:bg-white/[0.04] rounded-2xl border border-white/5 transition-all group">
+                                    <div key={i} className="flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all group">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/10 text-primary flex items-center justify-center font-bold text-sm transition-transform">
+                                            <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm transition-transform">
                                                 {item.name.split(' ').map((n: string) => n[0]).join('')}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-bold text-white">{item.name}</p>
-                                                <p className="text-[11px] text-slate-400">{item.service} • Hoje às {item.time}</p>
+                                                <p className="text-sm font-bold text-slate-900">{item.name}</p>
+                                                <p className="text-[11px] text-slate-500">{item.service} • Hoje às {item.time}</p>
                                             </div>
                                         </div>
                                         <span className={`px-3 py-1 text-[10px] font-bold rounded-full border ${item.status === 'Confirmado'
-                                            ? 'text-emerald-400 bg-emerald-500/5 border-emerald-500/10'
-                                            : 'text-amber-400 bg-amber-500/5 border-amber-500/10'
+                                            ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                                            : 'text-amber-700 bg-amber-50 border-amber-200'
                                             }`}>
                                             {item.status}
                                         </span>
@@ -125,7 +124,7 @@ export default async function DashboardPage() {
                                 ))
                             ) : (
                                 <div className="text-center py-12">
-                                    <p className="text-slate-500 text-sm">Nenhuma atividade recente.</p>
+                                    <p className="text-slate-400 text-sm">Nenhuma atividade recente.</p>
                                 </div>
                             )}
                         </div>
@@ -133,36 +132,36 @@ export default async function DashboardPage() {
                 </div>
 
                 <aside className="space-y-6">
-                    <section className="glass p-6 rounded-3xl border-white/5">
-                        <h3 className="text-lg font-bold text-white tracking-tight mb-6">Atalhos</h3>
+                    <section className="bg-white p-6 rounded-3xl border border-slate-200">
+                        <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-6">Atalhos</h3>
                         <div className="space-y-3">
-                            <Link href="/dashboard/agent" className="group flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-primary/40 transition-all">
-                                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all text-primary">
+                            <Link href="/dashboard/agent" className="group flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-300 transition-all">
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all text-indigo-600">
                                     <Users size={20} />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-white text-sm">Agente IA</p>
-                                    <p className="text-[10px] text-slate-500 font-medium">Configurações</p>
+                                    <p className="font-bold text-slate-900 text-sm">Agente IA</p>
+                                    <p className="text-[10px] text-slate-400 font-medium">Configurações</p>
                                 </div>
                             </Link>
 
-                            <Link href="/dashboard/whatsapp" className="group flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-primary/40 transition-all">
-                                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all text-primary">
+                            <Link href="/dashboard/whatsapp" className="group flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-300 transition-all">
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all text-indigo-600">
                                     <WhatsAppIcon size={20} />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-white text-sm">WhatsApp</p>
-                                    <p className="text-[10px] text-slate-500 font-medium">Conectividade</p>
+                                    <p className="font-bold text-slate-900 text-sm">WhatsApp</p>
+                                    <p className="text-[10px] text-slate-400 font-medium">Conectividade</p>
                                 </div>
                             </Link>
                         </div>
                     </section>
 
-                    <section className="glass p-6 rounded-3xl border-white/5 bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden group">
+                    <section className="bg-white p-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-indigo-50/50 to-transparent relative overflow-hidden group">
                         <div className="relative z-10">
-                            <h3 className="text-lg font-bold text-white mb-2">Suporte</h3>
-                            <p className="text-slate-400 text-[11px] font-medium mb-6">Precisa de ajuda com o sistema?</p>
-                            <button className="w-full py-3 bg-primary text-white text-xs font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">Suporte</h3>
+                            <p className="text-slate-500 text-[11px] font-medium mb-6">Precisa de ajuda com o sistema?</p>
+                            <button className="w-full py-3 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 hover:bg-indigo-500 transition-all">
                                 Abrir Chamado
                             </button>
                         </div>

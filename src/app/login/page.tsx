@@ -14,7 +14,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-// Google "G" SVG icon — reliable, no external requests
+// Google "G" SVG icon
 const GoogleIcon = () => (
     <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
@@ -64,22 +64,16 @@ export default function LoginPage() {
     return (
         <div
             className="flex items-center justify-center min-h-screen px-4"
-            style={{ background: 'linear-gradient(135deg, #020617 0%, #0d1117 100%)' }}
+            style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)' }}
         >
-            {/* Background glow */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-[0.08]"
-                    style={{ background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)' }} />
-            </div>
-
             <div className="relative w-full max-w-md">
                 {/* Card */}
                 <div
-                    className="p-8 space-y-7 rounded-3xl shadow-2xl"
+                    className="p-8 space-y-7 rounded-3xl shadow-xl"
                     style={{
-                        background: 'linear-gradient(145deg, #111827 0%, #1a1f2e 100%)',
-                        border: '1.5px solid rgba(255,255,255,0.08)',
-                        boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+                        background: 'white',
+                        border: '1px solid rgba(0,0,0,0.06)',
+                        boxShadow: '0 25px 60px rgba(0,0,0,0.08)',
                     }}
                 >
                     {/* Logo */}
@@ -87,18 +81,19 @@ export default function LoginPage() {
                         <div className="flex justify-center mb-4">
                             <BrandLogo size="md" />
                         </div>
-                        <p className="text-sm text-slate-400">Entre na sua conta para gerenciar seus agendamentos</p>
+                        <p className="text-sm text-slate-500">Entre na sua conta para gerenciar seus agendamentos</p>
                     </div>
 
-                    {/* Google Login — primary action */}
+                    {/* Google Login */}
                     <button
                         onClick={handleGoogleLogin}
                         disabled={googleLoading}
                         className="flex items-center justify-center w-full py-3.5 px-4 font-semibold rounded-2xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
                         style={{
-                            background: 'white',
-                            color: '#111827',
-                            boxShadow: '0 4px 16px rgba(255,255,255,0.08)',
+                            background: '#f8fafc',
+                            color: '#0f172a',
+                            border: '1px solid rgba(0,0,0,0.08)',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                             gap: '10px',
                         }}
                     >
@@ -108,41 +103,41 @@ export default function LoginPage() {
 
                     {/* Divider */}
                     <div className="relative flex items-center">
-                        <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-                        <span className="px-4 text-xs text-slate-500 font-medium">ou entre com email</span>
-                        <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+                        <div className="flex-1 h-px" style={{ background: 'rgba(0,0,0,0.08)' }} />
+                        <span className="px-4 text-xs text-slate-400 font-medium">ou entre com email</span>
+                        <div className="flex-1 h-px" style={{ background: 'rgba(0,0,0,0.08)' }} />
                     </div>
 
                     {/* Email / Password form */}
                     <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
                             <input
                                 {...register('email')}
                                 type="email"
-                                className="block w-full px-4 py-3 rounded-xl text-white placeholder:text-slate-600 outline-none transition-all"
+                                className="block w-full px-4 py-3 rounded-xl text-slate-900 placeholder:text-slate-400 outline-none transition-all"
                                 style={{
-                                    background: 'rgba(255,255,255,0.04)',
-                                    border: `1.5px solid ${errors.email ? '#f87171' : 'rgba(255,255,255,0.08)'}`,
+                                    background: '#f8fafc',
+                                    border: `1.5px solid ${errors.email ? '#ef4444' : 'rgba(0,0,0,0.08)'}`,
                                 }}
                                 placeholder="seu@email.com"
                             />
-                            {errors.email && <p className="mt-1 text-xs text-rose-400">{errors.email.message}</p>}
+                            {errors.email && <p className="mt-1 text-xs text-rose-500">{errors.email.message}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1.5">Senha</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1.5">Senha</label>
                             <input
                                 {...register('password')}
                                 type="password"
-                                className="block w-full px-4 py-3 rounded-xl text-white placeholder:text-slate-600 outline-none transition-all"
+                                className="block w-full px-4 py-3 rounded-xl text-slate-900 placeholder:text-slate-400 outline-none transition-all"
                                 style={{
-                                    background: 'rgba(255,255,255,0.04)',
-                                    border: `1.5px solid ${errors.password ? '#f87171' : 'rgba(255,255,255,0.08)'}`,
+                                    background: '#f8fafc',
+                                    border: `1.5px solid ${errors.password ? '#ef4444' : 'rgba(0,0,0,0.08)'}`,
                                 }}
                                 placeholder="••••••••"
                             />
-                            {errors.password && <p className="mt-1 text-xs text-rose-400">{errors.password.message}</p>}
+                            {errors.password && <p className="mt-1 text-xs text-rose-500">{errors.password.message}</p>}
                         </div>
 
                         <button
@@ -151,7 +146,7 @@ export default function LoginPage() {
                             className="w-full py-3.5 px-4 font-bold text-white rounded-2xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                             style={{
                                 background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-                                boxShadow: '0 8px 24px rgba(124,58,237,0.3)',
+                                boxShadow: '0 8px 24px rgba(124,58,237,0.25)',
                             }}
                         >
                             {isSubmitting ? 'Entrando...' : 'Entrar na Conta'}
@@ -161,7 +156,7 @@ export default function LoginPage() {
                     {/* Footer link */}
                     <p className="text-center text-sm text-slate-500">
                         Não tem uma conta?{' '}
-                        <a href="/register" className="font-bold text-indigo-400 hover:text-indigo-300 transition-colors">
+                        <a href="/register" className="font-bold text-indigo-600 hover:text-indigo-500 transition-colors">
                             Cadastre-se
                         </a>
                     </p>
