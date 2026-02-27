@@ -176,7 +176,7 @@ export default function WhatsAppPage() {
                             </div>
                             <div>
                                 <h3 className="text-lg font-bold text-slate-900 mb-1">
-                                    {instanceInfo?.profileName || instanceInfo?.instanceName || 'WhatsApp Business'}
+                                    WhatsApp Business
                                 </h3>
                                 <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${stateConfig.bg} ${stateConfig.color} ${stateConfig.border}`}>
                                     <span className={`w-2 h-2 rounded-full ${stateConfig.dot} ${state === 'connecting' ? 'animate-pulse' : ''}`}></span>
