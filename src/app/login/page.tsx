@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { BrandLogo } from '@/components/ui/BrandLogo';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 const loginSchema = z.object({
     email: z.string().email('Email inválido'),
@@ -69,14 +70,22 @@ export default function LoginPage() {
             <div className="relative w-full max-w-md">
                 {/* Card */}
                 <div
-                    className="p-8 space-y-7 rounded-3xl shadow-xl"
+                    className="relative p-8 space-y-7 rounded-3xl shadow-xl overflow-hidden group"
                     style={{
                         background: 'white',
                         border: '1px solid rgba(0,0,0,0.06)',
                         boxShadow: '0 25px 60px rgba(0,0,0,0.08)',
                     }}
                 >
-                    {/* Logo */}
+                    <GlowingEffect
+                        spread={80}
+                        glow={true}
+                        disabled={false}
+                        proximity={64}
+                        inactiveZone={0.01}
+                        borderWidth={3}
+                    />
+                    {/* Logo content */}
                     <div className="text-center pb-2">
                         <div className="flex justify-center mb-4">
                             <BrandLogo size="md" />

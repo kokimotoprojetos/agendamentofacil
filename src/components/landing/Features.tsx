@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 // ─── Static Scene 1: Sleeping owner, ringing phone ─────────────────────────────
 const PainScene1 = () => (
@@ -219,7 +220,7 @@ export const Features = () => {
                                 key={i}
                                 onMouseEnter={() => setHovered(i)}
                                 onMouseLeave={() => setHovered(null)}
-                                className="relative rounded-3xl overflow-hidden"
+                                className="relative rounded-3xl overflow-hidden group"
                                 style={{
                                     background: 'white',
                                     border: `1.5px solid ${isHovered ? card.borderColor : 'rgba(0,0,0,0.06)'}`,
@@ -228,6 +229,15 @@ export const Features = () => {
                                     transition: 'all 0.3s ease',
                                 }}
                             >
+                                <GlowingEffect
+                                    blur={0}
+                                    borderWidth={3}
+                                    spread={80}
+                                    glow={isHovered}
+                                    disabled={false}
+                                    proximity={64}
+                                    inactiveZone={0.01}
+                                />
                                 {/* Static SVG scene */}
                                 <div className="relative h-52 overflow-hidden">
                                     <Scene />
@@ -292,6 +302,13 @@ export const Features = () => {
                             background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
                             border: '1.5px solid rgba(99,102,241,0.2)',
                         }}>
+                        <GlowingEffect
+                            spread={40}
+                            glow={true}
+                            disabled={false}
+                            proximity={64}
+                            inactiveZone={0.01}
+                        />
                         <p className="text-xl font-bold leading-snug text-slate-800">
                             Cada dia que passa,{' '}
                             <span className="text-indigo-600">seu concorrente já está usando automação.</span>

@@ -1,4 +1,4 @@
-import React from 'react';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 interface StatsCardProps {
     label: string;
@@ -20,7 +20,14 @@ export const StatsCard = ({ label, value, icon, color, trend }: StatsCardProps) 
     };
 
     return (
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 transition-all duration-300 hover:border-slate-300 hover:shadow-md group">
+        <div className="relative bg-white p-6 rounded-3xl border border-slate-200 transition-all duration-300 hover:border-slate-300 hover:shadow-md group">
+            <GlowingEffect
+                spread={40}
+                glow={true}
+                disabled={false}
+                proximity={64}
+                inactiveZone={0.01}
+            />
             <div className="flex items-center justify-between mb-4">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${colorMap[color] || 'text-slate-600 bg-slate-50'}`}>
                     {icon}

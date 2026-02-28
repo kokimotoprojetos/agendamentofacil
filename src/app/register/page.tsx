@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { signIn } from 'next-auth/react';
 import { BrandLogo } from '@/components/ui/BrandLogo';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 const registerSchema = z.object({
     name: z.string().min(2, 'Nome muito curto'),
@@ -55,9 +56,17 @@ export default function RegisterPage() {
     return (
         <div className="flex items-center justify-center min-h-screen px-4 font-sans"
             style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)' }}>
-            <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-xl"
+            <div className="relative w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-xl overflow-hidden group"
                 style={{ border: '1px solid rgba(0,0,0,0.06)' }}>
-                <div className="text-center">
+                <GlowingEffect
+                    spread={80}
+                    glow={true}
+                    disabled={false}
+                    proximity={64}
+                    inactiveZone={0.01}
+                    borderWidth={3}
+                />
+                <div className="relative text-center">
                     <div className="flex justify-center mb-4">
                         <BrandLogo size="md" />
                     </div>
