@@ -616,8 +616,23 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        await supabaseAdmin.from('agent_logs').insert({
+          tenant_id: tenantId,
+          event_type: 'booking_insert_error',
+          description: `Erro ao inserir no banco: ${error.message}`,
+          metadata: { insertData, error }
+        });
+        throw error;
+      }
+
       console.log(`[booking] ✅ Appointment created successfully!`);
+      await supabaseAdmin.from('agent_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'appointment_created',
+        description: `Agendamento criado: ${insertData.customer_name} - ${booking.service_name}`,
+        metadata: { appointmentId: appointment?.id, customerPhone }
+      });
 
       // ─── Trigger dynamic notification to owner ───────────────────────────────
       if (instanceName) {
@@ -631,8 +646,14 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
       }
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('[booking] ❌ Error executing booking:', error);
+      await supabaseAdmin.from('agent_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'booking_execution_fatal',
+        description: `Erro fatal no executeBooking: ${error.message}`,
+        metadata: { error: error.message, stack: error.stack, booking }
+      });
       return false;
     }
   },
