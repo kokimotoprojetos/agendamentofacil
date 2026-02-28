@@ -84,6 +84,17 @@ export const CircularTestimonials = ({
         [activeIndex, testimonials]
     );
 
+    // Navigation handlers
+    const handleNext = useCallback(() => {
+        setActiveIndex((prev) => (prev + 1) % testimonialsLength);
+        if (autoplayIntervalRef.current) clearInterval(autoplayIntervalRef.current);
+    }, [testimonialsLength]);
+
+    const handlePrev = useCallback(() => {
+        setActiveIndex((prev) => (prev - 1 + testimonialsLength) % testimonialsLength);
+        if (autoplayIntervalRef.current) clearInterval(autoplayIntervalRef.current);
+    }, [testimonialsLength]);
+
     // Responsive gap calculation
     useEffect(() => {
         function handleResize() {
@@ -100,13 +111,13 @@ export const CircularTestimonials = ({
     useEffect(() => {
         if (autoplay) {
             autoplayIntervalRef.current = setInterval(() => {
-                setActiveIndex((prev) => (prev + 1) % testimonialsLength);
+                handleNext();
             }, 8000);
         }
         return () => {
             if (autoplayIntervalRef.current) clearInterval(autoplayIntervalRef.current);
         };
-    }, [autoplay, testimonialsLength]);
+    }, [autoplay, handleNext]);
 
     // Keyboard navigation
     useEffect(() => {
@@ -116,18 +127,7 @@ export const CircularTestimonials = ({
         };
         window.addEventListener("keydown", handleKey);
         return () => window.removeEventListener("keydown", handleKey);
-    }, [activeIndex, testimonialsLength, handleNext, handlePrev]);
-
-    // Navigation handlers
-    const handleNext = useCallback(() => {
-        setActiveIndex((prev) => (prev + 1) % testimonialsLength);
-        if (autoplayIntervalRef.current) clearInterval(autoplayIntervalRef.current);
-    }, [testimonialsLength]);
-
-    const handlePrev = useCallback(() => {
-        setActiveIndex((prev) => (prev - 1 + testimonialsLength) % testimonialsLength);
-        if (autoplayIntervalRef.current) clearInterval(autoplayIntervalRef.current);
-    }, [testimonialsLength]);
+    }, [handleNext, handlePrev]);
 
     // Compute transforms for each image
     function getImageStyle(index: number): React.CSSProperties {
