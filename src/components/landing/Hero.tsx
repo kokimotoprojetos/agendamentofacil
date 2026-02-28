@@ -34,17 +34,6 @@ export const Hero = () => {
                         </a>
                     </div>
                 </div>
-
-                <div className="mt-24 relative max-w-5xl mx-auto">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[2.5rem] blur opacity-10"></div>
-                    <div className="relative glass rounded-[2rem] overflow-hidden p-2">
-                        <img
-                            src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=2850&q=80"
-                            alt="Beautfy.ai Dashboard Preview"
-                            className="w-full rounded-3xl object-cover shadow-2xl"
-                        />
-                    </div>
-                </div>
             </div>
         </section>
     );
