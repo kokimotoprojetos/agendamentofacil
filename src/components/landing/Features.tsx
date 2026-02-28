@@ -185,8 +185,7 @@ export const Features = () => {
     return (
         <section
             id="features"
-            className="py-32 relative overflow-hidden"
-            style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)' }}
+            className="py-32 relative overflow-hidden bg-transparent"
         >
             <div className="container px-4 mx-auto relative">
                 {/* Header */}
@@ -222,7 +221,8 @@ export const Features = () => {
                                 onMouseLeave={() => setHovered(null)}
                                 className="relative rounded-3xl overflow-hidden group"
                                 style={{
-                                    background: 'white',
+                                    background: 'rgba(255, 255, 255, 0.7)',
+                                    backdropFilter: 'blur(10px)',
                                     border: `1.5px solid ${isHovered ? card.borderColor : 'rgba(0,0,0,0.06)'}`,
                                     boxShadow: isHovered ? `0 8px 30px rgba(0,0,0,0.08)` : '0 1px 3px rgba(0,0,0,0.04)',
                                     transform: isHovered ? 'scale(1.02)' : 'scale(1)',
@@ -242,7 +242,7 @@ export const Features = () => {
                                 <div className="relative h-52 overflow-hidden">
                                     <Scene />
                                     <div className="absolute bottom-0 left-0 right-0 h-16"
-                                        style={{ background: 'linear-gradient(to top, white, transparent)' }} />
+                                        style={{ background: 'linear-gradient(to top, rgba(255,255,255,0.8), transparent)' }} />
                                     <div className="absolute top-4 left-4">
                                         <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border"
                                             style={{ background: '#fef2f2', color: '#b91c1c', borderColor: '#fca5a5', borderWidth: 1 }}>
@@ -299,7 +299,8 @@ export const Features = () => {
                 <div className="text-center">
                     <div className="inline-flex flex-col items-center gap-5 px-8 py-9 rounded-3xl max-w-2xl mx-auto w-full"
                         style={{
-                            background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
+                            background: 'rgba(238, 242, 255, 0.6)',
+                            backdropFilter: 'blur(10px)',
                             border: '1.5px solid rgba(99,102,241,0.2)',
                         }}>
                         <GlowingEffect

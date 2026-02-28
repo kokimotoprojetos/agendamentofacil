@@ -3,7 +3,7 @@ import { BrandLogo } from '@/components/ui/BrandLogo';
 
 export const Footer = () => {
     return (
-        <footer className="py-20 border-t border-slate-200 bg-white/50">
+        <footer className="py-20 border-t border-slate-200 bg-white/30 backdrop-blur-md">
             <div className="container px-4 mx-auto">
                 <div className="flex flex-wrap -mx-4">
                     <div className="w-full px-4 mb-12 lg:w-1/2 lg:mb-0">
