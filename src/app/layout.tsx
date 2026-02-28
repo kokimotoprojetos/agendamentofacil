@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const bebasNeue = Bebas_Neue({
+  variable: "--font-bebas",
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -22,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="pt-br" className="scroll-smooth">
       <body
-        className={`${outfit.variable} font-sans antialiased`}
+        className={`${bebasNeue.variable} ${inter.variable} font-inter antialiased bg-[#070905] text-white`}
       >
         <Providers>
           {children}

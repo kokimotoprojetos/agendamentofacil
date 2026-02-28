@@ -63,110 +63,88 @@ export default function LoginPage() {
     };
 
     return (
-        <div
-            className="flex items-center justify-center min-h-screen px-4"
-            style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)' }}
-        >
-            <div className="relative w-full max-w-md">
+        <div className="flex items-center justify-center min-h-screen px-4 bg-[#070905] relative overflow-hidden">
+            {/* Background Accent */}
+            <div className="absolute top-0 left-0 w-full h-full opacity-20">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary rounded-full blur-[120px]" />
+            </div>
+
+            <div className="relative w-full max-w-md z-10">
                 {/* Card */}
-                <div
-                    className="relative p-8 space-y-7 rounded-3xl shadow-xl overflow-hidden group"
-                    style={{
-                        background: 'white',
-                        border: '1px solid rgba(0,0,0,0.06)',
-                        boxShadow: '0 25px 60px rgba(0,0,0,0.08)',
-                    }}
-                >
+                <div className="relative p-10 space-y-8 rounded-[2.5rem] border border-white/10 glass shadow-2xl overflow-hidden group">
                     <GlowingEffect
-                        spread={80}
+                        spread={60}
                         glow={true}
                         disabled={false}
                         proximity={64}
                         inactiveZone={0.01}
-                        borderWidth={3}
+                        borderWidth={2}
                     />
+
                     {/* Logo content */}
-                    <div className="text-center pb-2">
-                        <div className="flex justify-center mb-4">
-                            <BrandLogo size="md" />
+                    <div className="text-center">
+                        <div className="flex justify-center mb-6">
+                            <BrandLogo size="lg" />
                         </div>
-                        <p className="text-sm text-slate-600">Entre na sua conta para gerenciar seus agendamentos</p>
+                        <p className="text-slate-400 font-medium tracking-tight mt-2">Identidade e Agendamento para Salões</p>
                     </div>
 
                     {/* Google Login */}
                     <button
                         onClick={handleGoogleLogin}
                         disabled={googleLoading}
-                        className="flex items-center justify-center w-full py-3.5 px-4 font-semibold rounded-2xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
-                        style={{
-                            background: '#f8fafc',
-                            color: '#0f172a',
-                            border: '1px solid rgba(0,0,0,0.08)',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                            gap: '10px',
-                        }}
+                        className="flex items-center justify-center w-full py-4 px-4 font-bold rounded-2xl transition-all hover:bg-white/5 active:scale-95 disabled:opacity-60 border border-white/10 text-white gap-3"
                     >
                         <GoogleIcon />
-                        {googleLoading ? 'Redirecionando...' : 'Continuar com Google'}
+                        {googleLoading ? 'Redirecionando...' : 'Entrar com Google'}
                     </button>
 
                     {/* Divider */}
                     <div className="relative flex items-center">
-                        <div className="flex-1 h-px" style={{ background: 'rgba(0,0,0,0.08)' }} />
-                        <span className="px-4 text-xs text-slate-500 font-medium">ou entre com email</span>
-                        <div className="flex-1 h-px" style={{ background: 'rgba(0,0,0,0.08)' }} />
+                        <div className="flex-1 h-px bg-white/10" />
+                        <span className="px-4 text-[10px] text-slate-500 font-black uppercase tracking-widest">ou use seu email</span>
+                        <div className="flex-1 h-px bg-white/10" />
                     </div>
 
                     {/* Email / Password form */}
-                    <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+                    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+                            <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Email</label>
                             <input
                                 {...register('email')}
                                 type="email"
-                                className="block w-full px-4 py-3 rounded-xl text-slate-900 placeholder:text-slate-500 outline-none transition-all"
-                                style={{
-                                    background: '#f8fafc',
-                                    border: `1.5px solid ${errors.email ? '#ef4444' : 'rgba(0,0,0,0.08)'}`,
-                                }}
+                                className="block w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium"
                                 placeholder="seu@email.com"
                             />
-                            {errors.email && <p className="mt-1 text-xs text-rose-500">{errors.email.message}</p>}
+                            {errors.email && <p className="mt-2 text-xs text-rose-500 font-bold">{errors.email.message}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1.5">Senha</label>
+                            <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Senha</label>
                             <input
                                 {...register('password')}
                                 type="password"
-                                className="block w-full px-4 py-3 rounded-xl text-slate-900 placeholder:text-slate-500 outline-none transition-all"
-                                style={{
-                                    background: '#f8fafc',
-                                    border: `1.5px solid ${errors.password ? '#ef4444' : 'rgba(0,0,0,0.08)'}`,
-                                }}
+                                className="block w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium"
                                 placeholder="••••••••"
                             />
-                            {errors.password && <p className="mt-1 text-xs text-rose-500">{errors.password.message}</p>}
+                            {errors.password && <p className="mt-2 text-xs text-rose-500 font-bold">{errors.password.message}</p>}
                         </div>
 
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full py-3.5 px-4 font-bold text-white rounded-2xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                            style={{
-                                background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-                                boxShadow: '0 8px 24px rgba(124,58,237,0.25)',
-                            }}
+                            className="w-full py-5 px-4 font-black text-black bg-primary rounded-2xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_0_30px_rgba(219,237,23,0.2)] uppercase tracking-tight text-lg"
                         >
-                            {isSubmitting ? 'Entrando...' : 'Entrar na Conta'}
+                            {isSubmitting ? 'Verificando...' : 'ENTRAR NA CONTA'}
                         </button>
                     </form>
 
                     {/* Footer link */}
-                    <p className="text-center text-sm text-slate-600">
-                        Não tem uma conta?{' '}
-                        <a href="/register" className="font-bold text-indigo-600 hover:text-indigo-500 transition-colors">
-                            Cadastre-se
+                    <p className="text-center text-sm text-slate-400 font-medium">
+                        Novo por aqui?{' '}
+                        <a href="/register" className="font-bold text-primary hover:underline transition-all">
+                            Cadastre seu salão agora
                         </a>
                     </p>
                 </div>

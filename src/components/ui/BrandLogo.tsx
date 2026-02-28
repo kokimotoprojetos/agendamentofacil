@@ -37,32 +37,16 @@ export function BrandLogo({ size = 'md', showTagline = false }: BrandLogoProps) 
             >
                 <defs>
                     <linearGradient id={`${id}-bg`} x1="0" y1="0" x2="52" y2="52" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#4f46e5" />
-                        <stop offset="100%" stopColor="#7c3aed" />
+                        <stop offset="0%" stopColor="#171915" />
+                        <stop offset="100%" stopColor="#070905" />
                     </linearGradient>
                     <linearGradient id={`${id}-mark`} x1="10" y1="10" x2="42" y2="42" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#ffffff" />
-                        <stop offset="50%" stopColor="#e0e7ff" />
-                        <stop offset="100%" stopColor="#ffffff" />
-                    </linearGradient>
-                    <filter id={`${id}-glow`} x="-40%" y="-40%" width="180%" height="180%">
-                        <feGaussianBlur stdDeviation="3.5" result="blur" />
-                        <feMerge>
-                            <feMergeNode in="blur" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                </defs>
-
-                <rect width="52" height="52" rx="14" fill={`url(#${id}-bg)`} />
-
-                <rect width="52" height="52" rx="14" fill="url(#shimmer)" opacity="0.07" />
-                <defs>
-                    <linearGradient id="shimmer" x1="0" y1="0" x2="52" y2="52" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="white" stopOpacity="1" />
-                        <stop offset="40%" stopColor="white" stopOpacity="0" />
+                        <stop offset="0%" stopColor="#DBED17" />
+                        <stop offset="100%" stopColor="#A8B612" />
                     </linearGradient>
                 </defs>
+
+                <rect width="52" height="52" rx="14" fill={`url(#${id}-bg)`} stroke="#DBED17" strokeWidth="1.5" />
 
                 <g filter={`url(#${id}-glow)`}>
                     <path
@@ -81,28 +65,25 @@ export function BrandLogo({ size = 'md', showTagline = false }: BrandLogoProps) 
 
             {/* ── Wordmark ── */}
             <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1, flexShrink: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}>
                     <span
+                        className="font-inter"
                         style={{
                             fontSize: s.wordmark,
                             fontWeight: 800,
-                            color: '#0f172a',
+                            color: '#ffffff',
                             letterSpacing: '-0.4px',
-                            fontFamily: 'var(--font-inter, Inter, system-ui, sans-serif)',
                         }}
                     >
                         Beautfy
                     </span>
                     <span
+                        className="font-bebas"
                         style={{
-                            fontSize: s.wordmark,
-                            fontWeight: 800,
-                            letterSpacing: '-0.4px',
-                            background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
-                            fontFamily: 'var(--font-inter, Inter, system-ui, sans-serif)',
+                            fontSize: s.wordmark * 1.1,
+                            fontWeight: 400,
+                            letterSpacing: '0.5px',
+                            color: '#DBED17',
                         }}
                     >
                         .ai
@@ -110,10 +91,12 @@ export function BrandLogo({ size = 'md', showTagline = false }: BrandLogoProps) 
                 </div>
                 {showTagline && (
                     <span
+                        className="font-inter"
                         style={{
                             fontSize: s.tagline,
                             fontWeight: 600,
-                            color: '#94a3b8',
+                            color: '#DBED17',
+                            opacity: 0.8,
                             letterSpacing: '0.16em',
                             textTransform: 'uppercase',
                             marginTop: 4,

@@ -2,32 +2,32 @@ import React from 'react';
 
 export const Hero = () => {
     return (
-        <section className="relative pt-40 pb-20 overflow-hidden">
-            <div className="container px-4 mx-auto">
-                <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-600 text-xs font-semibold tracking-wider">
-                        <span className="flex h-2 w-2 rounded-full bg-indigo-500"></span>
+        <section className="relative pt-48 pb-24 overflow-hidden">
+            <div className="container px-4 mx-auto relative z-10">
+                <div className="max-w-5xl mx-auto text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-10 rounded-full bg-secondary/50 border border-primary/20 text-primary text-xs font-bold tracking-[0.2em] uppercase">
+                        <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
                         IA DE AGENDAMENTO 24/7
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-gradient">
-                        Seu salão no piloto automático com <span className="text-indigo-600">Beautfy.ai</span>
+                    <h1 className="text-6xl md:text-8xl lg:text-9xl mb-10 leading-[0.9] text-white">
+                        Seu salão no <span className="text-primary">piloto automático</span> com Beautfy.ai
                     </h1>
 
-                    <p className="text-lg md:text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-                        Atenda seus clientes, tire dúvidas e realize agendamentos sincronizados com sua agenda 24 horas por dia, 7 dias por semana, direto no WhatsApp.
+                    <p className="text-lg md:text-2xl text-slate-400 mb-14 max-w-3xl mx-auto leading-relaxed font-medium">
+                        Atenda seus clientes, tire dúvidas e realize agendamentos sincronizados com sua agenda 24 horas por dia, direto no WhatsApp.
                     </p>
 
-                    <div className="flex flex-wrap items-center justify-center gap-4">
+                    <div className="flex flex-wrap items-center justify-center gap-6">
                         <a
                             href="/register"
-                            className="px-8 py-4 text-lg font-bold text-white bg-indigo-600 rounded-2xl hover:bg-indigo-500 shadow-xl shadow-indigo-500/25 transition-all active:scale-95"
+                            className="px-10 py-5 text-xl font-bold text-black bg-primary rounded-2xl hover:bg-[#c5d615] shadow-2xl shadow-primary/20 transition-all active:scale-95 uppercase tracking-tight"
                         >
                             Começar Teste Grátis
                         </a>
                         <a
                             href="#features"
-                            className="px-8 py-4 text-lg font-semibold text-slate-600 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all"
+                            className="px-10 py-5 text-xl font-bold text-white border-2 border-primary/30 rounded-2xl hover:bg-primary/10 transition-all uppercase tracking-tight"
                         >
                             Ver Funcionalidades
                         </a>

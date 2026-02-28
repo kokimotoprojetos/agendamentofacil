@@ -1,29 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #020617;
-  /* Slate 950 - Strong almost black */
-  --card: rgba(255, 255, 255, 0.95);
-  --card-foreground: #020617;
-  --popover: #ffffff;
-  --popover-foreground: #020617;
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #0f172a;
-  /* Changed from Slate 600 to Slate 900 for high visibility */
-  --accent: #f1f5f9;
-  --accent-foreground: #020617;
+  --background: #070905;
+  --foreground: #ffffff;
+  --card: #171915;
+  --card-foreground: #ffffff;
+  --popover: #171915;
+  --popover-foreground: #ffffff;
+  --primary: #DBED17;
+  --primary-foreground: #070905;
+  --secondary: #2E3823;
+  --secondary-foreground: #ffffff;
+  --muted: #171915;
+  --muted-foreground: #94a3b8;
+  --accent: #2E3823;
+  --accent-foreground: #DBED17;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.12);
-  --input: rgba(0, 0, 0, 0.08);
-  --ring: #4f46e5;
-  --radius: 1rem;
+  --border: rgba(46, 56, 35, 0.5);
+  --input: rgba(46, 56, 35, 0.3);
+  --ring: #DBED17;
+  --radius: 0.75rem;
   --black: #000000;
+
+  /* Background Gradient Animation Defaults */
+  --gradient-background-start: #070905;
+  --gradient-background-end: #171915;
+  --first-color: 46, 56, 35;
+  --second-color: 23, 25, 21;
+  --third-color: 219, 237, 23;
+  --fourth-color: 7, 9, 5;
+  --fifth-color: 46, 56, 35;
+  --pointer-color: 219, 237, 23;
 }
 
 @theme inline {
@@ -34,7 +42,8 @@
   --color-primary: var(--primary);
   --color-muted: var(--muted);
   --color-border: var(--border);
-  --font-sans: var(--font-outfit);
+  --font-bebas: var(--font-bebas);
+  --font-inter: var(--font-inter);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
@@ -91,8 +100,19 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-bebas), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 /* Professional Scrollbar */
@@ -106,32 +126,32 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(219, 237, 23, 0.1);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.3);
+  background: rgba(219, 237, 23, 0.3);
 }
 
-/* Glass Card — Light */
+/* Glass Card — Dark */
 .glass {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(23, 25, 21, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(219, 237, 23, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .glass-dark {
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(7, 9, 5, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(219, 237, 23, 0.05);
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #0f172a 60%, rgba(15, 23, 42, 0.7));
+  background: linear-gradient(135deg, #DBED17 0%, #FFFFFF 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

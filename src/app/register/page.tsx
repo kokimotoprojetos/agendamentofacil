@@ -54,83 +54,93 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen px-4 font-sans"
-            style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)' }}>
-            <div className="relative w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-xl overflow-hidden group"
-                style={{ border: '1px solid rgba(0,0,0,0.06)' }}>
-                <GlowingEffect
-                    spread={80}
-                    glow={true}
-                    disabled={false}
-                    proximity={64}
-                    inactiveZone={0.01}
-                    borderWidth={3}
-                />
-                <div className="relative text-center">
-                    <div className="flex justify-center mb-4">
-                        <BrandLogo size="md" />
+        <div className="flex items-center justify-center min-h-screen px-4 bg-[#070905] relative overflow-hidden font-inter">
+            {/* Background Accent */}
+            <div className="absolute top-0 left-0 w-full h-full opacity-20">
+                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-secondary rounded-full blur-[120px]" />
+            </div>
+
+            <div className="relative w-full max-w-md z-10">
+                {/* Card */}
+                <div className="relative p-10 space-y-8 rounded-[2.5rem] border border-white/10 glass shadow-2xl overflow-hidden group">
+                    <GlowingEffect
+                        spread={60}
+                        glow={true}
+                        disabled={false}
+                        proximity={64}
+                        inactiveZone={0.01}
+                        borderWidth={2}
+                    />
+
+                    {/* Logo content */}
+                    <div className="relative text-center">
+                        <div className="flex justify-center mb-6">
+                            <BrandLogo size="lg" />
+                        </div>
+                        <p className="text-slate-400 font-medium tracking-tight mt-2">Crie sua conta e comece a automatizar</p>
                     </div>
-                    <p className="mt-2 text-sm text-slate-600">Crie sua conta e comece a automatizar seus agendamentos</p>
+
+                    <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+                        <div className="grid grid-cols-1 gap-5">
+                            <div>
+                                <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Seu Nome</label>
+                                <input
+                                    {...register('name')}
+                                    type="text"
+                                    className={`block w-full px-5 py-4 rounded-2xl bg-white/5 border ${errors.name ? 'border-red-500' : 'border-white/10'} text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium`}
+                                    placeholder="João Silva"
+                                />
+                                {errors.name && <p className="mt-2 text-xs text-red-500 font-bold">{errors.name.message}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Nome do Negócio</label>
+                                <input
+                                    {...register('businessName')}
+                                    type="text"
+                                    className={`block w-full px-5 py-4 rounded-2xl bg-white/5 border ${errors.businessName ? 'border-red-500' : 'border-white/10'} text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium`}
+                                    placeholder="Barbearia Imperial"
+                                />
+                                {errors.businessName && <p className="mt-2 text-xs text-red-500 font-bold">{errors.businessName.message}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Email Profissional</label>
+                                <input
+                                    {...register('email')}
+                                    type="email"
+                                    className={`block w-full px-5 py-4 rounded-2xl bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium`}
+                                    placeholder="contato@empresa.com"
+                                />
+                                {errors.email && <p className="mt-2 text-xs text-red-500 font-bold">{errors.email.message}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Senha</label>
+                                <input
+                                    {...register('password')}
+                                    type="password"
+                                    className={`block w-full px-5 py-4 rounded-2xl bg-white/5 border ${errors.password ? 'border-red-500' : 'border-white/10'} text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium`}
+                                    placeholder="••••••••"
+                                />
+                                {errors.password && <p className="mt-2 text-xs text-red-500 font-bold">{errors.password.message}</p>}
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full py-5 px-4 font-black text-black bg-primary rounded-2xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_0_30px_rgba(219,237,23,0.2)] uppercase tracking-tight text-lg mt-4"
+                        >
+                            {isSubmitting ? 'CRIANDO CONTA...' : 'CRIAR CONTA GRÁTIS'}
+                        </button>
+                    </form>
+
+                    <p className="text-center text-sm text-slate-400 font-medium">
+                        Já tem uma conta? <a href="/login" className="font-bold text-primary hover:underline transition-all">Entre aqui</a>
+                    </p>
                 </div>
-
-                <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Seu Nome</label>
-                        <input
-                            {...register('name')}
-                            type="text"
-                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.name ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500`}
-                            placeholder="João Silva"
-                        />
-                        {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Nome do Negócio</label>
-                        <input
-                            {...register('businessName')}
-                            type="text"
-                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.businessName ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500`}
-                            placeholder="Barbearia Imperial"
-                        />
-                        {errors.businessName && <p className="mt-1 text-xs text-red-500">{errors.businessName.message}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Email Profissional</label>
-                        <input
-                            {...register('email')}
-                            type="email"
-                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.email ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500`}
-                            placeholder="contato@empresa.com"
-                        />
-                        {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Senha</label>
-                        <input
-                            {...register('password')}
-                            type="password"
-                            className={`mt-1 block w-full px-4 py-3 bg-slate-50 border ${errors.password ? 'border-red-400' : 'border-slate-200'} text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500`}
-                            placeholder="••••••••"
-                        />
-                        {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full py-3 px-4 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all hover:scale-[1.02] disabled:opacity-50"
-                        style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}
-                    >
-                        {isSubmitting ? 'Criando conta...' : 'Criar Conta Grátis'}
-                    </button>
-                </form>
-
-                <p className="text-center text-sm text-slate-600">
-                    Já tem uma conta? <a href="/login" className="font-bold text-indigo-600 hover:underline">Entre aqui</a>
-                </p>
             </div>
         </div>
     );
