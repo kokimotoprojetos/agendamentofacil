@@ -1,5 +1,4 @@
 import React from 'react';
-import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 export const Hero = () => {
     return (
