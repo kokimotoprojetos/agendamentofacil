@@ -23,6 +23,7 @@
   --input: rgba(0, 0, 0, 0.08);
   --ring: #4f46e5;
   --radius: 1rem;
+  --black: #000000;
 }
 
 @theme inline {
