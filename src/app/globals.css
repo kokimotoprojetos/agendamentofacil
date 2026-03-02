@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #070905;
+  --background: #000000;
   --foreground: #ffffff;
-  --card: #171915;
+  --card: #0a0a0a;
   --card-foreground: #ffffff;
-  --popover: #171915;
+  --popover: #0a0a0a;
   --popover-foreground: #ffffff;
   --primary: #DBED17;
-  --primary-foreground: #070905;
-  --secondary: #2E3823;
+  --primary-foreground: #000000;
+  --secondary: #1a1f14;
   --secondary-foreground: #ffffff;
-  --muted: #171915;
+  --muted: #0a0a0a;
   --muted-foreground: #94a3b8;
-  --accent: #2E3823;
+  --accent: #1a1f14;
   --accent-foreground: #DBED17;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
@@ -24,13 +24,13 @@
   --black: #000000;
 
   /* Background Gradient Animation Defaults */
-  --gradient-background-start: #070905;
-  --gradient-background-end: #171915;
-  --first-color: 46, 56, 35;
-  --second-color: 23, 25, 21;
+  --gradient-background-start: #000000;
+  --gradient-background-end: #050505;
+  --first-color: 26, 31, 20;
+  --second-color: 10, 10, 10;
   --third-color: 219, 237, 23;
-  --fourth-color: 7, 9, 5;
-  --fifth-color: 46, 56, 35;
+  --fourth-color: 0, 0, 0;
+  --fifth-color: 26, 31, 20;
   --pointer-color: 219, 237, 23;
 }
 
@@ -136,15 +136,15 @@ h6 {
 
 /* Glass Card — Dark */
 .glass {
-  background: rgba(23, 25, 21, 0.7);
+  background: rgba(10, 10, 10, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(219, 237, 23, 0.1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .glass-dark {
-  background: rgba(7, 9, 5, 0.8);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(219, 237, 23, 0.05);
