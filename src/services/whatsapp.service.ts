@@ -101,6 +101,22 @@ export const whatsappService = {
         }
     },
 
+    getContactProfile: async (instanceName: string, remoteJid: string) => {
+        try {
+            const number = remoteJid.replace('@s.whatsapp.net', '').replace('@g.us', '');
+            const response = await evolutionApi.post(`/chat/fetchProfile/${instanceName}`, {
+                number
+            });
+            return {
+                name: response.data?.name || response.data?.pushname || null,
+                picture: response.data?.profilePictureUrl || null
+            };
+        } catch (error) {
+            console.error('Error fetching contact profile:', error);
+            return { name: null, picture: null };
+        }
+    },
+
     sendMessage: async (instanceName: string, remoteJid: string, text: string) => {
         try {
             // Evolution API expects a clean phone number (no @s.whatsapp.net suffix)

@@ -134,13 +134,30 @@ export const aiAgentService = {
         .eq('customer_phone', customerPhone)
         .single();
 
+      const updateData: any = {
+        last_message_at: new Date().toISOString()
+      };
+
+      if (context.customerName) updateData.customer_name = context.customerName;
+      if (context.customerPicture) updateData.customer_picture = context.customerPicture;
+
       if (!conversation) {
         const { data: newConv } = await supabaseAdmin
           .from('conversations')
-          .insert({ tenant_id: tenantId, customer_phone: customerPhone })
+          .insert({
+            tenant_id: tenantId,
+            customer_phone: customerPhone,
+            ...updateData
+          })
           .select()
           .single();
         conversation = newConv;
+      } else {
+        // Update existing conversation with latest name/picture/time
+        await supabaseAdmin
+          .from('conversations')
+          .update(updateData)
+          .eq('id', conversation.id);
       }
 
       // 2. Fetch message history (last 20 messages) ─────────────────────────────

@@ -91,10 +91,24 @@ export async function POST(req: Request) {
         '';
     }
 
+    let pushName = data?.pushName || '';
+    let profilePicUrl = data?.profilePicUrl || '';
+
+    // If name or photo is missing, try to fetch from API
+    if (!pushName || (!profilePicUrl && !profilePicUrl.startsWith('http'))) {
+      try {
+        const profile = await whatsappService.getContactProfile(instance, customerPhone);
+        if (profile.name && !pushName) pushName = profile.name;
+        if (profile.picture && (!profilePicUrl || !profilePicUrl.startsWith('http'))) profilePicUrl = profile.picture;
+      } catch (err) {
+        console.error('Failed to fetch profile during webhook:', err);
+      }
+    }
+
     await supabaseAdmin.from('agent_logs').insert({
       event_type: 'webhook_parsed',
-      description: `${isAudio ? '🎤 Áudio' : '💬 Texto'} de ${customerPhone}: "${messageText.substring(0, 50)}"`,
-      metadata: { customerPhone, messageText, instance, isAudio }
+      description: `${isAudio ? '🎤 Áudio' : '💬 Texto'} de ${pushName || customerPhone}: "${messageText.substring(0, 50)}"`,
+      metadata: { customerPhone, pushName, messageText, instance, isAudio, profilePicUrl }
     });
 
     if (!messageText || !customerPhone) {
@@ -138,7 +152,9 @@ export async function POST(req: Request) {
       workingHours: tenant?.settings?.workingHours || { start: "09:00", end: "18:00" },
       services: services || [],
       history: [],
-      instanceName: instance
+      instanceName: instance,
+      customerName: pushName,
+      customerPicture: profilePicUrl
     };
 
     // Log contextual debug info
