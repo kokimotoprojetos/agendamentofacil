@@ -2,6 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { DashboardMockup, ChatListMockup, CalendarMockup, ServicesMockup } from './Mockups';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 interface FeatureSectionProps {
     title: string;
@@ -40,8 +41,21 @@ const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
+                            className="relative"
                         >
-                            {mockup}
+                            <div className="relative p-2 rounded-[2rem] border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden group">
+                                <GlowingEffect
+                                    spread={60}
+                                    glow={true}
+                                    disabled={false}
+                                    proximity={64}
+                                    inactiveZone={0.01}
+                                    borderWidth={3}
+                                />
+                                <div className="relative rounded-[1.8rem] overflow-hidden border border-white/10 bg-black/50 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
+                                    {mockup}
+                                </div>
+                            </div>
                         </motion.div>
                     </div>
                 </div>

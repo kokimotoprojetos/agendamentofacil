@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     await supabaseAdmin.from('agent_logs').insert({
       event_type: 'WEBHOOK_V3_LIVE',
       description: `Webhook v3 received: ${body.event || 'unknown'}`,
-      metadata: { instance: body.instance, event: body.event }
+      metadata: { fullBody: body }
     });
 
     // Handle MESSAGES_UPSERT event from Evolution API
