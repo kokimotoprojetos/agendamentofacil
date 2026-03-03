@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { DashboardMockup, ChatListMockup, CalendarMockup } from './Mockups';
+import { DashboardMockup, ChatListMockup, CalendarMockup, ServicesMockup } from './Mockups';
 
 interface FeatureSectionProps {
     title: string;
@@ -76,6 +76,13 @@ export const Features = () => {
                 highlight="automatizada"
                 description="Visualize todos os seus compromissos em um só lugar. Nossa IA organiza sua agenda, evita conflitos de horários e envia lembretes automáticos."
                 mockup={<CalendarMockup />}
+            />
+            <FeatureSection
+                icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+                title="Deixe de reagir e"
+                highlight="comece a responder"
+                description="Nossa IA não apenas responde, ela converte. Ela identifica oportunidades de agendamento e faz o follow-up automático com seis clientes."
+                mockup={<ServicesMockup />}
             />
         </div>
     );

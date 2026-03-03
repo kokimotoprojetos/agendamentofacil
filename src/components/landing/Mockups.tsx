@@ -233,3 +233,48 @@ export const CalendarMockup = () => {
         </div>
     );
 };
+
+// --- Services Mockup ---
+export const ServicesMockup = () => {
+    return (
+        <div className="w-full rounded-2xl border border-white/10 bg-[#0a0a0a] p-8 shadow-2xl">
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-1">Catálogo de Serviços</div>
+                    <div className="text-sm font-medium text-white/60">Gerencie seus tratamentos e preços</div>
+                </div>
+                <div className="px-4 py-2 rounded-full bg-[#00e676] text-black text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 hover:brightness-110 transition-all cursor-pointer">
+                    <span className="text-sm">+</span> Adicionar Serviço
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {[
+                    { name: 'Corte Feminino', price: 'R$ 120', time: '60 min', color: 'text-pink-400' },
+                    { name: 'Escova Modelada', price: 'R$ 85', time: '45 min', color: 'text-blue-400' },
+                    { name: 'Manicure & Pedicure', price: 'R$ 75', time: '75 min', color: 'text-purple-400' },
+                    { name: 'Coloração Premium', price: 'R$ 250', time: '120 min', color: 'text-orange-400' },
+                    { name: 'Hidratação Loreal', price: 'R$ 150', time: '50 min', color: 'text-emerald-400' },
+                    { name: 'Design Sobrancelha', price: 'R$ 55', time: '30 min', color: 'text-indigo-400' },
+                ].map((service, i) => (
+                    <div key={i} className="bg-white/5 border border-white/5 rounded-xl p-4 flex flex-col gap-3 relative group cursor-pointer hover:border-white/10 transition-all">
+                        <div className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center ${service.color}`}>
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" /></svg>
+                        </div>
+                        <div>
+                            <div className="text-[10px] font-bold text-white mb-1 truncate">{service.name}</div>
+                            <div className="text-xs font-bold text-white">{service.price}</div>
+                            <div className="text-[9px] text-white/30 flex items-center gap-1 mt-1">
+                                <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                {service.time}
+                            </div>
+                        </div>
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg className="w-3 h-3 text-white/20" fill="currentColor" viewBox="0 0 20 20"><path d="M11.414 10l2.828 2.828-1.414 1.414L10 11.414l-2.828 2.828-1.414-1.414L8.586 10 5.758 7.172l1.414-1.414L10 8.586l2.828-2.828 1.414 1.414L11.414 10z" /></svg>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
