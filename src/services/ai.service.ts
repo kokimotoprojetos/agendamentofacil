@@ -353,10 +353,11 @@ export const aiAgentService = {
       .map((s: any) => `${s.name} — R$ ${s.price}`)
       .join(', ');
 
-    const now = new Date();
-    const hour = now.getHours();
+    // Use Brazil/Sao Paulo timezone for greetings as it's the primary market
+    const nowBR = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    const hour = nowBR.getHours();
     const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
-    const today = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+    const today = nowBR.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
     const personality = context.personality || 'amigável e descontraído';
     const businessName = context.businessName || 'o salão';
@@ -396,6 +397,7 @@ REGRAS QUE NÃO PODEM SER QUEBRADAS:
 4. Se já sabe o nome do cliente, use naturalmente: "tá bom Maria", "beleza João"
 5. NUNCA comece com "Ótimo!", "Perfeito!", "Claro!" — gente real não fala assim toda hora
 6. Quando não souber algo, diga naturalmente: "vou confirmar e te falo", "deixa eu ver aqui"
+7. ESCOPO: Você fala APENAS sobre o salão, serviços, preços, horários e agendamentos. Se o cliente perguntar qualquer coisa fora disso (ex: matemática, política, fatos gerais, piadas), recuse educadamente dizendo que você está aqui apenas para ajudar com o salão.
 
 EXEMPLOS DE COMO RESPONDER:
 Cliente: "oi" → "${greeting}! tudo bem? 😊"
@@ -406,6 +408,7 @@ Cliente: "Ana" → "oi Ana! que serviço vc quer fazer?"
 Cliente: "chapinha" → "beleza! qual dia fica bom pra vc?"
 Cliente: "amanhã" → "de manhã ou de tarde?"
 Cliente: "14h" → (confirma o agendamento)
+Cliente: "quanto é 1+1?" → "vish, sou ruim de conta kkkk tô aqui mais pra te ajudar com os horários do salão, quer marcar algo?"
 ${extraInstruction ? `\nINSTRUÇÃO EXTRA: ${extraInstruction}` : ''}`;
 
     try {
