@@ -1,39 +1,81 @@
 import React from 'react';
+import { BrandLogo } from '@/components/ui/BrandLogo';
+import { ChatMockup } from './Mockups';
+import { motion } from 'framer-motion';
 
 export const Hero = () => {
     return (
-        <section className="relative pt-48 pb-24 overflow-hidden">
-            <div className="container px-4 mx-auto relative z-10">
-                <div className="max-w-5xl mx-auto text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-10 rounded-full bg-secondary/50 border border-primary/20 text-primary text-xs font-bold tracking-[0.2em] uppercase">
-                        <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-                        IA DE AGENDAMENTO 24/7
-                    </div>
+        <section className="relative pt-10 pb-20 bg-[var(--bg-hero)] overflow-hidden">
+            {/* Navbar Placeholder inside Hero for requested layout */}
+            <nav className="relative z-[100] w-full max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+                <BrandLogo size="md" />
 
-                    <h1 className="text-6xl md:text-8xl lg:text-9xl mb-10 leading-[0.9] text-white">
-                        Seu salão no <span className="text-primary">piloto automático</span> com Beautfy.ai
-                    </h1>
+                <div className="hidden md:flex items-center space-x-12">
+                    <a href="#features" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Funcionalidades</a>
+                    <a href="#pricing" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Preços</a>
+                    <a href="#about" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Sobre</a>
+                </div>
 
-                    <p className="text-lg md:text-2xl text-slate-400 mb-14 max-w-3xl mx-auto leading-relaxed font-medium">
-                        Atenda seus clientes, tire dúvidas e realize agendamentos sincronizados com sua agenda 24 horas por dia, direto no WhatsApp.
-                    </p>
+                <div className="flex items-center gap-6">
+                    <a href="/login" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Entrar</a>
+                    <a href="/register" className="px-5 py-2.5 text-xs font-bold text-black bg-[var(--primary)] rounded-full hover:brightness-110 active:scale-95 transition-all">
+                        Teste grátis
+                    </a>
+                </div>
+            </nav>
 
-                    <div className="flex flex-wrap items-center justify-center gap-6">
+            <div className="container px-6 mx-auto relative z-10 pt-16">
+                <div className="max-w-4xl mx-auto text-center">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="text-[4rem] md:text-[5.5rem] lg:text-[6.5rem] font-bold tracking-tight text-white leading-[1.05] mb-8"
+                    >
+                        Encontre os clientes que precisam da sua <span className="text-[var(--primary)]">atenção</span>
+                    </motion.h1>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.1 }}
+                        className="text-lg md:text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed"
+                    >
+                        Automatize seus agendamentos no WhatsApp com um agente de IA inteligente que entende seu negócio e atende seus clientes 24 horas por dia.
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="flex flex-wrap items-center justify-center gap-4 mb-20"
+                    >
                         <a
                             href="/register"
-                            className="px-10 py-5 text-xl font-bold text-black bg-primary rounded-2xl hover:bg-[#c5d615] shadow-2xl shadow-primary/20 transition-all active:scale-95 uppercase tracking-tight"
+                            className="px-8 py-3.5 text-sm font-bold text-black bg-[var(--primary)] rounded-full hover:brightness-110 shadow-lg shadow-[var(--primary)]/20 transition-all active:scale-95"
                         >
-                            Começar Teste Grátis
+                            Começar teste grátis
                         </a>
                         <a
-                            href="#features"
-                            className="px-10 py-5 text-xl font-bold text-white border-2 border-primary/30 rounded-2xl hover:bg-primary/10 transition-all uppercase tracking-tight"
+                            href="#demo"
+                            className="px-8 py-3.5 text-sm font-bold text-white border border-white/20 rounded-full hover:bg-white/5 transition-all"
                         >
-                            Ver Funcionalidades
+                            Ver demonstração
                         </a>
-                    </div>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.3 }}
+                    >
+                        <ChatMockup />
+                    </motion.div>
                 </div>
             </div>
+
+            {/* Subtle Gradient Glow */}
+            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[var(--primary)]/5 blur-[120px] rounded-full -z-1" />
         </section>
     );
 };

@@ -1,99 +1,87 @@
 'use client';
 import React from 'react';
-import { CircularTestimonials } from '@/components/ui/circular-testimonials';
-import { GlowingEffect } from '@/components/ui/glowing-effect';
-import { FaWhatsapp, FaArrowRight } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { DashboardMockup, ChatListMockup, CalendarMockup } from './Mockups';
 
-const testimonials = [
-    {
-        quote: "Meus clientes mandavam mensagem meia-noite e eu perdia o sono tentando responder todo mundo. Com a Beautfy.ai, minha agenda se preenche sozinha enquanto eu descanso.",
-        name: "Juliana Silva",
-        designation: "Proprietária de Esmalteria",
-        src: "https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?q=80&w=800&auto=format&fit=crop",
-    },
-    {
-        quote: "O caos da agenda de papel me fazia perder clientes por erros de marcação dupla. Agora, o sistema bloqueia conflitos e eu não perco mais um centavo com reembolsos.",
-        name: "Ricardo Santos",
-        designation: "Barbeiro Profissional",
-        src: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=800&auto=format&fit=crop",
-    },
-    {
-        quote: "O 'no-show' era meu maior prejuízo. As confirmações automáticas pelo WhatsApp reduziram minhas faltas em 90%. É dinheiro que parou de sair pelo ralo.",
-        name: "Carla Oliveira",
-        designation: "Esteticista",
-        src: "https://images.unsplash.com/photo-1555681948-391f46394e80?q=80&w=800&auto=format&fit=crop",
-    },
-    {
-        quote: "Eu não tinha tempo para atender as clientes porque não parava de responder o celular. Recuperei meu tempo e foco total no meu trabalho manual.",
-        name: "Beatriz Costa",
-        designation: "Hair Stylist",
-        src: "https://images.unsplash.com/photo-1600948836101-f9ffda59d250?q=80&w=800&auto=format&fit=crop",
-    },
-];
+interface FeatureSectionProps {
+    title: string;
+    highlight: string;
+    description: string;
+    mockup: React.ReactNode;
+    reverse?: boolean;
+    icon?: React.ReactNode;
+}
 
-export const Features = () => {
+const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }: FeatureSectionProps) => {
     return (
-        <section id="features" className="py-32 relative overflow-hidden bg-transparent">
-            <div className="container px-4 mx-auto relative z-10">
-                {/* Header */}
-                <div className="text-center mb-24">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-secondary/30 mb-8">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        <span className="text-[10px] font-black text-primary tracking-[0.2em] uppercase">
-                            RESULTADOS QUE FALAM POR SI
-                        </span>
+        <section className="py-24 bg-black overflow-hidden">
+            <div className="container px-6 mx-auto">
+                <div className={`flex flex-col lg:flex-row items-center gap-16 ${reverse ? 'lg:flex-row-reverse' : ''}`}>
+                    {/* Text Content */}
+                    <div className="flex-1 max-w-xl">
+                        {icon && (
+                            <div className="w-12 h-12 rounded-xl bg-[var(--primary)]/10 border border-[var(--primary)]/20 flex items-center justify-center mb-8 text-[var(--primary)]">
+                                {icon}
+                            </div>
+                        )}
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight">
+                            {title} <span className="text-[var(--primary)]">{highlight}</span>
+                        </h2>
+                        <p className="text-lg text-white/50 mb-10 leading-relaxed">
+                            {description}
+                        </p>
+                        <a href="#details" className="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-[var(--primary)] transition-colors group">
+                            Ver mais detalhes
+                            <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
                     </div>
 
-                    <h2 className="text-5xl md:text-7xl lg:text-8xl mb-8 text-white leading-[0.9]">
-                        Pare de <span className="text-primary">queimar dinheiro</span><br />
-                        com processos manuais.
-                    </h2>
-
-                    <p className="text-slate-400 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed font-medium">
-                        Veja o que acontece nos bastidores dos salões que trocaram o caos pela inteligência artificial do Beautfy.ai.
-                    </p>
-                </div>
-
-                {/* Circular Testimonials Component */}
-                <div className="mb-32">
-                    <CircularTestimonials
-                        testimonials={testimonials}
-                        autoplay={true}
-                        colors={{
-                            name: "#ffffff",
-                            designation: "#DBED17",
-                            testimony: "#e2e8f0",
-                            arrowBackground: "#2E3823",
-                            arrowForeground: "#DBED17",
-                            arrowHoverBackground: "#DBED17",
-                        }}
-                    />
-                </div>
-
-                {/* CTA strip */}
-                <div className="max-w-6xl mx-auto relative group">
-                    <div className="absolute -inset-1 bg-primary/20 rounded-[2.5rem] blur-2xl group-hover:bg-primary/30 transition-all duration-500" />
-                    <div className="relative flex flex-col md:flex-row items-center justify-between gap-10 p-10 md:p-16 rounded-[2rem] border border-white/10 glass">
-                        <div className="max-w-2xl text-center md:text-left">
-                            <h3 className="text-4xl md:text-6xl mb-6 text-white leading-tight">
-                                Seu concorrente já está <span className="text-primary italic">automatizando</span>.
-                            </h3>
-                            <p className="text-slate-400 text-lg md:text-xl font-medium">
-                                Não deixe sua agenda nas mãos do acaso. Recupere 3h do seu dia hoje mesmo.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col items-center gap-4">
-                            <a href="/register"
-                                className="group relative inline-flex items-center gap-4 px-10 py-6 rounded-2xl text-xl font-black text-black bg-primary transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(219,237,23,0.3)]">
-                                COMEÇAR AGORA GRATUITAMENTE
-                                <FaArrowRight className="group-hover:translate-x-2 transition-transform" />
-                            </a>
-                            <p className="text-xs text-slate-500 font-bold tracking-widest uppercase">Sem cartão de crédito · Cancele quando quiser</p>
-                        </div>
+                    {/* Mockup Content */}
+                    <div className="flex-1 w-full max-w-2xl">
+                        <motion.div
+                            initial={{ opacity: 0, x: reverse ? -40 : 40 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            {mockup}
+                        </motion.div>
                     </div>
                 </div>
             </div>
         </section>
+    );
+};
+
+export const Features = () => {
+    return (
+        <div id="features" className="divide-y divide-white/5">
+            <FeatureSection
+                icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
+                title="Configuração rápida e"
+                highlight="simples"
+                description="Sem necessidade de código ou integrações complexas. Conecte seu WhatsApp e deixe nossa IA aprender sobre seus serviços em minutos."
+                mockup={<DashboardMockup />}
+            />
+
+            <FeatureSection
+                icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>}
+                title="Personalize o que sua"
+                highlight="IA diz"
+                description="O Beautfy foi criado para ser flexível. Crie fluxos personalizados e treine a IA com o tom de voz da sua marca para um atendimento humano."
+                mockup={<ChatListMockup />}
+                reverse
+            />
+
+            <FeatureSection
+                icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
+                title="Agenda inteligente e"
+                highlight="automatizada"
+                description="Visualize todos os seus compromissos em um só lugar. Nossa IA organiza sua agenda, evita conflitos de horários e envia lembretes automáticos."
+                mockup={<CalendarMockup />}
+            />
+        </div>
     );
 };
