@@ -76,11 +76,11 @@ export default async function DashboardPage() {
         <div className="max-w-6xl mx-auto pb-12">
             <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-1">Visão Geral</h1>
-                    <p className="text-sm text-slate-600">Acompanhe o desempenho do seu salão em tempo real.</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight mb-1">Visão Geral</h1>
+                    <p className="text-sm text-white/50">Acompanhe o desempenho do seu salão em tempo real.</p>
                 </div>
-                <div className="px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-medium text-emerald-700 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <div className="px-4 py-2 bg-[#00e676]/5 border border-[#00e676]/20 rounded-xl text-xs font-medium text-[#00e676] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#00e676] animate-pulse"></span>
                     Sistemas Ativos
                 </div>
             </header>
@@ -93,10 +93,10 @@ export default async function DashboardPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
-                    <section className="bg-white p-8 rounded-3xl border border-slate-200">
+                    <section className="bg-white/5 p-8 rounded-3xl border border-white/5">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-xl font-bold text-slate-900 tracking-tight">Atividade Recente</h3>
-                            <Link href="/dashboard/calendar" className="text-xs font-semibold text-indigo-600 hover:underline transition-all">
+                            <h3 className="text-xl font-bold text-white tracking-tight">Atividade Recente</h3>
+                            <Link href="/dashboard/calendar" className="text-xs font-semibold text-[#00e676] hover:underline transition-all">
                                 Ver Agenda Completa
                             </Link>
                         </div>
@@ -104,19 +104,19 @@ export default async function DashboardPage() {
                         <div className="space-y-3">
                             {recentActivity.length > 0 ? (
                                 recentActivity.map((item, i) => (
-                                    <div key={i} className="flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all group">
+                                    <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl border border-white/5 transition-all group">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm transition-transform">
+                                            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-white flex items-center justify-center font-bold text-sm transition-transform">
                                                 {item.name.split(' ').map((n: string) => n[0]).join('')}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-bold text-slate-900">{item.name}</p>
-                                                <p className="text-[11px] text-slate-600">{item.service} • Hoje às {item.time}</p>
+                                                <p className="text-sm font-bold text-white">{item.name}</p>
+                                                <p className="text-[11px] text-white/40">{item.service} • Hoje às {item.time}</p>
                                             </div>
                                         </div>
                                         <span className={`px-3 py-1 text-[10px] font-bold rounded-full border ${item.status === 'Confirmado'
-                                            ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                                            : 'text-amber-700 bg-amber-50 border-amber-200'
+                                            ? 'text-[#00e676] bg-[#00e676]/5 border-[#00e676]/20'
+                                            : 'text-amber-400 bg-amber-400/5 border-amber-400/20'
                                             }`}>
                                             {item.status}
                                         </span>
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
                                 ))
                             ) : (
                                 <div className="text-center py-12">
-                                    <p className="text-slate-500 text-sm">Nenhuma atividade recente.</p>
+                                    <p className="text-white/30 text-sm">Nenhuma atividade recente.</p>
                                 </div>
                             )}
                         </div>
@@ -132,36 +132,36 @@ export default async function DashboardPage() {
                 </div>
 
                 <aside className="space-y-6">
-                    <section className="bg-white p-6 rounded-3xl border border-slate-200">
-                        <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-6">Atalhos</h3>
+                    <section className="bg-white/5 p-6 rounded-3xl border border-white/5">
+                        <h3 className="text-lg font-bold text-white tracking-tight mb-6">Atalhos</h3>
                         <div className="space-y-3">
-                            <Link href="/dashboard/agent" className="group flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-300 transition-all">
-                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all text-indigo-600">
+                            <Link href="/dashboard/agent" className="group flex items-center gap-4 p-4 bg-white/[0.02] rounded-2xl border border-white/5 hover:border-[#00e676]/30 transition-all">
+                                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-[#00e676] group-hover:text-black transition-all text-white/70">
                                     <Users size={20} />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-slate-900 text-sm">Agente IA</p>
-                                    <p className="text-[10px] text-slate-500 font-medium">Configurações</p>
+                                    <p className="font-bold text-white text-sm">Agente IA</p>
+                                    <p className="text-[10px] text-white/40 font-medium">Configurações</p>
                                 </div>
                             </Link>
 
-                            <Link href="/dashboard/whatsapp" className="group flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-300 transition-all">
-                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all text-indigo-600">
+                            <Link href="/dashboard/whatsapp" className="group flex items-center gap-4 p-4 bg-white/[0.02] rounded-2xl border border-white/5 hover:border-[#00e676]/30 transition-all">
+                                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-[#00e676] group-hover:text-black transition-all text-white/70">
                                     <WhatsAppIcon size={20} />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-slate-900 text-sm">WhatsApp</p>
-                                    <p className="text-[10px] text-slate-500 font-medium">Conectividade</p>
+                                    <p className="font-bold text-white text-sm">WhatsApp</p>
+                                    <p className="text-[10px] text-white/40 font-medium">Conectividade</p>
                                 </div>
                             </Link>
                         </div>
                     </section>
 
-                    <section className="bg-white p-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-indigo-50/50 to-transparent relative overflow-hidden group">
+                    <section className="bg-white/5 p-6 rounded-3xl border border-white/5 bg-gradient-to-br from-[#00e676]/5 to-transparent relative overflow-hidden group">
                         <div className="relative z-10">
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">Suporte</h3>
-                            <p className="text-slate-600 text-[11px] font-medium mb-6">Precisa de ajuda com o sistema?</p>
-                            <button className="w-full py-3 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 hover:bg-indigo-500 transition-all">
+                            <h3 className="text-lg font-bold text-white mb-2">Suporte</h3>
+                            <p className="text-white/50 text-[11px] font-medium mb-6">Precisa de ajuda com o sistema?</p>
+                            <button className="w-full py-3 bg-[#00e676] text-black text-xs font-bold rounded-xl shadow-lg shadow-[#00e676]/10 hover:brightness-110 transition-all">
                                 Abrir Chamado
                             </button>
                         </div>
