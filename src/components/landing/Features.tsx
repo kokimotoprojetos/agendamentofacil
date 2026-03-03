@@ -19,11 +19,6 @@ const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }
                 <div className={`flex flex-col lg:flex-row items-center gap-16 ${reverse ? 'lg:flex-row-reverse' : ''}`}>
                     {/* Text Content */}
                     <div className="flex-1 max-w-xl">
-                        {icon && (
-                            <div className="w-12 h-12 rounded-xl bg-[var(--primary)]/10 border border-[var(--primary)]/20 flex items-center justify-center mb-8 text-[var(--primary)]">
-                                {icon}
-                            </div>
-                        )}
                         <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight">
                             {title} <span className="text-[var(--primary)]">{highlight}</span>
                         </h2>

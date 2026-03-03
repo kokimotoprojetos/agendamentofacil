@@ -25,44 +25,6 @@ export function BrandLogo({ size = 'md', showTagline = false }: BrandLogoProps) 
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: s.gap, flexShrink: 0 }}>
-            {/* ── Icon Badge ── */}
-            <svg
-                width={s.badge}
-                height={s.badge}
-                viewBox="0 0 52 52"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                style={{ flexShrink: 0, display: 'block' }}
-                aria-hidden="true"
-            >
-                <defs>
-                    <linearGradient id={`${id}-bg`} x1="0" y1="0" x2="52" y2="52" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#171915" />
-                        <stop offset="100%" stopColor="#070905" />
-                    </linearGradient>
-                    <linearGradient id={`${id}-mark`} x1="10" y1="10" x2="42" y2="42" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#DBED17" />
-                        <stop offset="100%" stopColor="#A8B612" />
-                    </linearGradient>
-                </defs>
-
-                <rect width="52" height="52" rx="14" fill={`url(#${id}-bg)`} stroke="#DBED17" strokeWidth="1.5" />
-
-                <g filter={`url(#${id}-glow)`}>
-                    <path
-                        d="M26 10 C26 10, 28.5 20, 28.5 26 C28.5 32, 26 42, 26 42 C26 42, 23.5 32, 23.5 26 C23.5 20, 26 10, 26 10Z"
-                        fill={`url(#${id}-mark)`}
-                    />
-                    <path
-                        d="M10 26 C10 26, 20 23.5, 26 23.5 C32 23.5, 42 26, 42 26 C42 26, 32 28.5, 26 28.5 C20 28.5, 10 26, 10 26Z"
-                        fill={`url(#${id}-mark)`}
-                        opacity="0.85"
-                    />
-                </g>
-
-                <circle cx="26" cy="26" r="2.2" fill="white" opacity="0.95" />
-            </svg>
-
             {/* ── Wordmark ── */}
             <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1, flexShrink: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}>
