@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import { ChatMockup } from './Mockups';
