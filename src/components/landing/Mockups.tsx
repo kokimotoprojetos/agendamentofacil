@@ -199,13 +199,13 @@ export const CalendarMockup = () => {
                         const day = i + 1;
                         const isToday = day === 2;
                         return (
-                            <div key={i} className="relative py-1">
-                                <span className={`text-xs font-medium ${isToday ? 'text-black z-10' : 'text-white/60'}`}>
+                            <div key={i} className="relative py-1 flex items-center justify-center">
+                                {isToday && (
+                                    <div className="absolute w-8 h-8 rounded-lg bg-[#00e676] shadow-lg shadow-[#00e676]/30" />
+                                )}
+                                <span className={`relative z-10 text-xs font-bold ${isToday ? 'text-black' : 'text-white/60'}`}>
                                     {day}
                                 </span>
-                                {isToday && (
-                                    <div className="absolute inset-0 m-auto w-8 h-8 rounded-lg bg-[#00e676] shadow-lg shadow-[#00e676]/30 -z-0" />
-                                )}
                                 {day > 22 && day < 30 && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-red-500/40" />}
                             </div>
                         );
