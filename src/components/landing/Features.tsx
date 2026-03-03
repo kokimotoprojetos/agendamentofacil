@@ -43,7 +43,7 @@ const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }
                             transition={{ duration: 0.8 }}
                             className="relative"
                         >
-                            <div className="relative p-2 rounded-[2rem] border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden group">
+                            <div className="relative p-2 rounded-[2rem] border border-white/5 bg-white/5 backdrop-blur-sm group">
                                 <GlowingEffect
                                     spread={60}
                                     glow={true}

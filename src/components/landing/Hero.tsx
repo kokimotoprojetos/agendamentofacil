@@ -3,6 +3,7 @@ import React from 'react';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import { ChatMockup } from './Mockups';
 import { motion } from 'framer-motion';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 export const Hero = () => {
     return (
@@ -69,8 +70,21 @@ export const Hero = () => {
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.3 }}
+                        className="relative"
                     >
-                        <ChatMockup />
+                        <div className="relative p-2 rounded-[2rem] border border-white/5 bg-white/5 backdrop-blur-sm group">
+                            <GlowingEffect
+                                spread={60}
+                                glow={true}
+                                disabled={false}
+                                proximity={64}
+                                inactiveZone={0.01}
+                                borderWidth={3}
+                            />
+                            <div className="relative rounded-[1.8rem] overflow-hidden border border-white/10 bg-black/50 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
+                                <ChatMockup />
+                            </div>
+                        </div>
                     </motion.div>
                 </div>
             </div>
