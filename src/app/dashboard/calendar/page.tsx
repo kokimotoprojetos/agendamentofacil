@@ -171,12 +171,12 @@ export default function AgendaPage() {
         <div className="max-w-6xl mx-auto pb-20 space-y-6">
             <header className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Agenda</h1>
-                    <p className="text-sm text-slate-600 mt-1">Clique em um dia para ver e gerenciar os agendamentos.</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight">Agenda</h1>
+                    <p className="text-sm text-white/50 mt-1">Clique em um dia para ver e gerenciar os agendamentos.</p>
                 </div>
                 <button
                     onClick={handleOpenModal}
-                    className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/20 hover:bg-indigo-500 transition-all active:scale-95"
+                    className="flex items-center gap-2 px-6 py-3 bg-[#00e676] text-black font-black text-sm rounded-xl shadow-lg shadow-[#00e676]/20 hover:bg-[#00c864] transition-all active:scale-95"
                 >
                     <Plus size={18} /> Novo Agendamento
                 </button>
@@ -184,22 +184,22 @@ export default function AgendaPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
                 {/* CALENDAR */}
-                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
-                    <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
-                        <button onClick={prevMonth} className="p-2 hover:bg-slate-50 rounded-xl transition-all">
-                            <ChevronLeft size={18} className="text-slate-600" />
+                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+                    <div className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-white/[0.02]">
+                        <button onClick={prevMonth} className="p-2 hover:bg-white/5 rounded-xl transition-all">
+                            <ChevronLeft size={18} className="text-white/40" />
                         </button>
-                        <h2 className="text-base font-bold text-slate-900 capitalize">
+                        <h2 className="text-base font-bold text-white capitalize">
                             {format(currentMonth, "MMMM 'de' yyyy", { locale: ptBR })}
                         </h2>
-                        <button onClick={nextMonth} className="p-2 hover:bg-slate-50 rounded-xl transition-all">
-                            <ChevronRight size={18} className="text-slate-600" />
+                        <button onClick={nextMonth} className="p-2 hover:bg-white/5 rounded-xl transition-all">
+                            <ChevronRight size={18} className="text-white/40" />
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-7 border-b border-slate-100">
+                    <div className="grid grid-cols-7 border-b border-white/5 bg-white/[0.01]">
                         {WEEK_DAYS.map(d => (
-                            <div key={d} className="py-3 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                            <div key={d} className="py-3 text-center text-[10px] font-black text-white/30 uppercase tracking-widest">
                                 {d}
                             </div>
                         ))}
@@ -215,31 +215,31 @@ export default function AgendaPage() {
                             const isTodays = isToday(day);
 
                             const bgClass =
-                                isSelected && hasAppts ? 'bg-emerald-50' :
-                                    hasAppts ? 'bg-emerald-50/50 hover:bg-emerald-50' :
-                                        isSelected ? 'bg-indigo-50' :
-                                            'hover:bg-slate-50';
+                                isSelected && hasAppts ? 'bg-[#00e676]/10' :
+                                    hasAppts ? 'bg-[#00e676]/5 hover:bg-[#00e676]/10' :
+                                        isSelected ? 'bg-white/5' :
+                                            'hover:bg-white/[0.02]';
 
                             const numClass =
-                                isSelected && hasAppts ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/40' :
-                                    hasAppts && !isSelected ? 'ring-2 ring-emerald-500 text-emerald-700' :
-                                        isSelected && isTodays ? 'bg-indigo-600 text-white font-black' :
-                                            isSelected ? 'bg-indigo-600 text-white font-bold' :
-                                                isTodays ? 'ring-1 ring-indigo-400 text-indigo-700 font-bold' :
-                                                    'text-slate-600';
+                                isSelected && hasAppts ? 'bg-[#00e676] text-black shadow-md shadow-[#00e676]/40 font-black' :
+                                    hasAppts && !isSelected ? 'ring-2 ring-[#00e676]/50 text-[#00e676] font-bold' :
+                                        isSelected && isTodays ? 'bg-white text-black font-black' :
+                                            isSelected ? 'bg-white/20 text-white font-bold' :
+                                                isTodays ? 'ring-1 ring-white/30 text-white font-bold' :
+                                                    'text-white/40';
 
                             return (
                                 <button
                                     key={i}
                                     onClick={() => handleDayClick(day)}
                                     className={`
-                                        relative flex flex-col items-center pt-3 pb-4 min-h-[72px] transition-all border-b border-r border-slate-50
+                                        relative flex flex-col items-center pt-3 pb-4 min-h-[72px] transition-all border-b border-r border-white/5
                                         ${bgClass}
-                                        ${!isCurrentMonth ? 'opacity-25' : ''}
+                                        ${!isCurrentMonth ? 'opacity-10' : ''}
                                     `}
                                 >
                                     {isTodays && (
-                                        <span className="absolute top-1 left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-600 uppercase tracking-widest">
+                                        <span className="absolute top-1 left-1/2 -translate-x-1/2 text-[8px] font-black text-[#00e676] uppercase tracking-widest">
                                             hoje
                                         </span>
                                     )}
@@ -254,7 +254,7 @@ export default function AgendaPage() {
                                     {hasAppts && (
                                         <span className={`
                                             mt-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-black
-                                            ${isSelected ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-50 text-emerald-600'}
+                                            ${isSelected ? 'bg-[#00e676]/20 text-[#00e676]' : 'bg-[#00e676]/10 text-[#00e676]'}
                                         `}>
                                             {count} {count === 1 ? 'horário' : 'horários'}
                                         </span>
@@ -266,30 +266,30 @@ export default function AgendaPage() {
                 </div>
 
                 {/* DAY PANEL */}
-                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden flex flex-col">
-                    <div className="px-6 py-5 border-b border-slate-100">
-                        <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">
+                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden flex flex-col shadow-2xl">
+                    <div className="px-6 py-5 border-b border-white/5 bg-white/[0.02]">
+                        <p className="text-xs font-black text-[#00e676]/50 uppercase tracking-widest mb-1">
                             {isToday(selectedDate) ? 'Hoje' : format(selectedDate, "EEEE", { locale: ptBR })}
                         </p>
-                        <h3 className="text-2xl font-bold text-slate-900">
+                        <h3 className="text-2xl font-bold text-white">
                             {format(selectedDate, "d 'de' MMMM", { locale: ptBR })}
                         </h3>
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-white/40 mt-1 font-medium">
                             {appointments.length === 0 ? 'Nenhum agendamento' : `${appointments.length} agendamento(s)`}
                         </p>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto bg-slate-50/50 relative">
+                    <div className="flex-1 overflow-y-auto bg-black/20 relative">
                         {loading ? (
                             <div className="flex justify-center py-12">
-                                <div className="w-7 h-7 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                                <div className="w-7 h-7 border-2 border-[#00e676] border-t-transparent rounded-full animate-spin" />
                             </div>
                         ) : (
                             <div className="relative min-h-full py-4">
                                 {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21].map(hour => (
-                                    <div key={hour} className="flex group border-b border-slate-100 h-20 items-start relative">
+                                    <div key={hour} className="flex group border-b border-white/[0.03] h-20 items-start relative">
                                         <div className="w-16 flex-shrink-0 text-center -mt-2">
-                                            <span className="text-[10px] font-bold text-slate-500 group-hover:text-slate-600 transition-colors">
+                                            <span className="text-[10px] font-bold text-white/20 group-hover:text-white/40 transition-colors">
                                                 {String(hour).padStart(2, '0')}:00
                                             </span>
                                         </div>
@@ -318,40 +318,40 @@ export default function AgendaPage() {
                                             style={{ top: `${topPos}px`, height: `${heightPos}px` }}
                                             className={`
                                                 absolute left-16 right-4 rounded-xl border-l-4 p-2.5 transition-all cursor-pointer group hover:z-20
-                                                shadow-sm flex flex-col justify-center
-                                                ${app.status === 'cancelled' ? 'bg-slate-100 border-slate-300 opacity-60' :
-                                                    app.status === 'completed' ? 'bg-emerald-50 border-emerald-400' :
-                                                        'bg-indigo-50 border-indigo-400 hover:bg-indigo-100 hover:shadow-md'}
+                                                shadow-xl flex flex-col justify-center backdrop-blur-sm
+                                                ${app.status === 'cancelled' ? 'bg-white/5 border-white/20 opacity-40' :
+                                                    app.status === 'completed' ? 'bg-[#00e676]/10 border-[#00e676]/60 shadow-[#00e676]/5' :
+                                                        'bg-white/[0.07] border-white/30 hover:bg-white/[0.12] hover:border-[#00e676]/50'}
                                             `}
                                         >
                                             <div className="flex items-start justify-between gap-2 overflow-hidden h-full w-full">
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">
+                                                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none">
                                                             {format(dateObj, 'HH:mm')}
                                                         </span>
-                                                        <div className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${st.dot === 'bg-emerald-500' ? 'bg-[#00e676]' : st.dot}`} />
                                                         {isShort && (
-                                                            <span className="text-[12px] font-bold text-slate-900 truncate flex-1">
+                                                            <span className="text-[12px] font-bold text-white truncate flex-1">
                                                                 {app.customer_name}
                                                             </span>
                                                         )}
                                                     </div>
                                                     {!isShort && (
-                                                        <h4 className="text-[13px] font-bold text-slate-900 leading-tight truncate">
+                                                        <h4 className="text-[13px] font-bold text-white leading-tight truncate">
                                                             {app.customer_name}
                                                         </h4>
                                                     )}
-                                                    <p className="text-[10px] font-bold text-slate-700 truncate opacity-90">
+                                                    <p className="text-[10px] font-bold text-[#00e676]/70 truncate uppercase tracking-tighter">
                                                         {app.service?.name} {isShort ? '' : `(${duration}m)`}
                                                     </p>
                                                 </div>
 
                                                 <div className="flex flex-col gap-1 items-end flex-shrink-0 opacity-0 group-hover:opacity-100 transition-all">
-                                                    <button onClick={(e) => { e.stopPropagation(); handleStatus(app.id, 'completed'); }} title="Finalizar" className="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white transition-all">
+                                                    <button onClick={(e) => { e.stopPropagation(); handleStatus(app.id, 'completed'); }} title="Finalizar" className="p-1.5 bg-[#00e676]/20 text-[#00e676] rounded-lg hover:bg-[#00e676] hover:text-black transition-all">
                                                         <Check size={12} strokeWidth={3} />
                                                     </button>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleDelete(app.id); }} title="Excluir" className="p-1.5 bg-rose-100 text-rose-500 rounded-lg hover:bg-rose-500 hover:text-white transition-all">
+                                                    <button onClick={(e) => { e.stopPropagation(); handleDelete(app.id); }} title="Excluir" className="p-1.5 bg-rose-500/20 text-rose-500 rounded-lg hover:bg-rose-500 hover:text-white transition-all">
                                                         <Trash2 size={12} strokeWidth={3} />
                                                     </button>
                                                 </div>
@@ -362,9 +362,9 @@ export default function AgendaPage() {
 
                                 {appointments.length === 0 && (
                                     <div className="absolute inset-x-16 inset-y-0 flex items-center justify-center pointer-events-none">
-                                        <div className="text-center opacity-30">
-                                            <Clock size={40} className="mx-auto mb-2 text-slate-500" />
-                                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Horários Livres</p>
+                                        <div className="text-center opacity-10">
+                                            <Clock size={48} className="mx-auto mb-3 text-white" />
+                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Horários Livres</p>
                                         </div>
                                     </div>
                                 )}
@@ -376,14 +376,14 @@ export default function AgendaPage() {
 
             {/* DETAILS MODAL */}
             {selectedApp && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white border border-slate-200 w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden">
-                        <div className="bg-gradient-to-br from-indigo-50 to-transparent p-8 border-b border-slate-100 flex justify-between items-start">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                    <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-md rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                        <div className="bg-white/5 p-8 border-b border-white/5 flex justify-between items-start">
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900">Detalhes do Agendamento</h2>
-                                <p className="text-[11px] text-slate-500 uppercase tracking-widest mt-1">Status: {STATUS_MAP[selectedApp.status]?.label || selectedApp.status}</p>
+                                <h2 className="text-xl font-bold text-white">Detalhes do Agendamento</h2>
+                                <p className="text-[10px] text-[#00e676] font-black uppercase tracking-widest mt-1">Status: {STATUS_MAP[selectedApp.status]?.label || selectedApp.status}</p>
                             </div>
-                            <button onClick={() => setSelectedApp(null)} className="p-2 bg-slate-100 rounded-xl text-slate-500 hover:text-slate-700 transition-all">
+                            <button onClick={() => setSelectedApp(null)} className="p-2 bg-white/5 rounded-xl text-white/40 hover:text-white transition-all">
                                 <X size={18} />
                             </button>
                         </div>
@@ -391,27 +391,27 @@ export default function AgendaPage() {
                         <div className="p-8 space-y-6">
                             <div className="space-y-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-[#00e676]">
                                         <User size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Cliente</p>
-                                        <p className="text-base font-bold text-slate-900">{selectedApp.customer_name}</p>
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest leading-none mb-1">Cliente</p>
+                                        <p className="text-base font-bold text-white">{selectedApp.customer_name}</p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                                    <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-[#00e676]">
                                         <Phone size={20} />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Telefone</p>
-                                        <p className="text-base font-bold text-slate-900">{selectedApp.customer_phone || 'Não informado'}</p>
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest leading-none mb-1">Telefone</p>
+                                        <p className="text-base font-bold text-white">{selectedApp.customer_phone || 'Não informado'}</p>
                                     </div>
                                     {selectedApp.customer_phone && (
                                         <button
                                             onClick={() => navigator.clipboard.writeText(selectedApp.customer_phone)}
-                                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold rounded-lg transition-all"
+                                            className="px-3 py-1.5 bg-[#00e676]/10 text-[#00e676] text-[10px] font-black rounded-lg hover:bg-[#00e676]/20 transition-all uppercase"
                                         >
                                             COPIAR
                                         </button>
@@ -419,32 +419,32 @@ export default function AgendaPage() {
                                 </div>
 
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+                                    <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-[#00e676]">
                                         <Clock size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Horário</p>
-                                        <p className="text-base font-bold text-slate-900">
-                                            {format(parseISO(selectedApp.start_time), "HH:mm")} às {format(parseISO(selectedApp.end_time), "HH:mm")}
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest leading-none mb-1">Horário</p>
+                                        <p className="text-base font-bold text-white uppercase tabular-nums">
+                                            {format(parseISO(selectedApp.start_time), "HH:mm")} — {format(parseISO(selectedApp.end_time), "HH:mm")}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Serviço solicitado</p>
+                                <div className="bg-white/5 rounded-2xl p-5 border border-white/5">
+                                    <p className="text-[10px] font-black text-[#00e676] uppercase tracking-widest mb-3">Serviço solicitado</p>
                                     <div className="flex justify-between items-end">
                                         <div>
-                                            <p className="text-sm font-bold text-slate-900">{selectedApp.service?.name}</p>
-                                            <p className="text-xs text-slate-500">{selectedApp.service?.duration} minutos</p>
+                                            <p className="text-sm font-bold text-white">{selectedApp.service?.name}</p>
+                                            <p className="text-xs text-white/40">{selectedApp.service?.duration} minutos</p>
                                         </div>
-                                        <p className="text-lg font-black text-indigo-600">R$ {selectedApp.service?.price}</p>
+                                        <p className="text-lg font-black text-[#00e676] tabular-nums">R$ {selectedApp.service?.price}</p>
                                     </div>
                                 </div>
 
                                 {selectedApp.notes && (
-                                    <div className="bg-indigo-50/30 rounded-2xl p-4 border border-indigo-100/50">
-                                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Observações</p>
-                                        <p className="text-xs text-slate-700 italic">"{selectedApp.notes}"</p>
+                                    <div className="bg-white/[0.02] rounded-2xl p-4 border border-white/5 border-dashed">
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Observações</p>
+                                        <p className="text-xs text-white/70 italic leading-relaxed">"{selectedApp.notes}"</p>
                                     </div>
                                 )}
                             </div>
@@ -452,14 +452,14 @@ export default function AgendaPage() {
                             <div className="flex gap-4 pt-2">
                                 <button
                                     onClick={() => { handleDelete(selectedApp.id); setSelectedApp(null); }}
-                                    className="flex-1 py-4 bg-rose-50 text-rose-600 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-rose-100 transition-all flex items-center justify-center gap-2"
+                                    className="flex-1 py-4 bg-rose-500/10 text-rose-500 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-rose-500/20 transition-all flex items-center justify-center gap-2 border border-rose-500/10"
                                 >
                                     <Trash2 size={14} /> Excluir
                                 </button>
                                 {selectedApp.status !== 'completed' && (
                                     <button
                                         onClick={() => { handleStatus(selectedApp.id, 'completed'); setSelectedApp(null); }}
-                                        className="flex-[2] py-4 bg-emerald-600 text-white font-bold text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                        className="flex-[2] py-4 bg-[#00e676] text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#00e676]/20 active:scale-95 transition-all flex items-center justify-center gap-2"
                                     >
                                         <Check size={16} /> Finalizar
                                     </button>
@@ -472,63 +472,65 @@ export default function AgendaPage() {
 
             {/* NEW APPOINTMENT MODAL */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white border border-slate-200 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden">
-                        <div className="bg-gradient-to-br from-indigo-50 to-transparent p-8 border-b border-slate-100 flex justify-between items-start">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                    <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                        <div className="bg-white/5 p-8 border-b border-white/5 flex justify-between items-start text-white">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <div className="w-7 h-7 bg-indigo-500 rounded-lg flex items-center justify-center"><Plus size={14} className="text-white" /></div>
-                                    <h2 className="text-xl font-bold text-slate-900">Novo Agendamento</h2>
+                                    <div className="w-8 h-8 bg-[#00e676] rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(0,230,118,0.3)]"><Plus size={16} className="text-black" /></div>
+                                    <h2 className="text-xl font-bold">Novo Agendamento</h2>
                                 </div>
-                                <p className="text-[11px] text-slate-500 uppercase tracking-widest">Registrar atendimento</p>
+                                <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Registrar atendimento manual</p>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 rounded-xl text-slate-500 hover:text-slate-700 transition-all">
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 bg-white/5 rounded-xl text-white/40 hover:text-white transition-all">
                                 <X size={18} />
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-8 space-y-4">
+                        <form onSubmit={handleSubmit} className="p-8 space-y-5">
                             <div>
-                                <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Serviço</label>
-                                <select required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.service_id} onChange={e => setFormData({ ...formData, service_id: e.target.value })}>
-                                    <option value="">Selecione...</option>
+                                <label className="block text-[10px] font-black text-white/30 mb-2 uppercase tracking-widest">Serviço</label>
+                                <select required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-[#00e676]/50 transition-all font-medium appearance-none" value={formData.service_id} onChange={e => setFormData({ ...formData, service_id: e.target.value })}>
+                                    <option value="" className="bg-[#1a1a1a]">Selecione um serviço...</option>
                                     {services.map(s => (
-                                        <option key={s.id} value={s.id}>{s.name} — R$ {s.price} ({s.duration} min)</option>
+                                        <option key={s.id} value={s.id} className="bg-[#1a1a1a]">{s.name} — R$ {s.price} ({s.duration} min)</option>
                                     ))}
                                 </select>
                             </div>
 
-                            <div>
-                                <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Nome do Cliente</label>
-                                <div className="relative">
-                                    <User size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-                                    <input required type="text" placeholder="Ex: Maria Silva" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.customer_name} onChange={e => setFormData({ ...formData, customer_name: e.target.value })} />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Telefone</label>
-                                <div className="relative">
-                                    <Phone size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-                                    <input type="text" placeholder="(11) 99999-9999" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.customer_phone} onChange={e => setFormData({ ...formData, customer_phone: e.target.value })} />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Data</label>
-                                    <input required type="date" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                                    <label className="block text-[10px] font-black text-white/30 mb-2 uppercase tracking-widest">Nome do Cliente</label>
+                                    <div className="relative">
+                                        <User size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                                        <input required type="text" placeholder="Ex: Maria Silva" className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3.5 text-white text-sm focus:outline-none focus:border-[#00e676]/50 placeholder:text-white/10 transition-all" value={formData.customer_name} onChange={e => setFormData({ ...formData, customer_name: e.target.value })} />
+                                    </div>
                                 </div>
+
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Horário</label>
-                                    <input required type="time" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-indigo-400" value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })} />
+                                    <label className="block text-[10px] font-black text-white/30 mb-2 uppercase tracking-widest">Telefone</label>
+                                    <div className="relative">
+                                        <Phone size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                                        <input type="text" placeholder="(11) 99999-9999" className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3.5 text-white text-sm focus:outline-none focus:border-[#00e676]/50 placeholder:text-white/10 transition-all" value={formData.customer_phone} onChange={e => setFormData({ ...formData, customer_phone: e.target.value })} />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="flex gap-4 pt-2">
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">Cancelar</button>
-                                <button type="submit" disabled={saving} className="flex-[2] py-4 bg-indigo-600 text-white font-bold text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-indigo-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
-                                    {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Save size={15} /> Agendar</>}
+                            <div className="grid grid-cols-2 gap-5">
+                                <div>
+                                    <label className="block text-[10px] font-black text-white/30 mb-2 uppercase tracking-widest">Data</label>
+                                    <input required type="date" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-[#00e676]/50 transition-all [color-scheme:dark]" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-white/30 mb-2 uppercase tracking-widest">Horário</label>
+                                    <input required type="time" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-[#00e676]/50 transition-all [color-scheme:dark]" value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })} />
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 pt-4">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 bg-white/5 text-white/60 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all">Cancelar</button>
+                                <button type="submit" disabled={saving} className="flex-[2] py-4 bg-[#00e676] text-black font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl shadow-[#00e676]/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40">
+                                    {saving ? <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" /> : <><Save size={15} /> Confirmar Agendamento</>}
                                 </button>
                             </div>
                         </form>
