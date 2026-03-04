@@ -13,7 +13,7 @@ export const ChatMockup = () => {
                     <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
                     <div className="w-3 h-3 rounded-full bg-green-500/80" />
                 </div>
-                <div className="text-xs font-medium text-white/40 uppercase tracking-widest">Agente IA • Salão de Beleza</div>
+                <div className="text-xs font-medium text-white/70 uppercase tracking-widest">Agente IA • Salão de Beleza</div>
                 <div className="w-12" /> {/* Spacer */}
             </div>
 
@@ -71,7 +71,7 @@ export const DashboardMockup = () => {
         <div className="w-full rounded-2xl border border-white/10 bg-[#0a0a0a] p-8 shadow-2xl">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-1">Visão Geral</div>
+                    <div className="text-[10px] font-bold text-white/70 uppercase tracking-[0.2em] mb-1">Visão Geral</div>
                     <div className="text-lg font-medium text-white">Desempenho do seu salão hoje</div>
                 </div>
                 <div className="px-3 py-1 rounded-full bg-[#00e676]/10 border border-[#00e676]/20 flex items-center gap-2">
@@ -88,11 +88,11 @@ export const DashboardMockup = () => {
                     { label: 'RECEITA', val: 'R$ 1.840', growth: '+18%', icon: '💰' },
                 ].map((stat, i) => (
                     <div key={i} className="bg-white/5 border border-white/5 rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-3 text-white/40">
+                        <div className="flex items-center justify-between mb-3 text-white/70">
                             <div className="text-lg">{stat.icon}</div>
                             <div className="text-[10px] font-bold text-[#00e676]">{stat.growth}</div>
                         </div>
-                        <div className="text-[10px] font-bold text-white/40 uppercase tracking-wider">{stat.label}</div>
+                        <div className="text-[10px] font-bold text-white/70 uppercase tracking-wider">{stat.label}</div>
                         <div className="text-xl font-bold text-white mt-1">{stat.val}</div>
                     </div>
                 ))}
@@ -100,15 +100,15 @@ export const DashboardMockup = () => {
 
             <div className="bg-white/5 border border-white/5 rounded-xl p-5">
                 <div className="flex items-center justify-between mb-4">
-                    <div className="text-[10px] font-bold text-white/40 uppercase tracking-wider">Atividade Recente</div>
-                    <div className="text-[10px] font-bold text-[#00e676] uppercase tracking-wider cursor-pointer">Ver Agenda</div>
+                    <div className="text-[10px] font-bold text-white/70 uppercase tracking-wider">Atividade Recente</div>
+                    <div className="text-[10px] font-bold text-[#00e676] uppercase tracking-wider cursor-pointer" aria-label="Ver Agenda">Ver Agenda</div>
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-emerald-900/40 flex items-center justify-center font-bold text-emerald-400 text-xs">MA</div>
                         <div>
                             <div className="text-sm font-bold text-white">Mariana Almeida</div>
-                            <div className="text-[10px] text-white/40 uppercase tracking-tight">Corte + Escova • Hoje às 15:30</div>
+                            <div className="text-[10px] text-white/70 uppercase tracking-tight">Corte + Escova • Hoje às 15:30</div>
                         </div>
                     </div>
                     <div className="px-2 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-[9px] font-bold text-orange-400 uppercase">Pendente</div>
@@ -124,7 +124,7 @@ export const ChatListMockup = () => {
         <div className="w-full rounded-2xl border border-white/10 bg-[#0a0a0a] shadow-2xl overflow-hidden aspect-[4/3] flex">
             {/* Sidebar */}
             <div className="w-1/3 border-r border-white/5 overflow-y-auto">
-                <div className="p-4 border-b border-white/5 text-[10px] font-bold text-white/40 uppercase tracking-widest">Conversas IA</div>
+                <div className="p-4 border-b border-white/5 text-[10px] font-bold text-white/70 uppercase tracking-widest">Conversas IA</div>
                 {[
                     { name: 'Juliana Silva', msg: 'Pode confirmar meu horário?', time: '14:22', active: true },
                     { name: 'Ricardo Mendes', msg: 'Quanto custa o corte?', time: '13:45' },
@@ -137,7 +137,7 @@ export const ChatListMockup = () => {
                             <span className="text-xs font-bold text-white leading-none">{chat.name}</span>
                             <span className="text-[9px] text-white/30">{chat.time}</span>
                         </div>
-                        <p className="text-[10px] text-white/40 truncate">{chat.msg}</p>
+                        <p className="text-[10px] text-white/70 truncate">{chat.msg}</p>
                     </div>
                 ))}
             </div>
@@ -145,7 +145,7 @@ export const ChatListMockup = () => {
             {/* Chat Body */}
             <div className="flex-1 flex flex-col">
                 <div className="p-4 border-b border-white/5 flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Juliana Silva</span>
+                    <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Juliana Silva</span>
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#00e676]" />
                         <span className="text-[9px] font-bold text-[#00e676] uppercase">IA Online</span>
@@ -183,11 +183,11 @@ export const CalendarMockup = () => {
                 <div className="flex items-center justify-between mb-6">
                     <div className="text-sm font-bold text-white uppercase tracking-widest">Março 2026</div>
                     <div className="flex gap-2">
-                        <button className="p-1 rounded bg-white/5 hover:bg-white/10 transition-colors">
-                            <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                        <button className="p-1 rounded bg-white/5 hover:bg-white/10 transition-colors" aria-label="Mês anterior">
+                            <svg className="w-4 h-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                         </button>
-                        <button className="p-1 rounded bg-white/5 hover:bg-white/10 transition-colors">
-                            <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        <button className="p-1 rounded bg-white/5 hover:bg-white/10 transition-colors" aria-label="Próximo mês">
+                            <svg className="w-4 h-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                         </button>
                     </div>
                 </div>
@@ -214,7 +214,7 @@ export const CalendarMockup = () => {
             </div>
 
             <div className="w-48 shrink-0">
-                <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">Agenda de hoje</div>
+                <div className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-4">Agenda de hoje</div>
                 <div className="space-y-3">
                     {[
                         { time: '09:00', name: 'Ana Paula', service: 'CORTE' },
@@ -225,7 +225,7 @@ export const CalendarMockup = () => {
                         <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/5">
                             <div className="text-[10px] font-bold text-[#00e676] leading-none mb-1">{item.time}</div>
                             <div className="text-xs font-bold text-white leading-none mb-1">{item.name}</div>
-                            <div className="text-[9px] text-white/40 uppercase tracking-tight">{item.service}</div>
+                            <div className="text-[9px] text-white/70 uppercase tracking-tight">{item.service}</div>
                         </div>
                     ))}
                 </div>
@@ -240,7 +240,7 @@ export const ServicesMockup = () => {
         <div className="w-full rounded-2xl border border-white/10 bg-[#0a0a0a] p-8 shadow-2xl">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-1">Catálogo de Serviços</div>
+                    <div className="text-[10px] font-bold text-white/70 uppercase tracking-[0.2em] mb-1">Catálogo de Serviços</div>
                     <div className="text-sm font-medium text-white/60">Gerencie seus tratamentos e preços</div>
                 </div>
                 <div className="px-4 py-2 rounded-full bg-[#00e676] text-black text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 hover:brightness-110 transition-all cursor-pointer">

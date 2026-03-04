@@ -11,12 +11,12 @@ export const Footer = () => {
                             <BrandLogo size="md" showTagline />
                         </div>
 
-                        <p className="max-w-sm text-slate-400 leading-relaxed font-medium text-lg">
+                        <p className="max-w-sm text-slate-300 leading-relaxed font-medium text-lg">
                             A tecnologia de inteligência artificial que humaniza o atendimento do seu salão e escala seu faturamento no piloto automático.
                         </p>
                     </div>
                     <div className="w-full px-4 mb-12 lg:w-1/4 lg:mb-0">
-                        <h4 className="mb-8 text-sm font-black text-primary tracking-[0.2em] uppercase">Produto</h4>
+                        <h3 className="mb-8 text-sm font-black text-primary tracking-[0.2em] uppercase">Produto</h3>
                         <ul className="text-slate-300 space-y-4 font-medium">
                             <li><a href="#features" className="hover:text-primary transition-colors">Funcionalidades</a></li>
                             <li><a href="#pricing" className="hover:text-primary transition-colors">Preços</a></li>
@@ -24,7 +24,7 @@ export const Footer = () => {
                         </ul>
                     </div>
                     <div className="w-full px-4 lg:w-1/4">
-                        <h4 className="mb-8 text-sm font-black text-primary tracking-[0.2em] uppercase">Legal</h4>
+                        <h3 className="mb-8 text-sm font-black text-primary tracking-[0.2em] uppercase">Legal</h3>
                         <ul className="text-slate-300 space-y-4 font-medium">
                             <li><a href="#" className="hover:text-primary transition-colors">Privacidade</a></li>
                             <li><a href="#" className="hover:text-primary transition-colors">Termos de Uso</a></li>
@@ -33,7 +33,7 @@ export const Footer = () => {
                     </div>
                 </div>
                 <div className="pt-12 mt-16 border-t border-white/5 text-center">
-                    <p className="text-sm text-slate-500 font-medium">
+                    <p className="text-sm text-slate-400 font-medium">
                         © {new Date().getFullYear()} Beautfy.ai. Todos os direitos reservados.
                     </p>
                 </div>

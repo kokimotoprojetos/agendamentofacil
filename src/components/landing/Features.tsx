@@ -23,7 +23,7 @@ const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }
                         <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight">
                             {title} <span className="text-[var(--primary)]">{highlight}</span>
                         </h2>
-                        <p className="text-lg text-white/50 mb-10 leading-relaxed">
+                        <p className="text-lg text-white/70 mb-10 leading-relaxed">
                             {description}
                         </p>
                         <a href="#details" className="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-[var(--primary)] transition-colors group">
