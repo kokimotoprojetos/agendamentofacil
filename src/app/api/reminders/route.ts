@@ -6,11 +6,11 @@ import { ptBR } from 'date-fns/locale';
 
 export async function GET(req: Request) {
     try {
-        const { searchParams } = new URL(req.url);
-        const key = searchParams.get('key');
+        // Authenticate via Authorization header instead of query parameter
+        const authHeader = req.headers.get('Authorization');
+        const expectedKey = process.env.CRON_SECRET || process.env.EVOLUTION_API_KEY;
 
-        // Simple security check using the evolution key format or similar
-        if (key !== process.env.EVOLUTION_API_KEY) {
+        if (!authHeader || authHeader !== `Bearer ${expectedKey}`) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

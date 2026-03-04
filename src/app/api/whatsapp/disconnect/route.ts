@@ -26,7 +26,7 @@ export async function POST() {
 
         const instanceName = `wa_${profile.tenant_id.split('-')[0]}`;
 
-        console.log('WhatsApp Disconnect API: Logging out and deleting instance:', instanceName);
+
 
         // 1. Logout and Delete from Evolution API
         await whatsappService.logout(instanceName);

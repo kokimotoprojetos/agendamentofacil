@@ -6,7 +6,6 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST() {
     try {
-        console.log('WhatsApp Connection API: POST request received');
 
         // 1. Strict Validation of Environment Variables
         const requiredVars = {
@@ -37,7 +36,6 @@ export async function POST() {
         }
 
         const userId = (session.user as any).id;
-        console.log('WhatsApp Connection API: Authenticated User ID:', userId);
 
         // 3. Get tenant ID
         const { data: profile, error: profileError } = await supabaseAdmin
@@ -52,19 +50,16 @@ export async function POST() {
         }
 
         const instanceName = `wa_${profile.tenant_id.split('-')[0]}`;
-        console.log('WhatsApp Connection API: Instance Name:', instanceName);
 
         // 4. Check if instance exists, create if not
         const exists = await whatsappService.instanceExists(instanceName);
         if (!exists) {
-            console.log('WhatsApp Connection API: Creating new instance:', instanceName);
             await whatsappService.createInstance(instanceName);
             // Wait for instance to be ready
             await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
         // Always Update/Sync Webhook to ensure reachable URL is correct
-        console.log('WhatsApp Connection API: Synchronizing webhook configuration');
         try {
             const webhookResult = await whatsappService.setWebhook(instanceName);
             await supabaseAdmin.from('agent_logs').insert({
@@ -87,7 +82,6 @@ export async function POST() {
         }
 
         // 4.2 Persist connection in DB for webhook lookup
-        console.log('WhatsApp Connection API: Persisting connection in DB');
         const { error: upsertError } = await supabaseAdmin
             .from('whatsapp_connections')
             .upsert({
@@ -111,7 +105,6 @@ export async function POST() {
         }
 
         // 5. Get QR Code
-        console.log('WhatsApp Connection API: Fetching QR Code for:', instanceName);
         const data = await whatsappService.getQrCode(instanceName);
 
         return NextResponse.json(data);
