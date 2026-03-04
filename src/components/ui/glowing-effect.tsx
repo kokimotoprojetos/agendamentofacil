@@ -1,8 +1,8 @@
 "use client";
 
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { animate } from "framer-motion";
+import { useMotionValue, useSpring, animate } from "framer-motion";
 
 interface GlowingEffectProps {
     blur?: number;
@@ -16,6 +16,7 @@ interface GlowingEffectProps {
     movementDuration?: number;
     borderWidth?: number;
 }
+
 const GlowingEffect = memo(
     ({
         blur = 0,
@@ -27,78 +28,84 @@ const GlowingEffect = memo(
         className,
         movementDuration = 2,
         borderWidth = 1,
-        disabled = true,
+        disabled = false,
     }: GlowingEffectProps) => {
         const containerRef = useRef<HTMLDivElement>(null);
         const lastPosition = useRef({ x: 0, y: 0 });
-        const animationFrameRef = useRef<number>(0);
+        const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+        const startAngle = useMotionValue(0);
+        const activeValue = useMotionValue(0);
+
+        const springConfig = {
+            duration: movementDuration,
+            bounce: 0,
+        };
+
+        const springAngle = useSpring(startAngle, springConfig);
+        const springActive = useSpring(activeValue, { duration: 0.3, bounce: 0 });
+
+        useEffect(() => {
+            const checkTouch = () => {
+                setIsTouchDevice(
+                    "ontouchstart" in window || navigator.maxTouchPoints > 0
+                );
+            };
+            checkTouch();
+        }, []);
 
         const handleMove = useCallback(
             (e?: MouseEvent | { x: number; y: number }) => {
-                if (!containerRef.current) return;
+                if (!containerRef.current || (isTouchDevice && !glow)) return;
 
-                if (animationFrameRef.current) {
-                    cancelAnimationFrame(animationFrameRef.current);
+                const element = containerRef.current;
+                const rect = element.getBoundingClientRect();
+
+                const mouseX = e?.x ?? lastPosition.current.x;
+                const mouseY = e?.y ?? lastPosition.current.y;
+
+                if (e) {
+                    lastPosition.current = { x: mouseX, y: mouseY };
                 }
 
-                animationFrameRef.current = requestAnimationFrame(() => {
-                    const element = containerRef.current;
-                    if (!element) return;
+                const center = [rect.left + rect.width * 0.5, rect.top + rect.height * 0.5];
+                const distanceFromCenter = Math.hypot(
+                    mouseX - center[0],
+                    mouseY - center[1]
+                );
+                const inactiveRadius = 0.5 * Math.min(rect.width, rect.height) * inactiveZone;
 
-                    const { left, top, width, height } = element.getBoundingClientRect();
-                    const mouseX = e?.x ?? lastPosition.current.x;
-                    const mouseY = e?.y ?? lastPosition.current.y;
+                if (distanceFromCenter < inactiveRadius) {
+                    activeValue.set(0);
+                    return;
+                }
 
-                    if (e) {
-                        lastPosition.current = { x: mouseX, y: mouseY };
-                    }
+                const isActive =
+                    mouseX > rect.left - proximity &&
+                    mouseX < rect.left + rect.width + proximity &&
+                    mouseY > rect.top - proximity &&
+                    mouseY < rect.top + rect.height + proximity;
 
-                    const center = [left + width * 0.5, top + height * 0.5];
-                    const distanceFromCenter = Math.hypot(
-                        mouseX - center[0],
-                        mouseY - center[1]
-                    );
-                    const inactiveRadius = 0.5 * Math.min(width, height) * inactiveZone;
+                activeValue.set(isActive ? 1 : 0);
 
-                    if (distanceFromCenter < inactiveRadius) {
-                        element.style.setProperty("--active", "0");
-                        return;
-                    }
+                if (!isActive) return;
 
-                    const isActive =
-                        mouseX > left - proximity &&
-                        mouseX < left + width + proximity &&
-                        mouseY > top - proximity &&
-                        mouseY < top + height + proximity;
+                const currentAngle = startAngle.get();
+                let targetAngle =
+                    (180 * Math.atan2(mouseY - center[1], mouseX - center[0])) /
+                    Math.PI +
+                    90;
 
-                    element.style.setProperty("--active", isActive ? "1" : "0");
+                const angleDiff = ((targetAngle - currentAngle + 180) % 360) - 180;
+                const newAngle = currentAngle + angleDiff;
 
-                    if (!isActive) return;
-
-                    const currentAngle =
-                        parseFloat(element.style.getPropertyValue("--start")) || 0;
-                    let targetAngle =
-                        (180 * Math.atan2(mouseY - center[1], mouseX - center[0])) /
-                        Math.PI +
-                        90;
-
-                    const angleDiff = ((targetAngle - currentAngle + 180) % 360) - 180;
-                    const newAngle = currentAngle + angleDiff;
-
-                    animate(currentAngle, newAngle, {
-                        duration: movementDuration,
-                        ease: [0.16, 1, 0.3, 1],
-                        onUpdate: (value) => {
-                            element.style.setProperty("--start", String(value));
-                        },
-                    });
-                });
+                startAngle.set(newAngle);
             },
-            [inactiveZone, proximity, movementDuration]
+            [inactiveZone, proximity, glow, isTouchDevice, activeValue, startAngle]
         );
 
         useEffect(() => {
-            if (disabled) return;
+            if (disabled || isTouchDevice) return;
 
             const handleScroll = () => handleMove();
             const handlePointerMove = (e: PointerEvent) => handleMove(e);
@@ -109,13 +116,40 @@ const GlowingEffect = memo(
             });
 
             return () => {
-                if (animationFrameRef.current) {
-                    cancelAnimationFrame(animationFrameRef.current);
-                }
                 window.removeEventListener("scroll", handleScroll);
                 document.body.removeEventListener("pointermove", handlePointerMove);
             };
-        }, [handleMove, disabled]);
+        }, [handleMove, disabled, isTouchDevice]);
+
+        useEffect(() => {
+            if (!containerRef.current) return;
+            const element = containerRef.current;
+
+            const unsubscribeAngle = springAngle.on("change", (value) => {
+                element.style.setProperty("--start", String(value));
+            });
+
+            const unsubscribeActive = springActive.on("change", (value) => {
+                element.style.setProperty("--active", String(value));
+            });
+
+            return () => {
+                unsubscribeAngle();
+                unsubscribeActive();
+            };
+        }, [springAngle, springActive]);
+
+        // If it's a touch device and glow isn't forced, don't render the animation layer for performance
+        if (isTouchDevice && !glow) {
+            return (
+                <div
+                    className={cn(
+                        "pointer-events-none absolute -inset-px rounded-[inherit] border border-border/50 opacity-0 transition-opacity",
+                        className
+                    )}
+                />
+            );
+        }
 
         return (
             <>
@@ -124,7 +158,7 @@ const GlowingEffect = memo(
                         "pointer-events-none absolute -inset-px hidden rounded-[inherit] border opacity-0 transition-opacity",
                         glow && "opacity-100",
                         variant === "white" && "border-white",
-                        disabled && "!block"
+                        (disabled || isTouchDevice) && "!block"
                     )}
                 />
                 <div
@@ -159,7 +193,7 @@ const GlowingEffect = memo(
                         } as React.CSSProperties
                     }
                     className={cn(
-                        "pointer-events-none absolute inset-0 rounded-[inherit] opacity-100 transition-opacity",
+                        "pointer-events-none absolute inset-0 rounded-[inherit] opacity-100 transition-opacity will-change-[transform,opacity]",
                         glow && "opacity-100",
                         blur > 0 && "blur-[var(--blur)] ",
                         className,
