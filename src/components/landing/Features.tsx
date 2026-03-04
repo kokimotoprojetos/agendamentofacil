@@ -1,8 +1,13 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { DashboardMockup, ChatListMockup, CalendarMockup, ServicesMockup } from './Mockups';
+import dynamic from 'next/dynamic';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
+
+const DashboardMockup = dynamic(() => import('./Mockups').then(m => m.DashboardMockup), { ssr: false });
+const ChatListMockup = dynamic(() => import('./Mockups').then(m => m.ChatListMockup), { ssr: false });
+const CalendarMockup = dynamic(() => import('./Mockups').then(m => m.CalendarMockup), { ssr: false });
+const ServicesMockup = dynamic(() => import('./Mockups').then(m => m.ServicesMockup), { ssr: false });
 
 interface FeatureSectionProps {
     title: string;

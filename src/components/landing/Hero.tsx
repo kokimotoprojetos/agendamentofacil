@@ -1,9 +1,14 @@
 'use client';
 import React from 'react';
 import { BrandLogo } from '@/components/ui/BrandLogo';
-import { ChatMockup } from './Mockups';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
+
+const ChatMockup = dynamic(() => import('./Mockups').then(m => m.ChatMockup), {
+    ssr: false,
+    loading: () => <div className="w-full aspect-[4/3] bg-black/20 animate-pulse rounded-2xl" />
+});
 
 export const Hero = () => {
     return (
