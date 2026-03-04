@@ -31,6 +31,7 @@ const GlowingEffect = memo(
         disabled = false,
     }: GlowingEffectProps) => {
         const containerRef = useRef<HTMLDivElement>(null);
+        const rectRef = useRef<DOMRect | null>(null);
         const lastPosition = useRef({ x: 0, y: 0 });
         const [isTouchDevice, setIsTouchDevice] = useState(false);
 
@@ -54,12 +55,21 @@ const GlowingEffect = memo(
             checkTouch();
         }, []);
 
+        const updateRect = useCallback(() => {
+            if (containerRef.current) {
+                rectRef.current = containerRef.current.getBoundingClientRect();
+            }
+        }, []);
+
         const handleMove = useCallback(
             (e?: MouseEvent | { x: number; y: number }) => {
                 if (!containerRef.current || (isTouchDevice && !glow)) return;
 
-                const element = containerRef.current;
-                const rect = element.getBoundingClientRect();
+                if (!rectRef.current) {
+                    updateRect();
+                }
+                const rect = rectRef.current;
+                if (!rect) return;
 
                 const mouseX = e?.x ?? lastPosition.current.x;
                 const mouseY = e?.y ?? lastPosition.current.y;
@@ -101,25 +111,31 @@ const GlowingEffect = memo(
 
                 startAngle.set(newAngle);
             },
-            [inactiveZone, proximity, glow, isTouchDevice, activeValue, startAngle]
+            [inactiveZone, proximity, glow, isTouchDevice, activeValue, startAngle, updateRect]
         );
 
         useEffect(() => {
             if (disabled || isTouchDevice) return;
 
-            const handleScroll = () => handleMove();
+            const handleScroll = () => {
+                updateRect();
+                handleMove();
+            };
             const handlePointerMove = (e: PointerEvent) => handleMove(e);
+            const handleResize = () => updateRect();
 
             window.addEventListener("scroll", handleScroll, { passive: true });
+            window.addEventListener("resize", handleResize, { passive: true });
             document.body.addEventListener("pointermove", handlePointerMove, {
                 passive: true,
             });
 
             return () => {
                 window.removeEventListener("scroll", handleScroll);
+                window.removeEventListener("resize", handleResize);
                 document.body.removeEventListener("pointermove", handlePointerMove);
             };
-        }, [handleMove, disabled, isTouchDevice]);
+        }, [handleMove, disabled, isTouchDevice, updateRect]);
 
         useEffect(() => {
             if (!containerRef.current) return;

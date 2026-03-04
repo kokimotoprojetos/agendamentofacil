@@ -28,19 +28,16 @@ export const Hero = () => {
 
             <div className="container px-6 mx-auto relative z-10 pt-16">
                 <div className="max-w-4xl mx-auto text-center">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
+                    <h1
                         className="text-[4rem] md:text-[5.5rem] lg:text-[6.5rem] font-bold tracking-tight text-white leading-[1.05] mb-8"
                     >
                         Encontre os clientes que precisam da sua <span className="text-[var(--primary)]">atenção</span>
-                    </motion.h1>
+                    </h1>
 
                     <motion.p
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
+                        transition={{ duration: 0.4 }}
                         className="text-lg md:text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed"
                     >
                         Automatize seus agendamentos no WhatsApp com um agente de IA inteligente que entende seu negócio e atende seus clientes 24 horas por dia.
