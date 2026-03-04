@@ -601,11 +601,13 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
       const cleanPhone = customerPhone.replace(/@s\.whatsapp\.net|@g\.us/g, '').replace(/\D+$/, '');
 
       console.log(`[booking] Looking for service "${booking.service_name}" in tenant ${tenantId}`);
+      // Sanitize service name to prevent SQL wildcard injection
+      const safeName = (booking.service_name || '').replace(/[%_\\]/g, '');
       const { data: service, error: serviceError } = await supabaseAdmin
         .from('services')
         .select('id, duration, price')
         .eq('tenant_id', tenantId)
-        .ilike('name', `%${booking.service_name}%`)
+        .ilike('name', `%${safeName}%`)
         .limit(1)
         .single();
 

@@ -17,7 +17,10 @@ export async function middleware(request: NextRequest) {
 
         if (!token) {
             const loginUrl = new URL('/login', request.url);
-            loginUrl.searchParams.set('callbackUrl', pathname);
+            // Prevent open redirect — only allow relative paths
+            if (pathname.startsWith('/') && !pathname.startsWith('//')) {
+                loginUrl.searchParams.set('callbackUrl', pathname);
+            }
             return NextResponse.redirect(loginUrl);
         }
     }

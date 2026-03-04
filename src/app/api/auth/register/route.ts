@@ -10,6 +10,23 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        // Input validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return NextResponse.json({ error: 'Email inválido' }, { status: 400 });
+        }
+        if (password.length < 8) {
+            return NextResponse.json({ error: 'A senha deve ter no mínimo 8 caracteres' }, { status: 400 });
+        }
+        if (name.length > 100 || businessName.length > 100) {
+            return NextResponse.json({ error: 'Nome muito longo' }, { status: 400 });
+        }
+        // Sanitize inputs — strip HTML tags
+        const sanitize = (str: string) => str.replace(/<[^>]*>/g, '').trim();
+        const safeName = sanitize(name);
+        const safeBusinessName = sanitize(businessName);
+        const safeEmail = email.toLowerCase().trim();
+
         // 1. Check if user already exists in public.users
         const { data: existingUser } = await supabaseAdmin
             .from('users')
@@ -37,8 +54,8 @@ export async function POST(request: Request) {
             const { data: newUser, error: userError } = await supabaseAdmin
                 .from('users')
                 .insert({
-                    name,
-                    email,
+                    name: safeName,
+                    email: safeEmail,
                     password: hashedPassword
                 })
                 .select('id')
@@ -70,7 +87,7 @@ export async function POST(request: Request) {
         const { data: tenant, error: tenantError } = await supabaseAdmin
             .from('tenants')
             .insert({
-                business_name: businessName,
+                business_name: safeBusinessName,
                 user_id: userId,
                 slug: slug
             })
@@ -85,7 +102,7 @@ export async function POST(request: Request) {
             .upsert({
                 id: userId,
                 tenant_id: tenant.id,
-                full_name: name,
+                full_name: safeName,
                 role: 'owner'
             });
 
@@ -94,6 +111,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error('Registration API Error:', error);
-        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: 'Erro ao criar conta. Tente novamente.' }, { status: 500 });
     }
 }
