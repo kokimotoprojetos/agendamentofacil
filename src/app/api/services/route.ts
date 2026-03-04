@@ -70,6 +70,15 @@ export async function DELETE(req: Request) {
         const session = await getServerSession(authOptions);
         if (!session?.user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
+        const userId = (session.user as any).id;
+        const { data: profile } = await supabaseAdmin
+            .from('profiles')
+            .select('tenant_id')
+            .eq('id', userId)
+            .single();
+
+        if (!profile) return NextResponse.json({ error: 'Perfil não encontrado' }, { status: 404 });
+
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
         if (!id) return NextResponse.json({ error: 'ID não fornecido' }, { status: 400 });
@@ -77,7 +86,8 @@ export async function DELETE(req: Request) {
         const { error } = await supabaseAdmin
             .from('services')
             .delete()
-            .eq('id', id);
+            .eq('id', id)
+            .eq('tenant_id', profile.tenant_id);
 
         if (error) throw error;
         return NextResponse.json({ success: true });
@@ -90,6 +100,15 @@ export async function PUT(req: Request) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+
+        const userId = (session.user as any).id;
+        const { data: profile } = await supabaseAdmin
+            .from('profiles')
+            .select('tenant_id')
+            .eq('id', userId)
+            .single();
+
+        if (!profile) return NextResponse.json({ error: 'Perfil não encontrado' }, { status: 404 });
 
         const body = await req.json();
         const { id, name, price, duration, description } = body;
@@ -105,6 +124,7 @@ export async function PUT(req: Request) {
                 description: description || ''
             })
             .eq('id', id)
+            .eq('tenant_id', profile.tenant_id)
             .select()
             .single();
 
