@@ -13,7 +13,8 @@ import {
     HelpCircle,
     Scissors,
     Smartphone,
-    MessageCircle
+    MessageCircle,
+    DollarSign
 } from 'lucide-react';
 
 const WhatsAppIcon = ({ size = 20, className = "" }) => (
@@ -33,6 +34,7 @@ const MENU_ITEMS = [
     { icon: MessageSquare, label: 'Conversas', href: '/dashboard/chats' },
     { icon: Calendar, label: 'Agenda', href: '/dashboard/calendar' },
     { icon: Scissors, label: 'Serviços', href: '/dashboard/services' },
+    { icon: DollarSign, label: 'Finanças', href: '/dashboard/financas' },
     { icon: Users, label: 'Agente IA', href: '/dashboard/agent' },
     { icon: WhatsAppIcon, label: 'WhatsApp', href: '/dashboard/whatsapp' },
 ];
