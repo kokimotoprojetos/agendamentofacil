@@ -18,13 +18,13 @@ export const Hero = () => {
                 <BrandLogo size="md" />
 
                 <div className="hidden md:flex items-center space-x-12">
-                    <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Funcionalidades</a>
-                    <a href="#pricing" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Preços</a>
-                    <a href="#about" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Sobre</a>
+                    <a href="#features" className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">Funcionalidades</a>
+                    <a href="#pricing" className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">Preços</a>
+                    <a href="#about" className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">Sobre</a>
                 </div>
 
                 <div className="flex items-center gap-6">
-                    <a href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Entrar</a>
+                    <a href="/login" className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">Entrar</a>
                     <a href="/register" className="px-5 py-2.5 text-xs font-bold text-white bg-[var(--primary)] rounded-full hover:brightness-110 active:scale-95 transition-all">
                         Teste grátis
                     </a>

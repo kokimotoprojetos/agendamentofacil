@@ -8,6 +8,7 @@ interface BrandLogoProps {
     size?: LogoSize;
     showTagline?: boolean;
     hideText?: boolean;
+    light?: boolean; // Prop to force light/dark text if needed
 }
 
 const sizes = {
@@ -18,11 +19,10 @@ const sizes = {
 
 /**
  * BrandLogo — premium mark for Beautfy.ai.
- * Light theme variant.
+ * Adaptable color for light/dark backgrounds.
  */
-export function BrandLogo({ size = 'md', showTagline = false }: BrandLogoProps) {
+export function BrandLogo({ size = 'md', showTagline = false, hideText = false, light = false }: BrandLogoProps) {
     const s = sizes[size];
-    const id = `lg-${size}`;
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: s.gap, flexShrink: 0 }}>
@@ -51,7 +51,7 @@ export function BrandLogo({ size = 'md', showTagline = false }: BrandLogoProps) 
                             style={{
                                 fontSize: s.wordmark,
                                 fontWeight: 800,
-                                color: '#ffffff',
+                                color: light ? '#ffffff' : '#0f172a',
                                 letterSpacing: '-0.4px',
                             }}
                         >
