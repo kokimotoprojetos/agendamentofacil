@@ -45,7 +45,7 @@ export function Sidebar() {
     return (
         <aside className="fixed left-0 top-0 h-screen w-20 lg:w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-50 overflow-hidden transition-all duration-300">
             <div className="p-4 lg:p-8 flex justify-center lg:justify-start">
-                <BrandLogo size="sm" hideText />
+                <BrandLogo size="sm" hideText light />
             </div>
 
             <nav className="flex-1 px-3 lg:px-4 space-y-2 overflow-y-auto scrollbar-hide py-4">
@@ -59,10 +59,10 @@ export function Sidebar() {
                             href={item.href}
                             className={`flex items-center justify-center lg:justify-start gap-3 p-3 lg:px-4 lg:py-3 rounded-2xl transition-all duration-200 group ${isActive
                                 ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                : 'text-slate-300 hover:text-white hover:bg-white/5'
                                 }`}
                         >
-                            <Icon size={24} className={isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'} />
+                            <Icon size={24} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-300'} />
                             <span className="hidden lg:block text-sm font-bold tracking-tight">{item.label}</span>
                         </Link>
                     );
@@ -72,7 +72,7 @@ export function Sidebar() {
             <div className="p-4 lg:p-8 mt-auto flex justify-center lg:justify-start border-t border-slate-800/50">
                 <button
                     onClick={() => {/* logout logic */ }}
-                    className="flex items-center justify-center lg:justify-start gap-3 p-3 lg:px-4 lg:py-3 rounded-2xl text-slate-500 hover:text-rose-500 hover:bg-rose-500/5 transition-all group w-full"
+                    className="flex items-center justify-center lg:justify-start gap-3 p-3 lg:px-4 lg:py-3 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-500/5 transition-all group w-full"
                 >
                     <LogOut size={24} className="group-hover:translate-x-1 transition-transform" />
                     <span className="hidden lg:block text-sm font-bold tracking-tight">Sair</span>

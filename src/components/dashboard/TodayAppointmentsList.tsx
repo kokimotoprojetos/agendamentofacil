@@ -33,14 +33,14 @@ export function TodayAppointmentsList({ appointments }: Props) {
                             className={`flex items-start gap-6 p-6 rounded-[2rem] transition-all hover:bg-slate-50 group border-l-4 ${index % 2 === 0 ? 'border-[var(--primary)] bg-slate-50/30' : 'border-slate-900'}`}
                         >
                             <div className="flex flex-col gap-1">
-                                <div className="flex items-center gap-2 text-slate-500">
+                                <div className="flex items-center gap-2 text-slate-600">
                                     <Clock size={16} />
                                     <span className="text-sm font-bold">{app.timeRange}</span>
                                 </div>
                                 <h4 className="text-lg font-bold text-slate-900 leading-tight">
                                     {app.service}
                                 </h4>
-                                <p className="text-sm font-medium text-slate-500">
+                                <p className="text-sm font-bold text-slate-600">
                                     {app.name}
                                 </p>
                             </div>
@@ -48,7 +48,7 @@ export function TodayAppointmentsList({ appointments }: Props) {
                     ))
                 ) : (
                     <div className="py-20 text-center">
-                        <p className="text-slate-400 font-medium">Nenhum agendamento para hoje.</p>
+                        <p className="text-slate-600 font-bold text-lg">Nenhum agendamento para hoje.</p>
                     </div>
                 )}
             </div>

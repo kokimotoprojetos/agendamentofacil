@@ -49,7 +49,7 @@ export const StatsCard = ({ label, value, icon, color, trend }: StatsCardProps) 
                 <h3 className="text-4xl font-bold text-slate-900 tracking-tight">
                     {value}
                 </h3>
-                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{label}</p>
+                <p className="text-sm font-bold text-slate-600 uppercase tracking-wider">{label}</p>
             </div>
         </div>
     );

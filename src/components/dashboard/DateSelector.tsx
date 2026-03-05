@@ -20,20 +20,20 @@ export function DateSelector() {
             <div className="flex items-center justify-between mb-8 overflow-x-auto">
                 <div className="flex items-center gap-2">
                     <button className="p-2 hover:bg-slate-50 rounded-full transition-colors">
-                        <ChevronLeft size={20} className="text-slate-500" />
+                        <ChevronLeft size={20} className="text-slate-700" />
                     </button>
                     <div className="flex items-center gap-6 px-4">
                         {months.map((month) => (
                             <span
                                 key={month}
-                                className={`text-sm font-semibold cursor-pointer whitespace-nowrap ${month === 'Abr' ? 'text-slate-900 border-b-2 border-slate-900 pb-1' : 'text-slate-500'}`}
+                                className={`text-sm font-bold cursor-pointer whitespace-nowrap ${month === 'Abr' ? 'text-slate-900 border-b-2 border-slate-900 pb-1' : 'text-slate-600'}`}
                             >
                                 {month}
                             </span>
                         ))}
                     </div>
                     <button className="p-2 hover:bg-slate-50 rounded-full transition-colors">
-                        <ChevronRight size={20} className="text-slate-500" />
+                        <ChevronRight size={20} className="text-slate-700" />
                     </button>
                 </div>
             </div>
@@ -44,7 +44,7 @@ export function DateSelector() {
                         key={day.day}
                         className={`flex flex-col items-center justify-center p-4 rounded-3xl transition-all cursor-pointer ${day.active
                             ? 'bg-[var(--primary)] text-white shadow-xl shadow-[var(--primary)]/20 scale-110'
-                            : 'hover:bg-slate-50 text-slate-500'
+                            : 'hover:bg-slate-50 text-slate-600'
                             }`}
                     >
                         <span className="text-lg font-bold mb-1">{day.day}</span>

@@ -23,7 +23,7 @@ export function RevenueBarChart({ data }: RevenueChartProps) {
         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 h-[400px]">
             <div className="flex items-center justify-between mb-8">
                 <h3 className="text-xl font-bold text-slate-900 tracking-tight">Receita da Semana</h3>
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Última semana</span>
+                <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Última semana</span>
             </div>
             <div className="h-[280px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -33,13 +33,13 @@ export function RevenueBarChart({ data }: RevenueChartProps) {
                             dataKey="day"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }}
+                            tick={{ fill: '#475569', fontSize: 12, fontWeight: 700 }}
                             dy={10}
                         />
                         <YAxis
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }}
+                            tick={{ fill: '#475569', fontSize: 12, fontWeight: 700 }}
                             tickFormatter={(value) => `${value > 0 ? value / 1000 + 'k' : 0}`}
                         />
                         <Tooltip
@@ -95,7 +95,7 @@ export function ServicesDonutChart({ data }: ServicesChartProps) {
                         <div key={item.name} className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                                <span className="text-sm font-medium text-slate-600">{item.name}</span>
+                                <span className="text-sm font-bold text-slate-700">{item.name}</span>
                             </div>
                             <span className="text-sm font-bold text-slate-900">{item.percentage}%</span>
                         </div>
