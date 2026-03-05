@@ -88,7 +88,7 @@ export default function ServicesPage() {
                     </div>
                     <button
                         onClick={() => handleOpenModal()}
-                        className="flex items-center gap-2 px-6 py-3 bg-[#00e676] text-black font-bold text-sm rounded-xl hover:bg-[#00c864] transition-all active:scale-95 shadow-[0_0_20px_rgba(0,230,118,0.15)]"
+                        className="flex items-center gap-2 px-6 py-3 bg-[var(--primary)] text-white font-bold text-sm rounded-xl hover:brightness-110 transition-all active:scale-95 shadow-[0_0_20px_rgba(244,96,37,0.15)]"
                     >
                         <Plus size={18} />
                         <span>Adicionar Serviço</span>
@@ -97,12 +97,12 @@ export default function ServicesPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className="w-8 h-8 border-2 border-[#00e676] border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : services.length === 0 ? (
                     <div className="bg-slate-50 p-16 rounded-[2rem] border-dashed border-2 border-slate-200 text-center">
-                        <div className="w-16 h-16 bg-[#00e676]/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                            <Briefcase size={32} className="text-[#00e676]" />
+                        <div className="w-16 h-16 bg-[var(--primary)]/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <Briefcase size={32} className="text-[var(--primary)]" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">Nenhum serviço cadastrado</h3>
                         <p className="text-slate-600 text-sm font-medium理论 max-w-sm mx-auto mb-8">Cadastre seus serviços para que o Agente IA possa apresentar opções e realizar agendamentos automáticos.</p>
@@ -118,10 +118,10 @@ export default function ServicesPage() {
                         {services.map((service) => (
                             <div
                                 key={service.id}
-                                className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-[#00e676]/30 transition-all group relative hover:shadow-xl hover:-translate-y-1"
+                                className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-[var(--primary)]/30 transition-all group relative hover:shadow-xl hover:-translate-y-1"
                             >
                                 <div className="flex justify-between items-start mb-5">
-                                    <div className="p-3 bg-[#00e676]/10 rounded-xl border border-[#00e676]/20 text-[#00e676] group-hover:bg-[#00e676] group-hover:text-black transition-all">
+                                    <div className="p-3 bg-[var(--primary)]/10 rounded-xl border border-[var(--primary)]/20 text-[var(--primary)] group-hover:bg-[var(--primary)] group-hover:text-white transition-all">
                                         <Briefcase size={20} />
                                     </div>
                                     <div className="flex gap-1">
@@ -143,7 +143,7 @@ export default function ServicesPage() {
                                 </div>
 
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-[#00e676] transition-colors line-clamp-1">{service.name}</h3>
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-[var(--primary)] transition-colors line-clamp-1">{service.name}</h3>
                                     <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2 h-8">{service.description || 'Nenhuma descrição detalhada para este serviço.'}</p>
                                 </div>
 
@@ -151,12 +151,12 @@ export default function ServicesPage() {
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Preço Sugerido</span>
                                         <div className="flex items-baseline gap-1">
-                                            <span className="text-xs text-[#00e676] font-bold">R$</span>
+                                            <span className="text-xs text-[var(--primary)] font-bold">R$</span>
                                             <span className="text-2xl font-bold text-slate-900 tracking-tight">{service.price}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100 text-slate-600">
-                                        <Clock size={12} className="text-[#00e676]" />
+                                        <Clock size={12} className="text-[var(--primary)]" />
                                         <span className="text-[11px] font-bold text-slate-700">{service.duration} min</span>
                                     </div>
                                 </div>
@@ -174,7 +174,7 @@ export default function ServicesPage() {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-8 h-8 bg-[#00e676] rounded-lg flex items-center justify-center text-black">
+                                        <div className="w-8 h-8 bg-[var(--primary)] rounded-lg flex items-center justify-center text-white">
                                             {editingId ? <Edit2 size={16} /> : <Plus size={16} />}
                                         </div>
                                         <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
@@ -197,7 +197,7 @@ export default function ServicesPage() {
                                         required
                                         type="text"
                                         placeholder="Ex: Corte de Cabelo Degradê"
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[var(--primary)]/50 transition-all text-sm font-bold"
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
                                     />
@@ -207,7 +207,7 @@ export default function ServicesPage() {
                                     <div>
                                         <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Preço (R$)</label>
                                         <div className="relative group">
-                                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#00e676] bg-[#00e676]/10 p-1.5 rounded-lg group-focus-within:bg-[#00e676] group-focus-within:text-black transition-all">
+                                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--primary)] bg-[var(--primary)]/10 p-1.5 rounded-lg group-focus-within:bg-[var(--primary)] group-focus-within:text-white transition-all">
                                                 <DollarSign size={12} strokeWidth={3} />
                                             </div>
                                             <input
@@ -215,7 +215,7 @@ export default function ServicesPage() {
                                                 type="number"
                                                 step="0.01"
                                                 placeholder="0.00"
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[var(--primary)]/50 transition-all text-sm font-bold"
                                                 value={formData.price}
                                                 onChange={e => setFormData({ ...formData, price: e.target.value })}
                                             />
@@ -224,14 +224,14 @@ export default function ServicesPage() {
                                     <div>
                                         <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Duração (minutos)</label>
                                         <div className="relative group">
-                                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#00e676] bg-[#00e676]/10 p-1.5 rounded-lg group-focus-within:bg-[#00e676] group-focus-within:text-black transition-all">
+                                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--primary)] bg-[var(--primary)]/10 p-1.5 rounded-lg group-focus-within:bg-[var(--primary)] group-focus-within:text-white transition-all">
                                                 <Clock size={12} strokeWidth={3} />
                                             </div>
                                             <input
                                                 required
                                                 type="number"
                                                 placeholder="60"
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[var(--primary)]/50 transition-all text-sm font-bold"
                                                 value={formData.duration}
                                                 onChange={e => setFormData({ ...formData, duration: e.target.value })}
                                             />
@@ -244,7 +244,7 @@ export default function ServicesPage() {
                                     <div className="relative">
                                         <textarea
                                             placeholder="Descreva detalhes do serviço, diferenciais ou produtos usados. Isso ajuda a IA a vender melhor."
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00e676]/50 transition-all h-28 resize-none text-sm font-bold leading-relaxed"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[var(--primary)]/50 transition-all h-28 resize-none text-sm font-bold leading-relaxed"
                                             value={formData.description}
                                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                                         ></textarea>
@@ -266,7 +266,7 @@ export default function ServicesPage() {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-[2] px-4 py-4 bg-[#00e676] text-black font-bold text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-[#00e676]/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    className="flex-[2] px-4 py-4 bg-[var(--primary)] text-white font-bold text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-[var(--primary)]/20 active:scale-95 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Save size={16} />
                                     <span>{editingId ? 'Salvar Alterações' : 'Cadastrar Serviço'}</span>

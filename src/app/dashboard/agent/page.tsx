@@ -78,7 +78,7 @@ export default function AgentConfig() {
 
     if (loading) return (
         <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-2 border-[#00e676] border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
         </div>
     );
 
@@ -87,7 +87,7 @@ export default function AgentConfig() {
             <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="bg-[#00e676]/10 text-[#00e676] p-2 rounded-lg border border-[#00e676]/20">
+                        <div className="bg-[var(--primary)]/10 text-[var(--primary)] p-2 rounded-lg border border-[var(--primary)]/20">
                             <Brain size={20} />
                         </div>
                         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Configuração do Agente</h1>
@@ -97,7 +97,7 @@ export default function AgentConfig() {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 px-8 py-3.5 bg-[#00e676] text-black font-bold text-sm rounded-xl shadow-xl shadow-[#00e676]/10 hover:brightness-110 transition-all active:scale-95 disabled:opacity-50"
+                    className="flex items-center gap-2 px-8 py-3.5 bg-[var(--primary)] text-white font-bold text-sm rounded-xl shadow-xl shadow-[var(--primary)]/10 hover:brightness-110 transition-all active:scale-95 disabled:opacity-50"
                 >
                     <Save size={18} />
                     <span>{saving ? 'Salvando...' : 'Salvar Alterações'}</span>
@@ -114,7 +114,7 @@ export default function AgentConfig() {
                         <h3 className="text-lg font-bold text-slate-900 tracking-tight">Instruções da IA (Personalidade)</h3>
                     </div>
                     <textarea
-                        className="w-full px-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:outline-none focus:border-[#00e676]/50 h-32 text-sm font-bold leading-relaxed resize-none transition-all placeholder:text-slate-400"
+                        className="w-full px-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:outline-none focus:border-[var(--primary)]/50 h-32 text-sm font-bold leading-relaxed resize-none transition-all placeholder:text-slate-400"
                         placeholder="Ex: Você é um assistente simpático de um salão de beleza..."
                         value={config.personality}
                         onChange={(e) => setConfig({ ...config, personality: e.target.value })}
@@ -139,7 +139,7 @@ export default function AgentConfig() {
                                         <button
                                             key={day.id}
                                             onClick={() => toggleDay(day.id)}
-                                            className={`py-2 text-[10px] font-bold rounded-lg border transition-all ${config.workingDays.includes(day.id) ? 'bg-[#00e676] border-[#00e676] text-black shadow-lg shadow-[#00e676]/10' : 'bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200'}`}
+                                            className={`py-2 text-[10px] font-bold rounded-lg border transition-all ${config.workingDays.includes(day.id) ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/10' : 'bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200'}`}
                                         >
                                             {day.label.substring(0, 3)}
                                         </button>
@@ -152,7 +152,7 @@ export default function AgentConfig() {
                                     <span className="text-[10px] text-slate-400 font-bold uppercase block text-center">Início</span>
                                     <input
                                         type="time"
-                                        className="w-full px-3 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold text-center"
+                                        className="w-full px-3 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:border-[var(--primary)]/50 transition-all text-sm font-bold text-center"
                                         value={config.workingHours.start}
                                         onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, start: e.target.value } })}
                                     />
@@ -161,7 +161,7 @@ export default function AgentConfig() {
                                     <span className="text-[10px] text-slate-400 font-bold uppercase block text-center">Término</span>
                                     <input
                                         type="time"
-                                        className="w-full px-3 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold text-center"
+                                        className="w-full px-3 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:border-[var(--primary)]/50 transition-all text-sm font-bold text-center"
                                         value={config.workingHours.end}
                                         onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, end: e.target.value } })}
                                     />
@@ -183,7 +183,7 @@ export default function AgentConfig() {
                             <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest text-center">Endereço do Estabelecimento</label>
                             <textarea
                                 placeholder="Rua, Número, Bairro, Cidade..."
-                                className="w-full px-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:outline-none focus:border-[#00e676]/50 transition-all text-sm h-32 resize-none leading-relaxed font-bold placeholder:text-slate-400"
+                                className="w-full px-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:outline-none focus:border-[var(--primary)]/50 transition-all text-sm h-32 resize-none leading-relaxed font-bold placeholder:text-slate-400"
                                 value={config.location}
                                 onChange={(e) => setConfig({ ...config, location: e.target.value })}
                             ></textarea>
