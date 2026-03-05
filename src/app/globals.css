@@ -1,32 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050505;
-  --foreground: #ffffff;
+  --background: #000000;
+  --foreground: #f9f9f9;
   --card: #0a0a0a;
   --card-foreground: #ffffff;
   --popover: #0a0a0a;
   --popover-foreground: #ffffff;
-  --primary: #00e676;
-  /* Vibrant Green */
-  --primary-foreground: #000000;
-  --secondary: #004d3d;
-  /* Dark Hero Green */
+  --primary: #f46025;
+  /* Radiant Orange */
+  --primary-foreground: #ffffff;
+  --secondary: #1a0a00;
+  /* Dark Hero Orange/Black */
   --secondary-foreground: #ffffff;
   --muted: #0a0a0a;
   --muted-foreground: #94a3b8;
-  --accent: #00e676;
-  --accent-foreground: #000000;
+  --accent: #f46025;
+  --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 230, 118, 0.1);
-  --input: rgba(0, 230, 118, 0.05);
-  --ring: #00e676;
+  --border: rgba(244, 96, 37, 0.1);
+  --input: rgba(244, 96, 37, 0.05);
+  --ring: #f46025;
   --radius: 0.75rem;
   --black: #000000;
 
   /* Background Hero */
-  --bg-hero: #00332a;
+  --bg-hero: #000000;
 }
 
 @theme inline {
@@ -134,7 +134,7 @@ h6 {
   background: rgba(10, 10, 10, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(219, 237, 23, 0.1);
+  border: 1px solid rgba(244, 96, 37, 0.1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
@@ -142,11 +142,11 @@ h6 {
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(219, 237, 23, 0.05);
+  border: 1px solid rgba(244, 96, 37, 0.05);
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #DBED17 0%, #FFFFFF 100%);
+  background: linear-gradient(135deg, #f46025 0%, #FFFFFF 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

@@ -45,7 +45,7 @@ export function BrandLogo({ size = 'md', showTagline = false }: BrandLogoProps) 
                             fontSize: s.wordmark * 1.1,
                             fontWeight: 400,
                             letterSpacing: '0.5px',
-                            color: '#DBED17',
+                            color: '#f46025',
                         }}
                     >
                         .ai
@@ -57,7 +57,7 @@ export function BrandLogo({ size = 'md', showTagline = false }: BrandLogoProps) 
                         style={{
                             fontSize: s.tagline,
                             fontWeight: 600,
-                            color: '#DBED17',
+                            color: '#f46025',
                             opacity: 0.8,
                             letterSpacing: '0.16em',
                             textTransform: 'uppercase',

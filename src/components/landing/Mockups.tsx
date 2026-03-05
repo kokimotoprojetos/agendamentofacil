@@ -28,7 +28,7 @@ export const ChatMockup = () => {
 
                 {/* User Message */}
                 <div className="flex flex-col items-end w-full">
-                    <div className="max-w-[80%] px-5 py-3 rounded-2xl rounded-tr-none bg-[#00e676] text-black font-medium text-sm leading-relaxed shadow-lg shadow-[#00e676]/20">
+                    <div className="max-w-[80%] px-5 py-3 rounded-2xl rounded-tr-none bg-[#f46025] text-white font-medium text-sm leading-relaxed shadow-lg shadow-[#f46025]/20">
                         Oi! Quero marcar um corte e uma hidratação para sábado de manhã. Tem horário?
                     </div>
                 </div>
@@ -42,15 +42,15 @@ export const ChatMockup = () => {
 
                 {/* User Message */}
                 <div className="flex flex-col items-end w-full">
-                    <div className="max-w-[80%] px-5 py-3 rounded-2xl rounded-tr-none bg-[#00e676] text-black font-medium text-sm leading-relaxed shadow-lg shadow-[#00e676]/20">
+                    <div className="max-w-[80%] px-5 py-3 rounded-2xl rounded-tr-none bg-[#f46025] text-white font-medium text-sm leading-relaxed shadow-lg shadow-[#f46025]/20">
                         Pode ser às 09:00h!
                     </div>
                 </div>
 
                 {/* Confirmation Card */}
-                <div className="mt-8 border border-[#00e676]/30 bg-[#00e676]/5 rounded-2xl p-5 flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-[#00e676] flex items-center justify-center shrink-0">
-                        <svg className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="mt-8 border border-[#f46025]/30 bg-[#f46025]/5 rounded-2xl p-5 flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-full bg-[#f46025] flex items-center justify-center shrink-0">
+                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
@@ -74,9 +74,9 @@ export const DashboardMockup = () => {
                     <div className="text-[10px] font-bold text-white/70 uppercase tracking-[0.2em] mb-1">Visão Geral</div>
                     <div className="text-lg font-medium text-white">Desempenho do seu salão hoje</div>
                 </div>
-                <div className="px-3 py-1 rounded-full bg-[#00e676]/10 border border-[#00e676]/20 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#00e676] animate-pulse" />
-                    <span className="text-[10px] font-bold text-[#00e676] uppercase tracking-wider">Sistemas Ativos</span>
+                <div className="px-3 py-1 rounded-full bg-[#f46025]/10 border border-[#f46025]/20 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#f46025] animate-pulse" />
+                    <span className="text-[10px] font-bold text-[#f46025] uppercase tracking-wider">Sistemas Ativos</span>
                 </div>
             </div>
 
@@ -90,7 +90,7 @@ export const DashboardMockup = () => {
                     <div key={i} className="bg-white/5 border border-white/5 rounded-xl p-4">
                         <div className="flex items-center justify-between mb-3 text-white/70">
                             <div className="text-lg">{stat.icon}</div>
-                            <div className="text-[10px] font-bold text-[#00e676]">{stat.growth}</div>
+                            <div className="text-[10px] font-bold text-[#f46025]">{stat.growth}</div>
                         </div>
                         <div className="text-[10px] font-bold text-white/70 uppercase tracking-wider">{stat.label}</div>
                         <div className="text-xl font-bold text-white mt-1">{stat.val}</div>
@@ -101,11 +101,11 @@ export const DashboardMockup = () => {
             <div className="bg-white/5 border border-white/5 rounded-xl p-5">
                 <div className="flex items-center justify-between mb-4">
                     <div className="text-[10px] font-bold text-white/70 uppercase tracking-wider">Atividade Recente</div>
-                    <div className="text-[10px] font-bold text-[#00e676] uppercase tracking-wider cursor-pointer" aria-label="Ver Agenda">Ver Agenda</div>
+                    <div className="text-[10px] font-bold text-[#f46025] uppercase tracking-wider cursor-pointer" aria-label="Ver Agenda">Ver Agenda</div>
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-emerald-900/40 flex items-center justify-center font-bold text-emerald-400 text-xs">MA</div>
+                        <div className="w-10 h-10 rounded-full bg-orange-900/40 flex items-center justify-center font-bold text-orange-400 text-xs">MA</div>
                         <div>
                             <div className="text-sm font-bold text-white">Mariana Almeida</div>
                             <div className="text-[10px] text-white/70 uppercase tracking-tight">Corte + Escova • Hoje às 15:30</div>
@@ -132,7 +132,7 @@ export const ChatListMockup = () => {
                     { name: 'Carla Ferreira', msg: 'Obrigada pelo atendimento!', time: 'Ontem' },
                     { name: 'Beatriz Lima', msg: 'Vou me atrasar 5 min', time: 'Ontem' },
                 ].map((chat, i) => (
-                    <div key={i} className={`p-4 border-b border-white/5 cursor-pointer ${chat.active ? 'bg-[#00e676]/5 border-l-2 border-l-[#00e676]' : ''}`}>
+                    <div key={i} className={`p-4 border-b border-white/5 cursor-pointer ${chat.active ? 'bg-[#f46025]/5 border-l-2 border-l-[#f46025]' : ''}`}>
                         <div className="flex items-center justify-between mb-1">
                             <span className="text-xs font-bold text-white leading-none">{chat.name}</span>
                             <span className="text-[9px] text-white/30">{chat.time}</span>
@@ -147,19 +147,19 @@ export const ChatListMockup = () => {
                 <div className="p-4 border-b border-white/5 flex items-center justify-between">
                     <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Juliana Silva</span>
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00e676]" />
-                        <span className="text-[9px] font-bold text-[#00e676] uppercase">IA Online</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#f46025]" />
+                        <span className="text-[9px] font-bold text-[#f46025] uppercase">IA Online</span>
                     </div>
                 </div>
                 <div className="flex-1 p-6 space-y-4 overflow-y-auto">
                     <div className="max-w-[85%] bg-white/5 border border-white/5 rounded-xl p-3 text-[11px] text-white/80 leading-relaxed">
                         Olá Juliana! Vi que você tem interesse em fazer **Coloração**. Temos vaga para amanhã às 10h com a nossa especialista. Pode ser?
                     </div>
-                    <div className="ml-auto max-w-[85%] bg-[#00e676] rounded-xl p-3 text-[11px] text-black font-medium leading-relaxed">
+                    <div className="ml-auto max-w-[85%] bg-[#f46025] rounded-xl p-3 text-[11px] text-white font-medium leading-relaxed">
                         Sim, perfeito! Pode marcar para mim. Qual o valor aproximado?
                     </div>
-                    <div className="max-w-[85%] bg-emerald-900/10 border border-[#00e676]/20 rounded-xl p-3">
-                        <div className="text-[9px] font-bold text-[#00e676] mb-1 flex items-center gap-1">
+                    <div className="max-w-[85%] bg-orange-900/10 border border-[#f46025]/20 rounded-xl p-3">
+                        <div className="text-[9px] font-bold text-[#f46025] mb-1 flex items-center gap-1">
                             <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                             </svg>
@@ -201,9 +201,9 @@ export const CalendarMockup = () => {
                         return (
                             <div key={i} className="relative py-1 flex items-center justify-center">
                                 {isToday && (
-                                    <div className="absolute w-8 h-8 rounded-lg bg-[#00e676] shadow-lg shadow-[#00e676]/30" />
+                                    <div className="absolute w-8 h-8 rounded-lg bg-[#f46025] shadow-lg shadow-[#f46025]/30" />
                                 )}
-                                <span className={`relative z-10 text-xs font-bold ${isToday ? 'text-black' : 'text-white/60'}`}>
+                                <span className={`relative z-10 text-xs font-bold ${isToday ? 'text-white' : 'text-white/60'}`}>
                                     {day}
                                 </span>
                                 {day > 22 && day < 30 && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-red-500/40" />}
@@ -223,7 +223,7 @@ export const CalendarMockup = () => {
                         { time: '15:30', name: 'Mariana A.', service: 'ESCOVA' },
                     ].map((item, i) => (
                         <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/5">
-                            <div className="text-[10px] font-bold text-[#00e676] leading-none mb-1">{item.time}</div>
+                            <div className="text-[10px] font-bold text-[#f46025] leading-none mb-1">{item.time}</div>
                             <div className="text-xs font-bold text-white leading-none mb-1">{item.name}</div>
                             <div className="text-[9px] text-white/70 uppercase tracking-tight">{item.service}</div>
                         </div>
@@ -243,7 +243,7 @@ export const ServicesMockup = () => {
                     <div className="text-[10px] font-bold text-white/70 uppercase tracking-[0.2em] mb-1">Catálogo de Serviços</div>
                     <div className="text-sm font-medium text-white/60">Gerencie seus tratamentos e preços</div>
                 </div>
-                <div className="px-4 py-2 rounded-full bg-[#00e676] text-black text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 hover:brightness-110 transition-all cursor-pointer">
+                <div className="px-4 py-2 rounded-full bg-[#f46025] text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 hover:brightness-110 transition-all cursor-pointer">
                     <span className="text-sm">+</span> Adicionar Serviço
                 </div>
             </div>

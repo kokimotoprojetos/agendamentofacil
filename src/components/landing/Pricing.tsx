@@ -16,10 +16,10 @@ export const Pricing = () => {
                     {plans.map((plan: any, index: number) => (
                         <div
                             key={index}
-                            className={`relative glass p-10 rounded-[2.5rem] border-white/5 flex flex-col transition-all hover:-translate-y-2 ${index === 1 ? 'border-indigo-500/30 shadow-2xl shadow-indigo-500/10 scale-105 z-10' : ''}`}
+                            className={`relative glass p-10 rounded-[2.5rem] border-white/5 flex flex-col transition-all hover:-translate-y-2 ${index === 1 ? 'border-orange-500/30 shadow-2xl shadow-orange-500/10 scale-105 z-10' : ''}`}
                         >
                             {index === 1 && (
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1.5 bg-indigo-600 rounded-full text-xs font-bold text-white tracking-widest uppercase">
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1.5 bg-orange-600 rounded-full text-xs font-bold text-white tracking-widest uppercase">
                                     Mais Popular
                                 </div>
                             )}
@@ -33,7 +33,7 @@ export const Pricing = () => {
                             <ul className="space-y-4 mb-10 flex-1">
                                 {plan.features.map((feature: string, fIndex: number) => (
                                     <li key={fIndex} className="flex items-center gap-3 text-slate-300 text-sm">
-                                        <div className="w-5 h-5 rounded-full bg-indigo-600/20 flex items-center justify-center text-indigo-400 shrink-0">
+                                        <div className="w-5 h-5 rounded-full bg-orange-600/20 flex items-center justify-center text-orange-400 shrink-0">
                                             ✓
                                         </div>
                                         {feature}
@@ -43,7 +43,7 @@ export const Pricing = () => {
 
                             <a
                                 href="/register"
-                                className={`w-full py-4 rounded-2xl font-bold text-center transition-all ${index === 1 ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20' : 'bg-white/5 text-white hover:bg-white/10 border border-white/5'}`}
+                                className={`w-full py-4 rounded-2xl font-bold text-center transition-all ${index === 1 ? 'bg-orange-600 text-white hover:bg-orange-500 shadow-lg shadow-orange-500/20' : 'bg-white/5 text-white hover:bg-white/10 border border-white/5'}`}
                             >
                                 Assinar Agora
                             </a>
