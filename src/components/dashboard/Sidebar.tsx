@@ -45,7 +45,14 @@ export function Sidebar() {
     return (
         <aside className="fixed left-0 top-0 h-screen w-20 lg:w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-50 overflow-hidden transition-all duration-300">
             <div className="p-4 lg:p-8 flex justify-center lg:justify-start">
-                <BrandLogo size="sm" hideText light />
+                <div className="hidden lg:flex items-baseline gap-1">
+                    <span className="text-xl font-extrabold text-white tracking-tight">Beautfy</span>
+                    <span className="text-xl font-bebas text-[var(--primary)] tracking-wider">.ai</span>
+                </div>
+                {/* Mobile / Collapsed view: Show just a stylized 'B' instead of the complex logo */}
+                <div className="lg:hidden w-10 h-10 bg-gradient-to-br from-[var(--primary)] to-[#ff8c5a] rounded-xl flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
+                    <span className="text-white font-black text-xl">B</span>
+                </div>
             </div>
 
             <nav className="flex-1 px-3 lg:px-4 space-y-2 overflow-y-auto scrollbar-hide py-4">
