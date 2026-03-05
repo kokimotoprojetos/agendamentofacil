@@ -48,16 +48,24 @@ export const authOptions: AuthOptions = {
                     .eq("email", normalizedEmail)
                     .single();
 
-                if (error || !user || !user.password) {
-                    throw new Error("Usuário não encontrado ou senha não configurada");
+                if (error || !user) {
+                    console.error("[auth] User not found:", normalizedEmail, error?.message);
+                    throw new Error("Usuário não encontrado");
+                }
+
+                if (!user.password) {
+                    console.error("[auth] User has no password (likely OAuth user):", normalizedEmail);
+                    throw new Error("Use o login com Google para esta conta");
                 }
 
                 const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
 
                 if (!isPasswordValid) {
+                    console.error("[auth] Invalid password for:", normalizedEmail);
                     throw new Error("Senha incorreta");
                 }
 
+                console.log("[auth] ✅ Credentials login successful for:", normalizedEmail);
                 return {
                     id: user.id,
                     email: user.email,
@@ -66,17 +74,23 @@ export const authOptions: AuthOptions = {
             }
         }),
     ],
-    adapter: isSupabaseConfigured
-        ? SupabaseAdapter({
-            url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-            schema: 'public',
-        } as any)
-        : undefined,
+    // NOTE: Do NOT use adapter with CredentialsProvider — they are incompatible.
+    // The SupabaseAdapter expects users to be created via OAuth/Email magic link,
+    // but our register API inserts directly into public.users.
+    // When adapter is present, NextAuth tries adapter.getUserByAccount() after
+    // authorize() returns, which fails for credentials users (no accounts row).
+    // Only enable adapter if you disable CredentialsProvider.
     session: {
         strategy: "jwt" as const,
     },
     callbacks: {
+        async signIn({ user, account }: any) {
+            // Always allow credentials and OAuth sign-ins
+            if (account?.provider === "credentials" || account?.provider === "google") {
+                return true;
+            }
+            return true;
+        },
         async jwt({ token, user }: any) {
             if (user) {
                 token.id = user.id;
@@ -94,4 +108,5 @@ export const authOptions: AuthOptions = {
         signIn: '/login',
     },
     secret: process.env.NEXTAUTH_SECRET,
+    debug: process.env.NODE_ENV === 'development',
 };
