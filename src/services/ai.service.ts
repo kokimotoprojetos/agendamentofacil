@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { paymentService } from '@/services/payment.service';
 
 let _openai: OpenAI | null = null;
 function getOpenAI(): OpenAI {
@@ -187,8 +186,6 @@ export const aiAgentService = {
       const convCtx = (conversation.context as any) || {};
       const pendingBooking: BookingExtract | null = convCtx.pending_booking || null;
       const pendingCancellation: CancellationCtx | null = convCtx.pending_cancellation || null;
-      const awaitingPayment = convCtx.awaiting_payment === true;
-      const pendingPaymentData = convCtx.pending_payment_data || null;
 
       // Detect state from last bot message in history (crash-resistant)
       const lastBotContent = [...chatHistory].reverse().find(m => m.role === 'assistant')?.content || '';
@@ -198,13 +195,10 @@ export const aiAgentService = {
         (lastBotContent.toLowerCase().includes('cancelar') && lastBotContent.toLowerCase().includes('confirma'));
       const historyShowsAwaitingBooking =
         lastBotContent.includes('Posso confirmar') || lastBotContent.includes('Confirma') && lastBotContent.includes('Agendamento');
-      const historyShowsAwaitingPayment =
-        lastBotContent.includes('pagar agora via PIX') || lastBotContent.includes('pagamento via PIX');
 
       // Merge context flags with conversation history evidence
       const awaitingCancellation = convCtx.awaiting_cancellation === true || historyShowsAwaitingCancellation;
       const awaitingConfirmation = (convCtx.awaiting_confirmation === true || historyShowsAwaitingBooking) && !!pendingBooking;
-      const isAwaitingPayment = awaitingPayment || historyShowsAwaitingPayment;
 
       let aiResponse = '';
       let updatedCtx = { ...convCtx };
@@ -255,19 +249,11 @@ export const aiAgentService = {
               ? new Date(pendingBooking.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
               : '';
             const firstName = pendingBooking.customer_name?.split(' ')[0] || '';
-            // Ask about payment
-            aiResponse = `agendado ${firstName}! te espero ${dateFormatted} às ${pendingBooking.time} pra ${pendingBooking.service_name} 😊\n\nVocê gostaria de pagar agora via PIX? 💰`;
+            aiResponse = `agendado ${firstName}! te espero ${dateFormatted} às ${pendingBooking.time} pra ${pendingBooking.service_name} 😊`;
             updatedCtx = {
               ...updatedCtx,
               awaiting_confirmation: false,
               pending_booking: null,
-              awaiting_payment: true,
-              pending_payment_data: {
-                appointmentId: bookingResult.appointmentId,
-                serviceName: pendingBooking.service_name,
-                price: bookingResult.price,
-                customerName: pendingBooking.customer_name || firstName,
-              },
             };
           } else {
             aiResponse = 'hmm deu um probleminha aqui, tenta de novo?';
@@ -281,50 +267,6 @@ export const aiAgentService = {
             'O cliente recusou ou quer alterar o agendamento. Pergunte o que ele gostaria de mudar.',
           );
         }
-
-        // ── A1: Awaiting payment confirmation ──────────────────────────────────────
-      } else if (isAwaitingPayment && pendingPaymentData) {
-        const wantsPayment = /^(sim|s|pode|quero|pagar|pix|ok|yes|claro|vai|bora)/i.test(messageText.trim());
-        const confirmed = wantsPayment || await this.checkConfirmation(messageText);
-
-        if (confirmed && pendingPaymentData.price > 0) {
-          console.log(`[payment] Generating PIX billing for appointment ${pendingPaymentData.appointmentId}`);
-          const cleanPhone = customerPhone.replace(/@s\.whatsapp\.net|@g\.us/g, '').replace(/\\D+$/, '');
-          const billing = await paymentService.createBilling({
-            serviceName: pendingPaymentData.serviceName || 'Serviço',
-            price: Math.round(pendingPaymentData.price * 100), // convert to cents
-            customerName: pendingPaymentData.customerName || 'Cliente',
-            customerPhone: cleanPhone,
-            appointmentId: pendingPaymentData.appointmentId,
-          });
-
-          if (billing) {
-            // Save payment info to appointment
-            await supabaseAdmin
-              .from('appointments')
-              .update({
-                payment_id: billing.id,
-                payment_url: billing.url,
-                payment_status: 'pending',
-              })
-              .eq('id', pendingPaymentData.appointmentId);
-
-            aiResponse = `Aqui está o link pra pagamento via PIX 💰\n\n🔗 ${billing.url}\n\nValor: R$ ${(pendingPaymentData.price).toFixed(2).replace('.', ',')}\n\nApós o pagamento, vou te confirmar automaticamente! ✅`;
-          } else {
-            aiResponse = 'Ops, tive um probleminha pra gerar o pagamento. Mas seu agendamento já está reservado! Você pode pagar presencialmente no dia 😉';
-          }
-        } else {
-          // Customer declined payment or service is free
-          aiResponse = 'Sem problemas! Seu agendamento já está confirmado ✅ Você pode pagar no dia. Nos vemos lá! 😊';
-          // Update appointment to scheduled (skip payment)
-          if (pendingPaymentData.appointmentId) {
-            await supabaseAdmin
-              .from('appointments')
-              .update({ status: 'scheduled', payment_status: 'none' })
-              .eq('id', pendingPaymentData.appointmentId);
-          }
-        }
-        updatedCtx = { ...updatedCtx, awaiting_payment: false, pending_payment_data: null };
 
       } else {
         // ── B: Normal conversation — LLM drives ─────────────────────────────────
@@ -690,8 +632,7 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
         customer_phone: cleanPhone,
         start_time: startTime,
         end_time: endTime,
-        status: 'pending_payment',
-        payment_status: 'pending',
+        status: 'scheduled',
         notes: `Agendado via WhatsApp. Serviço: ${booking.service_name}`,
       };
       console.log(`[booking] Inserting appointment:`, JSON.stringify(insertData));
