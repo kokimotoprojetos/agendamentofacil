@@ -70,12 +70,24 @@ export default function WhatsAppPage() {
         try {
             const res = await fetch('/api/whatsapp/connect', { method: 'POST' });
             const data = await res.json();
-            if (data.qrcode) {
-                setQrCode(data.qrcode);
+            console.log('Connect API response:', data);
+
+            const qrStr = data.base64 || data.qrcode?.base64 || data.qrcode;
+
+            if (qrStr && typeof qrStr === 'string' && qrStr.startsWith('data:image')) {
+                setQrCode(qrStr);
             } else if (data.error) {
                 setError(data.error);
+            } else {
+                console.warn('QR Code não recebido no formato esperado:', data);
+                // Às vezes a Evolution API muda o nome do campo dependendo da versão
+                if (data.code) {
+                    // Tentativa de usar fallback se tiver apenas o codigo raw
+                    setError('O WhatsApp está iniciando. Tente "Gerar QR Code" novamente em 5 segundos.');
+                }
             }
-        } catch {
+        } catch (err) {
+            console.error('Failed to connect:', err);
             setError('Erro ao gerar QR Code');
         } finally {
             setActionLoading(null);
