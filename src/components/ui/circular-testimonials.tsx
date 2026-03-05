@@ -62,9 +62,9 @@ export const CircularTestimonials = ({
     const colorName = colors.name ?? "#0f172a";
     const colorDesignation = colors.designation ?? "#64748b";
     const colorTestimony = colors.testimony ?? "#475569";
-    const colorArrowBg = colors.arrowBackground ?? "#4f46e5";
+    const colorArrowBg = colors.arrowBackground ?? "#f46025";
     const colorArrowFg = colors.arrowForeground ?? "#ffffff";
-    const colorArrowHoverBg = colors.arrowHoverBackground ?? "#4338ca";
+    const colorArrowHoverBg = colors.arrowHoverBackground ?? "#ff8c5a";
     const fontSizeName = fontSizes.name ?? "1.875rem";
     const fontSizeDesignation = fontSizes.designation ?? "1rem";
     const fontSizeQuote = fontSizes.quote ?? "1.125rem";
@@ -189,7 +189,7 @@ export const CircularTestimonials = ({
                             key={testimonial.src}
                             src={testimonial.src}
                             alt={testimonial.name}
-                            className="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl shadow-indigo-500/10 border border-white/20"
+                            className="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl shadow-indigo-500/10 border border-slate-200"
                             style={getImageStyle(index)}
                         />
                     ))}
@@ -223,7 +223,7 @@ export const CircularTestimonials = ({
                             </div>
 
                             <motion.p
-                                className="leading-relaxed font-medium bg-white/40 p-6 rounded-2xl border border-white/60 backdrop-blur-sm"
+                                className="leading-relaxed font-medium bg-slate-50 p-6 rounded-2xl border border-slate-200"
                                 style={{ color: colorTestimony, fontSize: fontSizeQuote }}
                             >
                                 {activeTestimonial.quote.split(" ").map((word, i) => (

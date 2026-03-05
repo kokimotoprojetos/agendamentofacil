@@ -11,7 +11,7 @@ export const Footer = () => {
                             <BrandLogo size="md" showTagline />
                         </div>
 
-                        <p className="max-w-sm text-slate-600 leading-relaxed font-medium text-lg">
+                        <p className="max-w-sm text-slate-700 leading-relaxed font-medium text-lg">
                             A tecnologia de inteligência artificial que humaniza o atendimento do seu salão e escala seu faturamento no piloto automático.
                         </p>
                     </div>
@@ -33,7 +33,7 @@ export const Footer = () => {
                     </div>
                 </div>
                 <div className="pt-12 mt-16 border-t border-slate-100 text-center">
-                    <p className="text-sm text-slate-400 font-medium">
+                    <p className="text-sm text-slate-500 font-medium">
                         © {new Date().getFullYear()} Beautfy.ai. Todos os direitos reservados.
                     </p>
                 </div>

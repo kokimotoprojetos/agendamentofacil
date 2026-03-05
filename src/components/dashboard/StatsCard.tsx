@@ -1,10 +1,13 @@
-import { GlowingEffect } from '@/components/ui/glowing-effect';
+'use client';
+
+import React from 'react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 interface StatsCardProps {
     label: string;
     value: string;
     icon: React.ReactNode;
-    color: string;
+    color: 'indigo' | 'blue' | 'emerald' | 'rose' | 'orange';
     trend?: {
         value: string;
         positive: boolean;
@@ -12,39 +15,41 @@ interface StatsCardProps {
 }
 
 export const StatsCard = ({ label, value, icon, color, trend }: StatsCardProps) => {
-    const colorMap: { [key: string]: string } = {
-        indigo: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
-        blue: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
-        emerald: 'text-[#00e676] bg-[#00e676]/10 border-[#00e676]/20',
-        rose: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
+    const colorConfigs = {
+        indigo: 'bg-indigo-50 border-indigo-100 text-indigo-600',
+        blue: 'bg-blue-50 border-blue-100 text-blue-600',
+        emerald: 'bg-emerald-50 border-emerald-100 text-emerald-600',
+        rose: 'bg-rose-50 border-rose-100 text-rose-600',
+        orange: 'bg-orange-50 border-orange-100 text-orange-600',
+    };
+
+    const iconBg = {
+        indigo: 'bg-indigo-500/10',
+        blue: 'bg-blue-500/10',
+        emerald: 'bg-emerald-500/10',
+        rose: 'bg-rose-500/10',
+        orange: 'bg-orange-500/10',
     };
 
     return (
-        <div className="relative bg-white p-6 rounded-3xl border border-slate-200 transition-all duration-300 hover:border-slate-300 hover:shadow-lg group">
-            <GlowingEffect
-                spread={40}
-                glow={true}
-                disabled={false}
-                proximity={64}
-                inactiveZone={0.01}
-            />
-            <div className="flex items-center justify-between mb-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${colorMap[color] || 'text-slate-400 bg-slate-50'}`}>
-                    {icon}
+        <div className={`p-8 rounded-[2.5rem] border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white border-slate-200`}>
+            <div className="flex items-center justify-between mb-8">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${iconBg[color] || 'bg-slate-50'} ${colorConfigs[color].split(' ')[2]}`}>
+                    {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { size: 28 }) : icon}
                 </div>
                 {trend && (
-                    <div className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full ${trend.positive ? 'bg-[#00e676]/10 text-[#00e676]' : 'bg-rose-500/10 text-rose-400'}`}>
-                        <span>{trend.positive ? '▲' : '▼'}</span>
-                        <span>{trend.value}</span>
+                    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${trend.positive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {trend.positive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                        <span>{trend.positive ? '+' : ''}{trend.value}</span>
                     </div>
                 )}
             </div>
 
-            <div className="relative z-10">
-                <p className="text-xs text-slate-500 font-medium mb-1">{label}</p>
-                <h3 className="text-2xl font-bold text-slate-900 tabular-nums tracking-tight">
+            <div className="space-y-1">
+                <h3 className="text-4xl font-bold text-slate-900 tracking-tight">
                     {value}
                 </h3>
+                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{label}</p>
             </div>
         </div>
     );

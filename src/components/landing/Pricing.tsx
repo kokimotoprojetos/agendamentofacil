@@ -9,7 +9,7 @@ export const Pricing = () => {
             <div className="container px-4 mx-auto">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold mb-4 text-gradient">Planos que cabem no seu bolso</h2>
-                    <p className="text-slate-400">Escolha o plano perfeito para o momento do seu negócio.</p>
+                    <p className="text-slate-500">Escolha o plano perfeito para o momento do seu negócio.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -27,7 +27,7 @@ export const Pricing = () => {
                             <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
                             <div className="flex items-baseline gap-1 mb-8">
                                 <span className="text-4xl font-bold text-slate-900">R$ {plan.price}</span>
-                                <span className="text-slate-500 text-sm">/{plan.interval === 'month' ? 'mês' : 'ano'}</span>
+                                <span className="text-slate-600 text-sm">/{plan.interval === 'month' ? 'mês' : 'ano'}</span>
                             </div>
 
                             <ul className="space-y-4 mb-10 flex-1">

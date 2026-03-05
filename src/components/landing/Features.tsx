@@ -28,7 +28,7 @@ const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }
                         <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
                             {title} <span className="text-[var(--primary)]">{highlight}</span>
                         </h2>
-                        <p className="text-lg text-slate-600 mb-10 leading-relaxed">
+                        <p className="text-lg text-slate-700 mb-10 leading-relaxed">
                             {description}
                         </p>
                         <a href="#details" className="inline-flex items-center gap-2 text-sm font-bold text-slate-900 hover:text-[var(--primary)] transition-colors group">
@@ -100,7 +100,7 @@ export const Features = () => {
                 icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                 title="Deixe de reagir e"
                 highlight="comece a responder"
-                description="Nossa IA não apenas responde, ela converte. Ela identifica oportunidades de agendamento e faz o follow-up automático com seis clientes."
+                description="Nossa IA não apenas responde, ela converte. Ela identifica oportunidades de agendamento e faz o follow-up automático com seus clientes."
                 mockup={<ServicesMockup />}
             />
         </div>

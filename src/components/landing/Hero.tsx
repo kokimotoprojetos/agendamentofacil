@@ -43,7 +43,7 @@ export const Hero = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
-                        className="text-lg md:text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed"
+                        className="text-lg md:text-xl text-slate-700 mb-12 max-w-2xl mx-auto leading-relaxed"
                     >
                         Automatize seus agendamentos no WhatsApp com um agente de IA inteligente que entende seu negócio e atende seus clientes 24 horas por dia.
                     </motion.p>
