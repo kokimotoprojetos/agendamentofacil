@@ -88,6 +88,23 @@ export async function POST(req: Request) {
     }
 
     const customerPhone = key?.remoteJid;
+    const messageId = key?.id;
+
+    // ── 4. Deduplication ────────────────────────────────────────────────────
+    if (messageId) {
+      const { error: dedupError } = await supabaseAdmin
+        .from('processed_webhooks')
+        .insert({ id: messageId });
+
+      if (dedupError) {
+        // If error code is 23505 (unique_violation), it means we already processed this
+        if (dedupError.code === '23505') {
+          console.log(`[webhook] Duplicate message detected: ${messageId} — skipping.`);
+          return NextResponse.json({ status: 'ignored', reason: 'duplicate' });
+        }
+        console.error('[webhook] Deduplication error:', dedupError);
+      }
+    }
 
     // ── Detect message type ──────────────────────────────────────────────────
     const audioMessage = data?.message?.audioMessage;
