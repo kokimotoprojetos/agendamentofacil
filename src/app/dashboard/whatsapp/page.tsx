@@ -27,6 +27,7 @@ type InstanceInfo = {
 export default function WhatsAppPage() {
     const [instanceInfo, setInstanceInfo] = useState<InstanceInfo>(null);
     const [qrCode, setQrCode] = useState<string | null>(null);
+    const [qrTimestamp, setQrTimestamp] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -37,17 +38,29 @@ export default function WhatsAppPage() {
             const data = await res.json();
 
             if (res.ok) {
-                // API returns { status: "open"|"close"|..., details: { instance: {...} } }
                 const details = data.details?.instance || {};
+                const newState = (data.status || 'unknown') as ConnectionState;
+
                 setInstanceInfo({
                     instanceName: details.instanceName || '',
                     owner: details.owner || '',
                     profileName: details.profileName || details.profilePicUrl ? details.profileName : '',
                     profilePictureUrl: details.profilePicUrl || undefined,
-                    state: (data.status || 'unknown') as ConnectionState,
+                    state: newState,
                 });
+
                 setError(null);
-                if (data.status === 'open') setQrCode(null);
+
+                // Se conectar, limpa o QR Code
+                if (newState === 'open') {
+                    setQrCode(null);
+                    setQrTimestamp(null);
+                }
+                // Se o QR Code existir e estiver expirado (55s), regera automaticamente
+                else if (qrCode && qrTimestamp && Date.now() - qrTimestamp > 55000 && newState !== 'connecting') {
+                    console.log('QR Code expirado, regenerando...');
+                    handleConnect();
+                }
             } else {
                 setError(data.error || 'Erro ao buscar status');
             }
@@ -56,7 +69,7 @@ export default function WhatsAppPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [qrCode, qrTimestamp]); // Adicionado dependências para o cheque de expiração
 
     useEffect(() => {
         fetchStatus();
@@ -76,6 +89,7 @@ export default function WhatsAppPage() {
 
             if (qrStr && typeof qrStr === 'string' && qrStr.startsWith('data:image')) {
                 setQrCode(qrStr);
+                setQrTimestamp(Date.now());
             } else if (data.error) {
                 setError(data.error);
             } else {
