@@ -15,16 +15,69 @@ export async function POST(req: Request) {
       metadata: { fullBody: body }
     });
 
-    // Handle MESSAGES_UPSERT event from Evolution API
-    const isUpsert = body.event === 'messages.upsert' ||
-      body.event === 'MESSAGES_UPSERT' ||
-      body.type === 'messages.upsert';
+    const { instance, data } = body;
+    const event = body.event || body.type || 'unknown';
 
-    if (!isUpsert) {
-      return NextResponse.json({ status: 'received', reason: 'not_a_message_event' });
+    // ── 1. Resolve Tenant from Instance Name Early ───────────────────────────
+    const { data: connection, error: connError } = await supabaseAdmin
+      .from('whatsapp_connections')
+      .select('tenant_id')
+      .eq('instance_name', instance)
+      .single();
+
+    const tenantId = connection?.tenant_id ? String(connection.tenant_id) : null;
+
+    // ── 2. Handle Connection Updates (Status/QR) ─────────────────────────────
+    if (event === 'connection.update' || event === 'CONNECTION_UPDATE') {
+      const state = data?.state || data?.status;
+      const statusReason = data?.statusReason;
+
+      await supabaseAdmin.from('agent_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'connection_update',
+        description: `Conexão ${instance}: ${state} (Razão: ${statusReason})`,
+        metadata: { instance, state, data }
+      });
+
+      if (state) {
+        await supabaseAdmin.from('whatsapp_connections')
+          .update({
+            status: state === 'open' ? 'connected' : (state === 'connecting' ? 'connecting' : 'disconnected'),
+            updated_at: new Date().toISOString()
+          })
+          .eq('instance_name', instance);
+      }
+      return NextResponse.json({ status: 'received' });
     }
 
-    const { instance, data } = body;
+    if (event === 'qrcode.updated' || event === 'QRCODE_UPDATED') {
+      const qrcode = data?.qrcode?.code || data?.code;
+
+      await supabaseAdmin.from('agent_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'qrcode_updated',
+        description: `QR Code atualizado para ${instance}`,
+        metadata: { instance }
+      });
+
+      if (qrcode) {
+        await supabaseAdmin.from('whatsapp_connections')
+          .update({
+            qr_code: qrcode,
+            status: 'disconnected',
+            updated_at: new Date().toISOString()
+          })
+          .eq('instance_name', instance);
+      }
+      return NextResponse.json({ status: 'received' });
+    }
+
+    // ── 3. Handle MESSAGES_UPSERT — Final Guard ──────────────────────────────
+    const isUpsert = event === 'messages.upsert' || event === 'MESSAGES_UPSERT';
+
+    if (!isUpsert) {
+      return NextResponse.json({ status: 'received', reason: 'unhandled_event' });
+    }
 
     // Evolution API v2: key and message are directly under data
     const key = data?.key;
@@ -64,12 +117,14 @@ export async function POST(req: Request) {
           messageText = await aiAgentService.transcribeAudio(audioBuffer, mimeType);
 
           await supabaseAdmin.from('agent_logs').insert({
+            tenant_id: tenantId,
             event_type: 'audio_transcribed',
             description: `Áudio de ${customerPhone} transcrito: "${messageText.substring(0, 80)}"`,
             metadata: { customerPhone, audioSize: audioBuffer.length, mimeType, transcription: messageText }
           });
         } else {
           await supabaseAdmin.from('agent_logs').insert({
+            tenant_id: tenantId,
             event_type: 'audio_download_failed',
             description: `Falha ao baixar áudio de ${customerPhone} — sem base64`,
             metadata: { customerPhone, messageId }
@@ -106,6 +161,7 @@ export async function POST(req: Request) {
     }
 
     await supabaseAdmin.from('agent_logs').insert({
+      tenant_id: tenantId,
       event_type: 'webhook_parsed',
       description: `${isAudio ? '🎤 Áudio' : '💬 Texto'} de ${pushName || customerPhone}: "${messageText.substring(0, 50)}"`,
       metadata: { customerPhone, pushName, messageText, instance, isAudio, profilePicUrl }
@@ -115,14 +171,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: 'ignored', reason: isAudio ? 'transcription_failed' : 'invalid_payload' });
     }
 
-    // 1. Resolve Tenant from Instance Name
-    const { data: connection, error: connError } = await supabaseAdmin
-      .from('whatsapp_connections')
-      .select('tenant_id')
-      .eq('instance_name', instance)
-      .single();
-
-    if (connError || !connection) {
+    if (!tenantId) {
       await supabaseAdmin.from('agent_logs').insert({
         event_type: 'webhook_error',
         description: `Tenant não encontrado para a instância: ${instance}`,
@@ -130,8 +179,6 @@ export async function POST(req: Request) {
       });
       return NextResponse.json({ status: 'error', message: 'Tenant not found' }, { status: 404 });
     }
-
-    const tenantId = String(connection.tenant_id);
 
     // 2. Fetch Tenant Context
     const { data: tenant } = await supabaseAdmin
@@ -192,12 +239,12 @@ export async function POST(req: Request) {
 
     // 4. Send Response via WhatsApp
     try {
-      await whatsappService.sendMessage(instance, customerPhone, aiResponse);
+      const result = await whatsappService.sendMessage(instance, customerPhone, aiResponse);
       await supabaseAdmin.from('agent_logs').insert({
         tenant_id: tenantId,
         event_type: 'message_sent',
         description: `Mensagem enviada para ${customerPhone}`,
-        metadata: { customerPhone, instance }
+        metadata: { customerPhone, instance, apiResponse: result }
       });
     } catch (sendError: any) {
       const errorDetails = sendError.response?.data || sendError.message;
