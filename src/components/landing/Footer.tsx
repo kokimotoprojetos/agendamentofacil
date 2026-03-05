@@ -8,7 +8,10 @@ export const Footer = () => {
                 <div className="flex flex-wrap -mx-4">
                     <div className="w-full px-4 mb-16 lg:w-1/2 lg:mb-0">
                         <div className="mb-8">
-                            <BrandLogo size="md" showTagline />
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-extrabold text-slate-900 tracking-tight">Beautfy</span>
+                                <span className="text-2xl font-bebas text-[var(--primary)] tracking-wider">.ai</span>
+                            </div>
                         </div>
 
                         <p className="max-w-sm text-slate-700 leading-relaxed font-medium text-lg">

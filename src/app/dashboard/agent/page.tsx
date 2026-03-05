@@ -87,12 +87,12 @@ export default function AgentConfig() {
             <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="bg-[#00e676]/5 text-[#00e676] p-2 rounded-lg border border-[#00e676]/10">
+                        <div className="bg-[#00e676]/10 text-[#00e676] p-2 rounded-lg border border-[#00e676]/20">
                             <Brain size={20} />
                         </div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">Configuração do Agente</h1>
+                        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Configuração do Agente</h1>
                     </div>
-                    <p className="text-sm text-white/50">Ajuste os dados essenciais para o funcionamento do assistente.</p>
+                    <p className="text-sm text-slate-600 font-medium">Ajuste os dados essenciais para o funcionamento do assistente.</p>
                 </div>
                 <button
                     onClick={handleSave}
@@ -106,15 +106,15 @@ export default function AgentConfig() {
 
             <div className="grid grid-cols-1 gap-6">
                 {/* Personalidade e Instruções */}
-                <section className="bg-white/5 p-8 rounded-[2rem] border border-white/5">
+                <section className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-white/5 rounded-lg text-white">
+                        <div className="p-2 bg-slate-50 rounded-lg text-slate-900 border border-slate-100">
                             <Brain size={20} />
                         </div>
-                        <h3 className="text-lg font-bold text-white tracking-tight">Instruções da IA (Personalidade)</h3>
+                        <h3 className="text-lg font-bold text-slate-900 tracking-tight">Instruções da IA (Personalidade)</h3>
                     </div>
                     <textarea
-                        className="w-full px-4 py-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:outline-none focus:border-[#00e676]/50 h-32 text-sm leading-relaxed resize-none transition-all"
+                        className="w-full px-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:outline-none focus:border-[#00e676]/50 h-32 text-sm font-bold leading-relaxed resize-none transition-all placeholder:text-slate-400"
                         placeholder="Ex: Você é um assistente simpático de um salão de beleza..."
                         value={config.personality}
                         onChange={(e) => setConfig({ ...config, personality: e.target.value })}
@@ -123,23 +123,23 @@ export default function AgentConfig() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Agenda de Operação */}
-                    <section className="bg-white/5 p-8 rounded-[2rem] border border-white/5">
+                    <section className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
                         <div className="flex items-center gap-3 mb-8">
-                            <div className="p-2 bg-white/5 rounded-lg text-white">
+                            <div className="p-2 bg-slate-50 rounded-lg text-slate-900 border border-slate-100">
                                 <CalendarDays size={20} />
                             </div>
-                            <h3 className="text-lg font-bold text-white tracking-tight">Dias e Horários</h3>
+                            <h3 className="text-lg font-bold text-slate-900 tracking-tight">Dias e Horários</h3>
                         </div>
 
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-[10px] font-black text-white/30 mb-4 uppercase tracking-widest">Dias de Funcionamento</label>
+                                <label className="block text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest">Dias de Funcionamento</label>
                                 <div className="grid grid-cols-4 gap-2">
                                     {DAYS_OF_WEEK.map(day => (
                                         <button
                                             key={day.id}
                                             onClick={() => toggleDay(day.id)}
-                                            className={`py-2 text-[10px] font-bold rounded-lg border transition-all ${config.workingDays.includes(day.id) ? 'bg-[#00e676] border-[#00e676] text-black shadow-lg shadow-[#00e676]/10' : 'bg-white/5 border-white/10 text-white/40 hover:border-white/20'}`}
+                                            className={`py-2 text-[10px] font-bold rounded-lg border transition-all ${config.workingDays.includes(day.id) ? 'bg-[#00e676] border-[#00e676] text-black shadow-lg shadow-[#00e676]/10' : 'bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200'}`}
                                         >
                                             {day.label.substring(0, 3)}
                                         </button>
@@ -147,21 +147,21 @@ export default function AgentConfig() {
                                 </div>
                             </div>
 
-                            <div className="pt-6 border-t border-white/5 flex gap-4">
+                            <div className="pt-6 border-t border-slate-100 flex gap-4">
                                 <div className="flex-1 space-y-2">
-                                    <span className="text-[10px] text-white/30 font-bold uppercase block text-center">Início</span>
+                                    <span className="text-[10px] text-slate-400 font-bold uppercase block text-center">Início</span>
                                     <input
                                         type="time"
-                                        className="w-full px-3 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:outline-none focus:border-[#00e676]/50 transition-all text-xs font-bold text-center"
+                                        className="w-full px-3 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold text-center"
                                         value={config.workingHours.start}
                                         onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, start: e.target.value } })}
                                     />
                                 </div>
                                 <div className="flex-1 space-y-2">
-                                    <span className="text-[10px] text-white/30 font-bold uppercase block text-center">Término</span>
+                                    <span className="text-[10px] text-slate-400 font-bold uppercase block text-center">Término</span>
                                     <input
                                         type="time"
-                                        className="w-full px-3 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:outline-none focus:border-[#00e676]/50 transition-all text-xs font-bold text-center"
+                                        className="w-full px-3 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold text-center"
                                         value={config.workingHours.end}
                                         onChange={(e) => setConfig({ ...config, workingHours: { ...config.workingHours, end: e.target.value } })}
                                     />
@@ -171,19 +171,19 @@ export default function AgentConfig() {
                     </section>
 
                     {/* Endereço */}
-                    <section className="bg-white/5 p-8 rounded-[2rem] border border-white/5">
+                    <section className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
                         <div className="flex items-center gap-3 mb-8">
-                            <div className="p-2 bg-white/5 rounded-lg text-white">
+                            <div className="p-2 bg-slate-50 rounded-lg text-slate-900 border border-slate-100">
                                 <MapPin size={20} />
                             </div>
-                            <h3 className="text-lg font-bold text-white tracking-tight">Localização</h3>
+                            <h3 className="text-lg font-bold text-slate-900 tracking-tight">Localização</h3>
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-black text-white/30 mb-3 uppercase tracking-widest text-center">Endereço do Estabelecimento</label>
+                            <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest text-center">Endereço do Estabelecimento</label>
                             <textarea
                                 placeholder="Rua, Número, Bairro, Cidade..."
-                                className="w-full px-4 py-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:outline-none focus:border-[#00e676]/50 transition-all text-sm h-32 resize-none leading-relaxed"
+                                className="w-full px-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:outline-none focus:border-[#00e676]/50 transition-all text-sm h-32 resize-none leading-relaxed font-bold placeholder:text-slate-400"
                                 value={config.location}
                                 onChange={(e) => setConfig({ ...config, location: e.target.value })}
                             ></textarea>

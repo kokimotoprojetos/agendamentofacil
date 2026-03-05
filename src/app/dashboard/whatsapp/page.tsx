@@ -163,12 +163,12 @@ export default function WhatsAppPage() {
         <div className="max-w-4xl mx-auto pb-20">
             <header className="mb-10">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="bg-[#00e676]/5 text-[#00e676] p-2 rounded-lg border border-[#00e676]/10">
+                    <div className="bg-[#00e676]/10 text-[#00e676] p-2 rounded-lg border border-[#00e676]/20">
                         <WhatsAppIcon size={22} />
                     </div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">WhatsApp</h1>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">WhatsApp</h1>
                 </div>
-                <p className="text-sm text-white/50">Gerencie a conexão do seu número com o agente de IA.</p>
+                <p className="text-sm text-slate-600 font-medium">Gerencie a conexão do seu número com o agente de IA.</p>
             </header>
 
             {error && (
@@ -179,19 +179,19 @@ export default function WhatsAppPage() {
             )}
 
             {/* Status Card */}
-            <div className="bg-white/5 rounded-3xl border border-white/5 overflow-hidden mb-6">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-6">
                 <div className="p-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div className="flex items-center gap-5">
-                            <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center">
+                            <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center">
                                 <Smartphone size={28} className="text-[#00e676]" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-white mb-1">
+                                <h3 className="text-lg font-bold text-slate-900 mb-1">
                                     WhatsApp Business
                                 </h3>
-                                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${state === 'open' ? 'bg-[#00e676]/5 text-[#00e676] border-[#00e676]/20' : state === 'connecting' ? 'bg-amber-400/5 text-amber-400 border-amber-400/20' : 'bg-white/5 text-white/40 border-white/10'}`}>
-                                    <span className={`w-2 h-2 rounded-full ${state === 'open' ? 'bg-[#00e676]' : state === 'connecting' ? 'bg-amber-400 animate-pulse' : 'bg-white/20'}`}></span>
+                                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${state === 'open' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : state === 'connecting' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-slate-50 text-slate-500 border-slate-100'}`}>
+                                    <span className={`w-2 h-2 rounded-full ${state === 'open' ? 'bg-emerald-500' : state === 'connecting' ? 'bg-amber-400 animate-pulse' : 'bg-slate-300'}`}></span>
                                     <StateIcon size={12} className={state === 'connecting' ? 'animate-spin' : ''} />
                                     {stateConfig.label}
                                 </div>
@@ -204,7 +204,7 @@ export default function WhatsAppPage() {
                                     <button
                                         onClick={handleRestart}
                                         disabled={!!actionLoading}
-                                        className="flex items-center gap-2 px-5 py-3 bg-white/5 text-white font-bold text-sm rounded-xl hover:bg-white/10 transition-all disabled:opacity-50 border border-white/10"
+                                        className="flex items-center gap-2 px-5 py-3 bg-slate-50 text-slate-900 font-bold text-sm rounded-xl hover:bg-slate-100 transition-all disabled:opacity-50 border border-slate-200"
                                     >
                                         <RefreshCw size={16} className={actionLoading === 'restart' ? 'animate-spin' : ''} />
                                         Reconectar
@@ -239,14 +239,14 @@ export default function WhatsAppPage() {
 
             {/* QR Code */}
             {qrCode && (
-                <div className="bg-white/5 rounded-3xl border border-white/5 overflow-hidden mb-6">
+                <div className="bg-slate-50 rounded-3xl border border-slate-200 overflow-hidden mb-6">
                     <div className="p-8 text-center">
-                        <h3 className="text-lg font-bold text-white mb-2">Escaneie o QR Code</h3>
-                        <p className="text-sm text-white/50 mb-8">Abra o WhatsApp → Menu (⋮) → Aparelhos Conectados → Conectar.</p>
-                        <div className="inline-block p-4 bg-white rounded-2xl border border-white/10 shadow-lg">
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">Escaneie o QR Code</h3>
+                        <p className="text-sm text-slate-600 font-medium mb-8">Abra o WhatsApp → Menu (⋮) → Aparelhos Conectados → Conectar.</p>
+                        <div className="inline-block p-4 bg-white rounded-2xl border border-slate-200 shadow-xl">
                             <img src={qrCode} alt="QR Code WhatsApp" className="w-64 h-64" />
                         </div>
-                        <p className="text-xs text-white/30 mt-6">O QR Code expira em 60 segundos. Gere outro se necessário.</p>
+                        <p className="text-[10px] text-slate-400 font-bold mt-6 uppercase tracking-widest">O QR Code expira em 60 segundos. Gere outro se necessário.</p>
                     </div>
                 </div>
             )}

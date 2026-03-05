@@ -54,16 +54,16 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen px-4 bg-[#070905] relative overflow-hidden font-inter">
+        <div className="flex items-center justify-center min-h-screen px-4 bg-white relative overflow-hidden font-inter">
             {/* Background Accent */}
-            <div className="absolute top-0 left-0 w-full h-full opacity-20">
+            <div className="absolute top-0 left-0 w-full h-full opacity-10">
                 <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary rounded-full blur-[120px]" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-secondary rounded-full blur-[120px]" />
             </div>
 
             <div className="relative w-full max-w-md z-10">
                 {/* Card */}
-                <div className="relative p-10 space-y-8 rounded-[2.5rem] border border-white/10 glass shadow-2xl overflow-hidden group">
+                <div className="relative p-10 space-y-8 rounded-[2.5rem] border border-slate-200 bg-white/70 backdrop-blur-xl shadow-2xl overflow-hidden group">
                     <GlowingEffect
                         spread={60}
                         glow={true}
@@ -76,55 +76,58 @@ export default function RegisterPage() {
                     {/* Logo content */}
                     <div className="relative text-center">
                         <div className="flex justify-center mb-6">
-                            <BrandLogo size="lg" />
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-3xl font-extrabold text-slate-900 tracking-tight">Beautfy</span>
+                                <span className="text-3xl font-bebas text-[var(--primary)] tracking-wider">.ai</span>
+                            </div>
                         </div>
-                        <p className="text-slate-400 font-medium tracking-tight mt-2">Crie sua conta e comece a automatizar</p>
+                        <p className="text-slate-600 font-semibold tracking-tight mt-2">Crie sua conta e comece a automatizar</p>
                     </div>
 
                     <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
                         <div className="grid grid-cols-1 gap-5">
                             <div>
-                                <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Seu Nome</label>
+                                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Seu Nome</label>
                                 <input
                                     {...register('name')}
                                     type="text"
-                                    className={`block w-full px-5 py-4 rounded-2xl bg-white/5 border ${errors.name ? 'border-red-500' : 'border-white/10'} text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium`}
+                                    className={`block w-full px-5 py-4 rounded-2xl bg-slate-50 border ${errors.name ? 'border-rose-500' : 'border-slate-200'} text-slate-900 placeholder:text-slate-400 outline-none focus:border-primary/50 transition-all font-bold`}
                                     placeholder="João Silva"
                                 />
-                                {errors.name && <p className="mt-2 text-xs text-red-500 font-bold">{errors.name.message}</p>}
+                                {errors.name && <p className="mt-2 text-xs text-rose-500 font-bold">{errors.name.message}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Nome do Negócio</label>
+                                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nome do Negócio</label>
                                 <input
                                     {...register('businessName')}
                                     type="text"
-                                    className={`block w-full px-5 py-4 rounded-2xl bg-white/5 border ${errors.businessName ? 'border-red-500' : 'border-white/10'} text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium`}
+                                    className={`block w-full px-5 py-4 rounded-2xl bg-slate-50 border ${errors.businessName ? 'border-rose-500' : 'border-slate-200'} text-slate-900 placeholder:text-slate-400 outline-none focus:border-primary/50 transition-all font-bold`}
                                     placeholder="Barbearia Imperial"
                                 />
-                                {errors.businessName && <p className="mt-2 text-xs text-red-500 font-bold">{errors.businessName.message}</p>}
+                                {errors.businessName && <p className="mt-2 text-xs text-rose-500 font-bold">{errors.businessName.message}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Email Profissional</label>
+                                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Email Profissional</label>
                                 <input
                                     {...register('email')}
                                     type="email"
-                                    className={`block w-full px-5 py-4 rounded-2xl bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium`}
+                                    className={`block w-full px-5 py-4 rounded-2xl bg-slate-50 border ${errors.email ? 'border-rose-500' : 'border-slate-200'} text-slate-900 placeholder:text-slate-400 outline-none focus:border-primary/50 transition-all font-bold`}
                                     placeholder="contato@empresa.com"
                                 />
-                                {errors.email && <p className="mt-2 text-xs text-red-500 font-bold">{errors.email.message}</p>}
+                                {errors.email && <p className="mt-2 text-xs text-rose-500 font-bold">{errors.email.message}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">Senha</label>
+                                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Senha Forte</label>
                                 <input
                                     {...register('password')}
                                     type="password"
-                                    className={`block w-full px-5 py-4 rounded-2xl bg-white/5 border ${errors.password ? 'border-red-500' : 'border-white/10'} text-white placeholder:text-slate-600 outline-none focus:border-primary/50 transition-all font-medium`}
+                                    className={`block w-full px-5 py-4 rounded-2xl bg-slate-50 border ${errors.password ? 'border-rose-500' : 'border-slate-200'} text-slate-900 placeholder:text-slate-400 outline-none focus:border-primary/50 transition-all font-bold`}
                                     placeholder="••••••••"
                                 />
-                                {errors.password && <p className="mt-2 text-xs text-red-500 font-bold">{errors.password.message}</p>}
+                                {errors.password && <p className="mt-2 text-xs text-rose-500 font-bold">{errors.password.message}</p>}
                             </div>
                         </div>
 
@@ -137,8 +140,8 @@ export default function RegisterPage() {
                         </button>
                     </form>
 
-                    <p className="text-center text-sm text-slate-400 font-medium">
-                        Já tem uma conta? <a href="/login" className="font-bold text-primary hover:underline transition-all">Entre aqui</a>
+                    <p className="relative text-center text-sm text-slate-600 font-semibold leading-relaxed">
+                        Já tem uma conta? <a href="/login" className="font-bold text-[var(--primary)] hover:underline transition-all">Entre aqui</a>
                     </p>
                 </div>
             </div>

@@ -83,8 +83,8 @@ export default function ServicesPage() {
             <div className="max-w-7xl mx-auto pb-20">
                 <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Catálogo de Serviços</h1>
-                        <p className="text-sm text-white/50">Gerencie os tratamentos e serviços oferecidos pela sua unidade.</p>
+                        <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Catálogo de Serviços</h1>
+                        <p className="text-sm text-slate-600 font-medium">Gerencie os tratamentos e serviços oferecidos pela sua unidade.</p>
                     </div>
                     <button
                         onClick={() => handleOpenModal()}
@@ -100,15 +100,15 @@ export default function ServicesPage() {
                         <div className="w-8 h-8 border-2 border-[#00e676] border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : services.length === 0 ? (
-                    <div className="bg-white/5 p-16 rounded-[2rem] border-dashed border-2 border-white/10 text-center">
+                    <div className="bg-slate-50 p-16 rounded-[2rem] border-dashed border-2 border-slate-200 text-center">
                         <div className="w-16 h-16 bg-[#00e676]/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                             <Briefcase size={32} className="text-[#00e676]" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Nenhum serviço cadastrado</h3>
-                        <p className="text-white/40 text-sm max-w-sm mx-auto mb-8">Cadastre seus serviços para que o Agente IA possa apresentar opções e realizar agendamentos automáticos.</p>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">Nenhum serviço cadastrado</h3>
+                        <p className="text-slate-600 text-sm font-medium理论 max-w-sm mx-auto mb-8">Cadastre seus serviços para que o Agente IA possa apresentar opções e realizar agendamentos automáticos.</p>
                         <button
                             onClick={() => handleOpenModal()}
-                            className="px-8 py-3 bg-white/5 text-white font-bold text-sm rounded-xl hover:bg-white/10 transition-all border border-white/10"
+                            className="px-8 py-3 bg-white text-slate-900 font-bold text-sm rounded-xl hover:bg-slate-50 transition-all border border-slate-200"
                         >
                             Começar agora
                         </button>
@@ -118,7 +118,7 @@ export default function ServicesPage() {
                         {services.map((service) => (
                             <div
                                 key={service.id}
-                                className="bg-white/5 p-6 rounded-2xl border border-white/5 hover:border-[#00e676]/30 transition-all group relative"
+                                className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-[#00e676]/30 transition-all group relative hover:shadow-xl hover:-translate-y-1"
                             >
                                 <div className="flex justify-between items-start mb-5">
                                     <div className="p-3 bg-[#00e676]/10 rounded-xl border border-[#00e676]/20 text-[#00e676] group-hover:bg-[#00e676] group-hover:text-black transition-all">
@@ -127,14 +127,14 @@ export default function ServicesPage() {
                                     <div className="flex gap-1">
                                         <button
                                             onClick={() => handleOpenModal(service)}
-                                            className="p-2.5 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                                            className="p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
                                             title="Editar"
                                         >
                                             <Edit2 size={16} />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(service.id)}
-                                            className="p-2.5 text-white/40 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
+                                            className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
                                             title="Excluir"
                                         >
                                             <Trash2 size={16} />
@@ -143,21 +143,21 @@ export default function ServicesPage() {
                                 </div>
 
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#00e676] transition-colors line-clamp-1">{service.name}</h3>
-                                    <p className="text-xs text-white/40 leading-relaxed line-clamp-2 h-8">{service.description || 'Nenhuma descrição detalhada para este serviço.'}</p>
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-[#00e676] transition-colors line-clamp-1">{service.name}</h3>
+                                    <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2 h-8">{service.description || 'Nenhuma descrição detalhada para este serviço.'}</p>
                                 </div>
 
-                                <div className="flex items-center justify-between pt-5 border-t border-white/5">
+                                <div className="flex items-center justify-between pt-5 border-t border-slate-100">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Preço Sugerido</span>
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Preço Sugerido</span>
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-xs text-[#00e676] font-bold">R$</span>
-                                            <span className="text-2xl font-bold text-white tracking-tight">{service.price}</span>
+                                            <span className="text-2xl font-bold text-slate-900 tracking-tight">{service.price}</span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.03] rounded-full border border-white/5 text-white/60">
+                                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100 text-slate-600">
                                         <Clock size={12} className="text-[#00e676]" />
-                                        <span className="text-[11px] font-bold text-white/80">{service.duration} min</span>
+                                        <span className="text-[11px] font-bold text-slate-700">{service.duration} min</span>
                                     </div>
                                 </div>
                             </div>
@@ -168,22 +168,22 @@ export default function ServicesPage() {
 
             {/* MODAL */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden">
-                        <div className="bg-gradient-to-br from-white/[0.02] to-transparent p-8 border-b border-white/5">
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white border border-slate-200 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden">
+                        <div className="bg-gradient-to-br from-slate-50 to-transparent p-8 border-b border-slate-100">
                             <div className="flex justify-between items-start">
                                 <div>
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="w-8 h-8 bg-[#00e676] rounded-lg flex items-center justify-center text-black">
                                             {editingId ? <Edit2 size={16} /> : <Plus size={16} />}
                                         </div>
-                                        <h2 className="text-2xl font-bold text-white tracking-tight">
+                                        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
                                             {editingId ? 'Editar Serviço' : 'Novo Serviço'}
                                         </h2>
                                     </div>
-                                    <p className="text-[11px] text-white/40 font-semibold uppercase tracking-widest">Configuração do portfólio</p>
+                                    <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest">Configuração do portfólio</p>
                                 </div>
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="p-2 text-white/40 hover:text-white transition-all bg-white/5 rounded-xl">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-900 transition-all bg-slate-100 rounded-xl">
                                     <X size={20} />
                                 </button>
                             </div>
@@ -192,12 +192,12 @@ export default function ServicesPage() {
                         <form onSubmit={handleSubmit} className="p-8">
                             <div className="space-y-6">
                                 <div>
-                                    <label className="block text-[10px] font-black text-white/40 mb-2 uppercase tracking-widest">Nome do Serviço</label>
+                                    <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Nome do Serviço</label>
                                     <input
                                         required
                                         type="text"
                                         placeholder="Ex: Corte de Cabelo Degradê"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-medium"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold"
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
                                     />
@@ -205,7 +205,7 @@ export default function ServicesPage() {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-[10px] font-black text-white/40 mb-2 uppercase tracking-widest">Preço (R$)</label>
+                                        <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Preço (R$)</label>
                                         <div className="relative group">
                                             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#00e676] bg-[#00e676]/10 p-1.5 rounded-lg group-focus-within:bg-[#00e676] group-focus-within:text-black transition-all">
                                                 <DollarSign size={12} strokeWidth={3} />
@@ -215,14 +215,14 @@ export default function ServicesPage() {
                                                 type="number"
                                                 step="0.01"
                                                 placeholder="0.00"
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold"
                                                 value={formData.price}
                                                 onChange={e => setFormData({ ...formData, price: e.target.value })}
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] font-black text-white/40 mb-2 uppercase tracking-widest">Duração (minutos)</label>
+                                        <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Duração (minutos)</label>
                                         <div className="relative group">
                                             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#00e676] bg-[#00e676]/10 p-1.5 rounded-lg group-focus-within:bg-[#00e676] group-focus-within:text-black transition-all">
                                                 <Clock size={12} strokeWidth={3} />
@@ -231,7 +231,7 @@ export default function ServicesPage() {
                                                 required
                                                 type="number"
                                                 placeholder="60"
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00e676]/50 transition-all text-sm font-bold"
                                                 value={formData.duration}
                                                 onChange={e => setFormData({ ...formData, duration: e.target.value })}
                                             />
@@ -240,15 +240,15 @@ export default function ServicesPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] font-black text-white/40 mb-2 uppercase tracking-widest">Descrição para o Agente IA</label>
+                                    <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Descrição para o Agente IA</label>
                                     <div className="relative">
                                         <textarea
                                             placeholder="Descreva detalhes do serviço, diferenciais ou produtos usados. Isso ajuda a IA a vender melhor."
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00e676]/50 transition-all h-28 resize-none text-sm font-medium leading-relaxed"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00e676]/50 transition-all h-28 resize-none text-sm font-bold leading-relaxed"
                                             value={formData.description}
                                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                                         ></textarea>
-                                        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 text-[9px] font-bold text-white/40 bg-white/5 px-2 py-1 rounded-md">
+                                        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 text-[9px] font-black text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-200">
                                             <Info size={10} />
                                             CONTEÚDO PARA IA
                                         </div>
@@ -260,7 +260,7 @@ export default function ServicesPage() {
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 px-4 py-4 bg-white/5 text-white/60 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all border border-white/10"
+                                    className="flex-1 px-4 py-4 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-100 transition-all border border-slate-200"
                                 >
                                     Cancelar
                                 </button>

@@ -15,7 +15,10 @@ export const Hero = () => {
         <section className="relative pt-10 pb-20 bg-[var(--bg-hero)] overflow-hidden">
             {/* Navbar Placeholder inside Hero for requested layout */}
             <nav className="relative z-[100] w-full max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-                <BrandLogo size="md" />
+                <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-extrabold text-slate-900 tracking-tight">Beautfy</span>
+                    <span className="text-2xl font-bebas text-[var(--primary)] tracking-wider">.ai</span>
+                </div>
 
                 <div className="hidden md:flex items-center space-x-12">
                     <a href="#features" className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">Funcionalidades</a>
