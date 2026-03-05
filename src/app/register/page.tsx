@@ -11,7 +11,7 @@ import { GlowingEffect } from '@/components/ui/glowing-effect';
 const registerSchema = z.object({
     name: z.string().min(2, 'Nome muito curto'),
     email: z.string().email('Email inválido'),
-    password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
+    password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres'),
     businessName: z.string().min(2, 'Nome do negócio muito curto'),
 });
 

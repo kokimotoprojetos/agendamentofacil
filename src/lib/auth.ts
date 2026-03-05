@@ -40,10 +40,12 @@ export const authOptions: AuthOptions = {
                     throw new Error("Credenciais inválidas");
                 }
 
+                const normalizedEmail = credentials.email.toLowerCase().trim();
+
                 const { data: user, error } = await supabaseAdmin
                     .from("users")
                     .select("*")
-                    .eq("email", credentials.email)
+                    .eq("email", normalizedEmail)
                     .single();
 
                 if (error || !user || !user.password) {
