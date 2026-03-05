@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="pt-br" className="scroll-smooth">
       <body
-        className={`${bebasNeue.variable} ${inter.variable} font-inter antialiased bg-[#070905] text-white`}
+        className={`${bebasNeue.variable} ${inter.variable} font-inter antialiased bg-background text-foreground`}
       >
         <Providers>
           {children}

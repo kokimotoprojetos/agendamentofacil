@@ -20,7 +20,7 @@ export const StatsCard = ({ label, value, icon, color, trend }: StatsCardProps) 
     };
 
     return (
-        <div className="relative bg-white/5 p-6 rounded-3xl border border-white/5 transition-all duration-300 hover:border-white/10 hover:bg-white/[0.07] group">
+        <div className="relative bg-white p-6 rounded-3xl border border-slate-200 transition-all duration-300 hover:border-slate-300 hover:shadow-lg group">
             <GlowingEffect
                 spread={40}
                 glow={true}
@@ -29,7 +29,7 @@ export const StatsCard = ({ label, value, icon, color, trend }: StatsCardProps) 
                 inactiveZone={0.01}
             />
             <div className="flex items-center justify-between mb-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${colorMap[color] || 'text-white/60 bg-white/5'}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${colorMap[color] || 'text-slate-400 bg-slate-50'}`}>
                     {icon}
                 </div>
                 {trend && (
@@ -41,8 +41,8 @@ export const StatsCard = ({ label, value, icon, color, trend }: StatsCardProps) 
             </div>
 
             <div className="relative z-10">
-                <p className="text-xs text-white/40 font-medium mb-1">{label}</p>
-                <h3 className="text-2xl font-bold text-white tabular-nums tracking-tight">
+                <p className="text-xs text-slate-500 font-medium mb-1">{label}</p>
+                <h3 className="text-2xl font-bold text-slate-900 tabular-nums tracking-tight">
                     {value}
                 </h3>
             </div>

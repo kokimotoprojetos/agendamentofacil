@@ -20,18 +20,18 @@ interface FeatureSectionProps {
 
 const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }: FeatureSectionProps) => {
     return (
-        <section className="py-24 bg-black overflow-hidden">
+        <section className="py-24 bg-background overflow-hidden">
             <div className="container px-6 mx-auto">
                 <div className={`flex flex-col lg:flex-row items-center gap-16 ${reverse ? 'lg:flex-row-reverse' : ''}`}>
                     {/* Text Content */}
                     <div className="flex-1 max-w-xl">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight">
+                        <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
                             {title} <span className="text-[var(--primary)]">{highlight}</span>
                         </h2>
-                        <p className="text-lg text-white/70 mb-10 leading-relaxed">
+                        <p className="text-lg text-slate-600 mb-10 leading-relaxed">
                             {description}
                         </p>
-                        <a href="#details" className="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-[var(--primary)] transition-colors group">
+                        <a href="#details" className="inline-flex items-center gap-2 text-sm font-bold text-slate-900 hover:text-[var(--primary)] transition-colors group">
                             Ver mais detalhes
                             <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -48,7 +48,7 @@ const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }
                             transition={{ duration: 0.8 }}
                             className="relative"
                         >
-                            <div className="relative p-2 rounded-[2rem] border border-white/5 bg-white/5 backdrop-blur-sm group">
+                            <div className="relative p-2 rounded-[2rem] border border-slate-200 bg-white/50 backdrop-blur-sm group">
                                 <GlowingEffect
                                     spread={60}
                                     glow={true}
@@ -57,7 +57,7 @@ const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }
                                     inactiveZone={0.01}
                                     borderWidth={3}
                                 />
-                                <div className="relative rounded-[1.8rem] overflow-hidden border border-white/10 bg-black/50 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
+                                <div className="relative rounded-[1.8rem] overflow-hidden border border-slate-200 bg-white shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
                                     {mockup}
                                 </div>
                             </div>
@@ -71,7 +71,7 @@ const FeatureSection = ({ title, highlight, description, mockup, reverse, icon }
 
 export const Features = () => {
     return (
-        <div id="features" className="divide-y divide-white/5">
+        <div id="features" className="divide-y divide-slate-100">
             <FeatureSection
                 icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
                 title="Configuração rápida e"

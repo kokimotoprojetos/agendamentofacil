@@ -18,14 +18,14 @@ export const Hero = () => {
                 <BrandLogo size="md" />
 
                 <div className="hidden md:flex items-center space-x-12">
-                    <a href="#features" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Funcionalidades</a>
-                    <a href="#pricing" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Preços</a>
-                    <a href="#about" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Sobre</a>
+                    <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Funcionalidades</a>
+                    <a href="#pricing" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Preços</a>
+                    <a href="#about" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Sobre</a>
                 </div>
 
                 <div className="flex items-center gap-6">
-                    <a href="/login" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Entrar</a>
-                    <a href="/register" className="px-5 py-2.5 text-xs font-bold text-black bg-[var(--primary)] rounded-full hover:brightness-110 active:scale-95 transition-all">
+                    <a href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Entrar</a>
+                    <a href="/register" className="px-5 py-2.5 text-xs font-bold text-white bg-[var(--primary)] rounded-full hover:brightness-110 active:scale-95 transition-all">
                         Teste grátis
                     </a>
                 </div>
@@ -34,7 +34,7 @@ export const Hero = () => {
             <div className="container px-6 mx-auto relative z-10 pt-16">
                 <div className="max-w-4xl mx-auto text-center">
                     <h1
-                        className="text-[4rem] md:text-[5.5rem] lg:text-[6.5rem] font-bold tracking-tight text-white leading-[1.05] mb-8"
+                        className="text-[4rem] md:text-[5.5rem] lg:text-[6.5rem] font-bold tracking-tight text-slate-900 leading-[1.05] mb-8"
                     >
                         Encontre os clientes que precisam da sua <span className="text-[var(--primary)]">atenção</span>
                     </h1>
@@ -43,7 +43,7 @@ export const Hero = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
-                        className="text-lg md:text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed"
+                        className="text-lg md:text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed"
                     >
                         Automatize seus agendamentos no WhatsApp com um agente de IA inteligente que entende seu negócio e atende seus clientes 24 horas por dia.
                     </motion.p>
@@ -56,13 +56,13 @@ export const Hero = () => {
                     >
                         <a
                             href="/register"
-                            className="px-8 py-3.5 text-sm font-bold text-black bg-[var(--primary)] rounded-full hover:brightness-110 shadow-lg shadow-[var(--primary)]/20 transition-all active:scale-95"
+                            className="px-8 py-3.5 text-sm font-bold text-white bg-[var(--primary)] rounded-full hover:brightness-110 shadow-lg shadow-[var(--primary)]/20 transition-all active:scale-95"
                         >
                             Começar teste grátis
                         </a>
                         <a
                             href="#demo"
-                            className="px-8 py-3.5 text-sm font-bold text-white border border-white/20 rounded-full hover:bg-white/5 transition-all"
+                            className="px-8 py-3.5 text-sm font-bold text-slate-900 border border-slate-200 rounded-full hover:bg-slate-50 transition-all"
                         >
                             Ver demonstração
                         </a>
@@ -74,7 +74,7 @@ export const Hero = () => {
                         transition={{ duration: 0.8, delay: 0.3 }}
                         className="relative"
                     >
-                        <div className="relative p-2 rounded-[2rem] border border-white/5 bg-white/5 backdrop-blur-sm group">
+                        <div className="relative p-2 rounded-[2rem] border border-slate-200 bg-white/50 backdrop-blur-sm group">
                             <GlowingEffect
                                 spread={60}
                                 glow={true}
@@ -83,7 +83,7 @@ export const Hero = () => {
                                 inactiveZone={0.01}
                                 borderWidth={3}
                             />
-                            <div className="relative rounded-[1.8rem] overflow-hidden border border-white/10 bg-black/50 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
+                            <div className="relative rounded-[1.8rem] overflow-hidden border border-slate-200 bg-white shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
                                 <ChatMockup />
                             </div>
                         </div>
