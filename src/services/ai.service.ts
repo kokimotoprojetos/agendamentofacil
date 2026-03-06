@@ -226,7 +226,7 @@ export const aiAgentService = {
           } else {
             aiResponse = await this.generateResponse(
               context, chatHistory, messageText,
-              'O cliente confirmou cancelamento mas não encontramos nenhum agendamento futuro para ele. Informe isso de forma amigável.',
+              'O cliente confirmou cancelamento mas não encontramos nenhum agendamento futuro para ele no banco de dados. Informe isso de forma amigável e NÃO finja que cancelou.',
             );
           }
           updatedCtx = { ...updatedCtx, awaiting_cancellation: false, pending_cancellation: null };
@@ -309,7 +309,7 @@ export const aiAgentService = {
           } else {
             aiResponse = await this.generateResponse(
               context, allMessages.slice(0, -1), messageText,
-              'O cliente quer cancelar mas não há agendamentos futuros para o número dele. Informe isso de forma amigável.',
+              'O cliente quer cancelar mas não há agendamentos futuros para o número dele no sistema. Informe isso de forma amigável e explique que não encontrou agendamentos. Se ele insistir, diga que pode ter havido um erro e NÃO finja que cancelou.',
             );
             updatedCtx = { ...updatedCtx, awaiting_cancellation: false, pending_cancellation: null };
           }
@@ -445,6 +445,7 @@ REGRAS QUE NÃO PODEM SER QUEBRADAS:
 5. NUNCA comece com "Ótimo!", "Perfeito!", "Claro!" — gente real não fala assim toda hora
 6. Quando não souber algo, diga naturalmente: "vou confirmar e te falo", "deixa eu ver aqui"
 7. ESCOPO: Você fala APENAS sobre o salão, serviços, preços, horários e agendamentos. Se o cliente perguntar qualquer coisa fora disso (ex: matemática, política, fatos gerais, piadas), recuse educadamente dizendo que você está aqui apenas para ajudar com o salão.
+8. ALUCINAÇÃO PROIBIDA: Você não tem acesso direto ao banco de dados para criar/deletar. Eu (o sistema) gerencio isso. Portanto, NUNCA diga que "agendou", "cancelou" ou "desmarcou" a menos que eu tenha fornecido uma INSTRUÇÃO EXTRA dizendo que foi confirmado. Se constar que não há agendamento e o cliente insistir, seja firme e diga que não encontrou nada no sistema.
 
 EXEMPLOS DE COMO RESPONDER:
 Cliente: "oi" → "${greeting}! tudo bem? 😊 Sou o atendente virtual do ${businessName}, como posso te ajudar hoje?"
