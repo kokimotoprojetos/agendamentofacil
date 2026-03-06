@@ -194,7 +194,10 @@ export const aiAgentService = {
         lastBotContent.includes('quer cancelar o agendamento') ||
         (lastBotContent.toLowerCase().includes('cancelar') && lastBotContent.toLowerCase().includes('confirma'));
       const historyShowsAwaitingBooking =
-        lastBotContent.includes('Posso confirmar') || lastBotContent.includes('Confirma') && lastBotContent.includes('Agendamento');
+        lastBotContent.includes('Posso confirmar') ||
+        lastBotContent.includes('posso agendar') ||
+        (lastBotContent.includes('Confirma') && lastBotContent.includes('Agendamento')) ||
+        (lastBotContent.toLowerCase().includes('certo?') && lastBotContent.toLowerCase().includes('posso'));
 
       // Merge context flags with conversation history evidence
       const awaitingCancellation = convCtx.awaiting_cancellation === true || historyShowsAwaitingCancellation;
@@ -239,7 +242,8 @@ export const aiAgentService = {
 
         // ── A: Awaiting booking confirmation ────────────────────────────────────────
       } else if (awaitingConfirmation && pendingBooking) {
-        const confirmed = await this.checkConfirmation(messageText);
+        const isKeywordConfirmation = /^(sim|s|pode|pode ser|pode sim|confirma|confirmar|ok|yes|claro|vai|vai sim|bora|isso|sss|ss|siim|simm|pode agendar|agenda|marca|marcar|agendar|por favor)/i.test(messageText.trim());
+        const confirmed = isKeywordConfirmation || await this.checkConfirmation(messageText);
 
         if (confirmed) {
           console.log(`[booking] Confirmed! Executing booking for tenant ${tenantId}:`, pendingBooking);
@@ -322,6 +326,7 @@ export const aiAgentService = {
               const dateFormatted = dateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
 
               const firstName = extract.customer_name?.split(' ')[0] || '';
+              // OVERRIDE the AI response with a proper confirmation prompt
               aiResponse = `${firstName}, deixa eu confirmar: ${extract.service_name} ${dateFormatted} às ${extract.time}, certo? posso agendar?`;
               updatedCtx = {
                 ...updatedCtx,
@@ -332,6 +337,23 @@ export const aiAgentService = {
               aiResponse = await this.generateResponse(
                 context, allMessages.slice(0, -1), messageText,
                 `O horário das ${extract.time} em ${extract.date} está ocupado. Informe de forma amigável e sugira outro horário.`,
+              );
+            }
+          } else if (extract.hasIntent && extract.activeNow && !extract.complete) {
+            // Booking is in progress but incomplete.
+            // Check if the LLM response already confirms/schedules (phantom booking).
+            // If so, replace with a proper follow-up question.
+            const phantomBooking = /te vejo|te espero|está agendado|agendado!|confirmado!|tá marcado|tá agendado|reservado/i.test(aiResponse);
+            if (phantomBooking) {
+              const missing = [];
+              if (!extract.customer_name) missing.push('nome');
+              if (!extract.service_name) missing.push('serviço');
+              if (!extract.date) missing.push('data');
+              if (!extract.time) missing.push('horário');
+              console.log(`[booking] ⚠️ Phantom booking detected! Missing: ${missing.join(', ')}. Overriding AI response.`);
+              aiResponse = await this.generateResponse(
+                context, allMessages.slice(0, -1), messageText,
+                `O cliente está querendo agendar mas ainda faltam dados: ${missing.join(', ')}. Pergunte o que falta de forma natural, UMA coisa por vez. NÃO confirme nenhum agendamento.`,
               );
             }
           }
