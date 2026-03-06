@@ -182,7 +182,7 @@ export default function AgendaPage() {
                 </button>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+            <div className="flex flex-col gap-8">
                 {/* CALENDAR */}
                 <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
                     <div className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-white/[0.02]">
@@ -266,7 +266,7 @@ export default function AgendaPage() {
                 </div>
 
                 {/* DAY PANEL */}
-                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden flex flex-col shadow-2xl">
+                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden flex flex-col shadow-2xl min-h-[600px]">
                     <div className="px-6 py-5 border-b border-white/5 bg-white/[0.02]">
                         <p className="text-xs font-black text-[#00e676]/50 uppercase tracking-widest mb-1">
                             {isToday(selectedDate) ? 'Hoje' : format(selectedDate, "EEEE", { locale: ptBR })}
