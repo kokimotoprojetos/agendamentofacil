@@ -29,8 +29,18 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'year e month são obrigatórios' }, { status: 400 });
         }
 
-        const startOfMonth = `${year}-${String(month).padStart(2, '0')}-01T00:00:00.000Z`;
-        const nextMonth = month === 12 ? `${year + 1}-01-01T00:00:00.000Z` : `${year}-${String(month + 1).padStart(2, '0')}-01T00:00:00.000Z`;
+        // Adjust boundaries to ensure we don't miss appointments near the edges due to timezone
+        // Start of month (00:00 BRT) = 03:00 UTC
+        const startOfMonth = `${year}-${String(month).padStart(2, '0')}-01T03:00:00.000Z`;
+
+        // End of month (23:59 BRT) = Next month T02:59 UTC
+        let nextYear = year;
+        let nextMonthNum = month + 1;
+        if (nextMonthNum > 12) {
+            nextMonthNum = 1;
+            nextYear++;
+        }
+        const nextMonth = `${nextYear}-${String(nextMonthNum).padStart(2, '0')}-01T02:59:59.999Z`;
 
         const { data, error } = await supabaseAdmin
             .from('appointments')
@@ -42,10 +52,13 @@ export async function GET(req: Request) {
 
         if (error) throw error;
 
-        // Count per day
+        // Count per day, adjusting for Brazil (UTC-3)
         const counts: Record<string, number> = {};
         for (const row of data || []) {
-            const day = row.start_time.substring(0, 10); // YYYY-MM-DD
+            const dateUTC = new Date(row.start_time);
+            // Subtract 3 hours for Brazil
+            const dateBR = new Date(dateUTC.getTime() - 3 * 60 * 60 * 1000);
+            const day = dateBR.toISOString().substring(0, 10); // YYYY-MM-DD in local time
             counts[day] = (counts[day] || 0) + 1;
         }
 

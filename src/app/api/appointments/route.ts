@@ -34,9 +34,16 @@ export async function GET(req: Request) {
             .order('start_time', { ascending: true });
 
         if (date) {
-            const start = `${date}T00:00:00.000Z`;
-            const end = `${date}T23:59:59.999Z`;
-            query = query.gte('start_time', start).lte('start_time', end);
+            // Brazil is UTC-3. To get the full day in Brazil:
+            // Start: Day T00:00 BRT = Day T03:00 UTC
+            // End: Day T23:59 BRT = Day+1 T02:59 UTC
+            const startStr = `${date}T03:00:00.000Z`;
+            const dateObj = new Date(date + 'T12:00:00Z');
+            dateObj.setUTCDate(dateObj.getUTCDate() + 1);
+            const nextDay = dateObj.toISOString().split('T')[0];
+            const endStr = `${nextDay}T02:59:59.999Z`;
+
+            query = query.gte('start_time', startStr).lte('start_time', endStr);
         }
 
         const { data, error } = await query;

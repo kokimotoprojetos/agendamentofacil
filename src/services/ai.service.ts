@@ -318,9 +318,9 @@ export const aiAgentService = {
             const available = await this.checkAvailability(tenantId, extract.date!, extract.time!);
             console.log(`[booking] Availability for ${extract.date} ${extract.time}: ${available}`);
             if (available) {
-              const dateFormatted = extract.date
-                ? new Date(extract.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
-                : '';
+              const dateObj = new Date(extract.date + 'T12:00:00');
+              const dateFormatted = dateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+
               const firstName = extract.customer_name?.split(' ')[0] || '';
               aiResponse = `${firstName}, deixa eu confirmar: ${extract.service_name} ${dateFormatted} às ${extract.time}, certo? posso agendar?`;
               updatedCtx = {
@@ -411,7 +411,7 @@ FLUXO DE AGENDAMENTO (siga esta ordem naturalmente):
 2. Depois pergunte qual serviço quer
 3. Depois pergunte que dia seria bom
 4. Depois pergunte o horário
-5. Confirme tudo antes de finalizar
+5. Confirme tudo antes de finalizar. NUNCA diga que agendou ANTES de eu (o sistema) confirmar que o horário está disponível e você ter perguntado "posso agendar?".
 - NUNCA pule etapas. Pergunte UMA coisa por vez, como humano faz
 - Se o cliente já disse alguma info (nome, serviço), não pergunte de novo
 
@@ -507,17 +507,23 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
   // ─── Check for conflicting appointments ───────────────────────────────────────
   checkAvailability: async (tenantId: string, date: string, time: string): Promise<boolean> => {
     try {
-      const startTime = `${date}T${time}:00`;
-      const endTime = new Date(new Date(startTime).getTime() + 60 * 60 * 1000).toISOString();
+      // Brazil Timezone Offset (UTC-3)
+      const startTime = `${date}T${time}:00-03:00`;
+      const startDateTime = new Date(startTime);
+      // Assume 1h duration for availability check if service is unknown
+      const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000);
+
       const { count } = await supabaseAdmin
         .from('appointments')
         .select('*', { count: 'exact', head: true })
         .eq('tenant_id', tenantId)
         .neq('status', 'cancelled')
-        .lt('start_time', endTime)
-        .gt('end_time', startTime);
+        .lt('start_time', endDateTime.toISOString())
+        .gt('end_time', startDateTime.toISOString());
+
       return (count ?? 0) === 0;
-    } catch {
+    } catch (error) {
+      console.error('[availability] Error:', error);
       return true;
     }
   },
@@ -624,17 +630,19 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
       }
       console.log(`[booking] Service found:`, service ? `${service.id} (duration: ${service.duration})` : 'none (using defaults)');
 
-      const startTime = `${booking.date}T${booking.time}:00`;
+      // Timezone Handling: All times are treated as Brazil/Sao Paulo (UTC-3)
+      const startTime = `${booking.date}T${booking.time}:00-03:00`;
+      const startDateTime = new Date(startTime);
       const duration = service?.duration || 60;
-      const endTime = new Date(new Date(startTime).getTime() + duration * 60 * 1000).toISOString();
+      const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 1000);
 
       const insertData = {
         tenant_id: tenantId,
         service_id: service?.id || null,
         customer_name: booking.customer_name || `WhatsApp: ${cleanPhone}`,
         customer_phone: cleanPhone,
-        start_time: startTime,
-        end_time: endTime,
+        start_time: startDateTime.toISOString(), // Standard UTC in DB
+        end_time: endDateTime.toISOString(),     // Standard UTC in DB
         status: 'scheduled',
         notes: `Agendado via WhatsApp. Serviço: ${booking.service_name}`,
       };
