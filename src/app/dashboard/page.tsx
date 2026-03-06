@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { DateSelector } from '@/components/dashboard/DateSelector';
 import { RevenueBarChart, ServicesDonutChart } from '@/components/dashboard/DashboardCharts';
-import { TodayAppointmentsList } from '@/components/dashboard/TodayAppointmentsList';
+import { RealTimeTodayAppointments } from '@/components/dashboard/RealTimeTodayAppointments';
 import { Users, LayoutDashboard, Calendar, MessageCircle, DollarSign, Activity } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -106,7 +106,7 @@ export default async function DashboardPage() {
                 </div>
 
                 <div>
-                    <TodayAppointmentsList appointments={todayAppointments} />
+                    <RealTimeTodayAppointments initialAppointments={todayAppointments} tenantId={tenantId} />
                 </div>
             </div>
         </div>

@@ -20,7 +20,7 @@ interface RevenueChartProps {
 
 export function RevenueBarChart({ data }: RevenueChartProps) {
     return (
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 h-[400px]">
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 h-full min-h-[400px]">
             <div className="flex items-center justify-between mb-8">
                 <h3 className="text-xl font-bold text-slate-900 tracking-tight">Receita da Semana</h3>
                 <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Última semana</span>
@@ -67,10 +67,10 @@ const COLORS = ['#f46025', '#fb923c', '#475569', '#94a3b8', '#cbd5e1'];
 
 export function ServicesDonutChart({ data }: ServicesChartProps) {
     return (
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 h-[400px]">
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 h-full min-h-[400px]">
             <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-8">Serviços Agendados</h3>
-            <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="h-[240px] w-[240px]">
+            <div className="flex flex-col xl:flex-row items-center gap-8">
+                <div className="h-[240px] w-full max-w-[240px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
