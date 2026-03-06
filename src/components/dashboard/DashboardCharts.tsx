@@ -70,7 +70,7 @@ export function ServicesDonutChart({ data }: ServicesChartProps) {
         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 h-full min-h-[400px]">
             <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-8">Serviços Agendados</h3>
             <div className="flex flex-col xl:flex-row items-center gap-8">
-                <div className="h-[240px] w-full max-w-[240px]">
+                <div className="h-[240px] w-full max-w-[240px] aspect-square flex-shrink-0">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie

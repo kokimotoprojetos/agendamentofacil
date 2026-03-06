@@ -43,7 +43,7 @@ export function Sidebar() {
     const pathname = usePathname();
 
     return (
-        <aside className="fixed left-0 top-0 h-screen w-20 lg:w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-50 overflow-hidden transition-all duration-300">
+        <aside className="fixed left-0 top-0 h-screen w-20 lg:w-64 bg-slate-900 border-r border-slate-800 flex flex-col z-50 overflow-hidden transition-all duration-300">
             <div className="p-4 lg:p-8 flex justify-center lg:justify-start">
                 <div className="hidden lg:flex items-baseline gap-1">
                     <span className="text-xl font-extrabold text-white tracking-tight">Beautfy</span>
