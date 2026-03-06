@@ -15,6 +15,7 @@ const DAYS_OF_WEEK = [
 
 export default function AgentConfig() {
     const [config, setConfig] = useState({
+        businessName: "",
         personality: "Amigável e profissional",
         location: "",
         workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
@@ -36,6 +37,7 @@ export default function AgentConfig() {
             const data = await res.json();
             if (res.ok) {
                 setConfig({
+                    businessName: data.businessName || "",
                     personality: data.personality || "Amigável e profissional",
                     location: data.location || "",
                     workingDays: data.workingDays || ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
@@ -105,6 +107,28 @@ export default function AgentConfig() {
             </header>
 
             <div className="grid grid-cols-1 gap-6">
+                {/* Nome do Salão */}
+                <section className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-slate-50 rounded-lg text-slate-900 border border-slate-100">
+                            <Scissors size={20} />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 tracking-tight">Identidade</h3>
+                    </div>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Nome do Salão</label>
+                            <input
+                                type="text"
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:outline-none focus:border-[var(--primary)]/50 text-sm font-bold transition-all placeholder:text-slate-400"
+                                placeholder="Ex: Salão da Maria"
+                                value={config.businessName}
+                                onChange={(e) => setConfig({ ...config, businessName: e.target.value })}
+                            />
+                        </div>
+                    </div>
+                </section>
+
                 {/* Personalidade e Instruções */}
                 <section className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">

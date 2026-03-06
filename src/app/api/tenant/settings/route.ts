@@ -18,12 +18,15 @@ export async function GET() {
 
         const { data: tenant, error } = await supabaseAdmin
             .from('tenants')
-            .select('settings')
+            .select('settings, business_name')
             .eq('id', profile.tenant_id)
             .single();
 
         if (error) throw error;
-        return NextResponse.json(tenant?.settings || {});
+        return NextResponse.json({
+            ...(tenant?.settings || {}),
+            businessName: tenant?.business_name || ''
+        });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -61,11 +64,14 @@ export async function POST(req: Request) {
 
         const { error } = await supabaseAdmin
             .from('tenants')
-            .update({ settings: updatedSettings })
+            .update({
+                settings: updatedSettings,
+                business_name: body.businessName
+            })
             .eq('id', profile.tenant_id);
 
         if (error) throw error;
-        return NextResponse.json({ success: true, settings: updatedSettings });
+        return NextResponse.json({ success: true, settings: { ...updatedSettings, businessName: body.businessName } });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
