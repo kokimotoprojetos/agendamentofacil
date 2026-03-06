@@ -95,17 +95,15 @@ export default async function DashboardPage() {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <div className="lg:col-span-2 space-y-12">
-                    <DateSelector />
+            <div className="space-y-12">
+                <DateSelector />
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <RevenueBarChart data={weeklyRevenue} />
-                        <ServicesDonutChart data={serviceDistribution} />
-                    </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <RevenueBarChart data={weeklyRevenue} />
+                    <ServicesDonutChart data={serviceDistribution} />
                 </div>
 
-                <div>
+                <div className="w-full">
                     <RealTimeTodayAppointments initialAppointments={todayAppointments} tenantId={tenantId} />
                 </div>
             </div>
