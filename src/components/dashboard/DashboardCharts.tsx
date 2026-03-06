@@ -69,7 +69,7 @@ export function ServicesDonutChart({ data }: ServicesChartProps) {
     return (
         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 h-full min-h-[400px]">
             <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-8">Serviços Agendados</h3>
-            <div className="flex flex-col xl:flex-row items-center gap-8">
+            <div className="flex flex-col items-center gap-8 w-full">
                 <div className="h-[240px] w-full max-w-[240px] aspect-square flex-shrink-0">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -90,14 +90,14 @@ export function ServicesDonutChart({ data }: ServicesChartProps) {
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
-                <div className="flex-1 space-y-4">
+                <div className="w-full max-w-[240px] space-y-4">
                     {data.map((item, index) => (
                         <div key={item.name} className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                                <span className="text-sm font-bold text-slate-700">{item.name}</span>
+                                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                                <span className="text-sm font-bold text-slate-700 truncate">{item.name}</span>
                             </div>
-                            <span className="text-sm font-bold text-slate-900">{item.percentage}%</span>
+                            <span className="text-sm font-bold text-slate-900 ml-2">{item.percentage}%</span>
                         </div>
                     ))}
                 </div>
