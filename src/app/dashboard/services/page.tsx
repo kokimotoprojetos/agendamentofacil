@@ -80,7 +80,7 @@ export default function ServicesPage() {
 
     return (
         <>
-            <div className="max-w-7xl mx-auto pb-20">
+            <div className="max-w-7xl mx-auto pb-20 p-6 lg:p-12 pt-24 lg:pt-12">
                 <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Catálogo de Serviços</h1>

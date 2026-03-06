@@ -174,7 +174,7 @@ export default function WhatsAppPage() {
     const StateIcon = stateConfig.icon;
 
     return (
-        <div className="max-w-4xl mx-auto pb-20">
+        <div className="max-w-4xl mx-auto pb-20 p-6 lg:p-12 pt-24 lg:pt-12">
             <header className="mb-10">
                 <div className="flex items-center gap-3 mb-2">
                     <div className="bg-[#00e676]/10 text-[#00e676] p-2 rounded-lg border border-[#00e676]/20">

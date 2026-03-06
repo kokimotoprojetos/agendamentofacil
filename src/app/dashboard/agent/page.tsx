@@ -85,7 +85,7 @@ export default function AgentConfig() {
     );
 
     return (
-        <div className="max-w-4xl mx-auto pb-20">
+        <div className="max-w-4xl mx-auto pb-20 p-6 lg:p-12 pt-24 lg:pt-12">
             <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-2 mb-2">

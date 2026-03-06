@@ -88,15 +88,15 @@ export default function ChatsPage() {
     };
 
     return (
-        <div className="max-w-full mx-auto pb-4 px-4 md:px-8">
-            <div className="mb-4 flex items-center justify-between">
+        <div className="w-full h-screen flex flex-col pt-20 lg:pt-0">
+            <div className="px-6 py-4 flex items-center justify-between border-b border-white/5 bg-[#0f0f0f]/50 backdrop-blur-md">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Conversas</h1>
-                    <p className="text-xs text-white/40">Interações em tempo real com seus clientes.</p>
+                    <h1 className="text-xl font-bold text-white tracking-tight">Conversas</h1>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Interações em tempo real</p>
                 </div>
             </div>
 
-            <div className="bg-[#0c0c0c] rounded-3xl overflow-hidden border border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.5)]" style={{ height: 'calc(100vh - 160px)' }}>
+            <div className="flex-1 overflow-hidden">
                 <div className="flex h-full">
                     {/* Conversation list */}
                     <div className={`${selectedConvo ? 'hidden md:flex' : 'flex'} flex-col border-r border-white/5 w-full md:w-[320px] lg:w-[350px] bg-[#0f0f0f]`}>

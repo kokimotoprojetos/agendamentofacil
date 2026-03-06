@@ -83,7 +83,7 @@ export default async function DashboardPage() {
     ];
 
     return (
-        <div className="max-w-[1600px] mx-auto pb-20">
+        <div className="max-w-[1600px] mx-auto pb-20 p-6 lg:p-12 pt-24 lg:pt-12">
             <header className="mb-12">
                 <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight mb-2">Painel de Controle</h1>
                 <p className="text-lg text-slate-600 font-semibold">Acompanhe seus agendamentos e métricas do dia</p>

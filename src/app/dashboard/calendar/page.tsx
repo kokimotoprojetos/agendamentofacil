@@ -168,7 +168,7 @@ export default function AgendaPage() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto pb-20 space-y-6">
+        <div className="max-w-6xl mx-auto pb-20 space-y-6 pt-24 lg:pt-12 p-6 lg:p-12">
             <header className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">Agenda</h1>
