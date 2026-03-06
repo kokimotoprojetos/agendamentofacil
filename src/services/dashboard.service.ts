@@ -128,14 +128,16 @@ export const dashboardService = {
     },
 
     getTodayAppointments: async (tenantId: string) => {
-        const today = new Date();
-        const start = startOfDay(today).toISOString();
-        const end = endOfDay(today).toISOString();
+        // Adjust for Brazil timezone (UTC-3)
+        const todayBR = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+        const start = startOfDay(todayBR).toISOString();
+        const end = endOfDay(todayBR).toISOString();
 
         const { data } = await supabaseAdmin
             .from('appointments')
             .select('*, customer_name, start_time, duration, service:services(name)')
             .eq('tenant_id', tenantId)
+            .eq('status', 'scheduled') // Only show active appointments
             .gte('start_time', start)
             .lte('start_time', end)
             .order('start_time', { ascending: true });
@@ -144,11 +146,16 @@ export const dashboardService = {
             const startTime = new Date(item.start_time);
             const endTime = new Date(startTime.getTime() + (item.duration || 60) * 60000);
 
+            // Force America/Sao_Paulo timezone for server-side rendering/API
+            const formatter = new Intl.DateTimeFormat('pt-BR', {
+                hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo'
+            });
+
             return {
                 id: item.id,
                 name: item.customer_name || "Cliente",
                 service: item.service?.name || "Serviço",
-                timeRange: `${startTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`,
+                timeRange: `${formatter.format(startTime)} - ${formatter.format(endTime)}`,
                 startTime: item.start_time
             };
         }) || [];
