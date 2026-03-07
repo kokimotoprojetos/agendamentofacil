@@ -319,7 +319,7 @@ export const aiAgentService = {
           const extract = await this.extractBookingData(allMessages, context.services || []);
           console.log(`[booking] Extract result:`, JSON.stringify(extract));
           if (extract.complete && extract.hasIntent && extract.activeNow) {
-            const available = await this.checkAvailability(tenantId, extract.date!, extract.time!);
+            const available = await this.checkAvailability(tenantId, extract.date!, extract.time!, extract.service_name || '');
             console.log(`[booking] Availability for ${extract.date} ${extract.time}: ${available}`);
             if (available) {
               const dateObj = new Date(extract.date + 'T12:00:00');
@@ -528,15 +528,57 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
   },
 
   // ─── Check for conflicting appointments ───────────────────────────────────────
-  checkAvailability: async (tenantId: string, date: string, time: string): Promise<boolean> => {
+  checkAvailability: async (tenantId: string, date: string, time: string, serviceName?: string): Promise<boolean> => {
     try {
       // Brazil Timezone Offset (UTC-3)
       const startTime = `${date}T${time}:00-03:00`;
       const startDateTime = new Date(startTime);
-      // Assume 1h duration for availability check if service is unknown
-      const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000);
 
-      const { count } = await supabaseAdmin
+      let serviceId = null;
+      let duration = 60; // Assume 1h duration if service is unknown
+
+      // Resolve service for accurate duration & professional capabilities
+      if (serviceName) {
+        const safeName = serviceName.replace(/[%_\\]/g, '');
+        const { data: svc } = await supabaseAdmin
+          .from('services')
+          .select('id, duration')
+          .eq('tenant_id', tenantId)
+          .ilike('name', `%${safeName}%`)
+          .limit(1)
+          .single();
+
+        if (svc) {
+          serviceId = svc.id;
+          duration = svc.duration || 60;
+        }
+      }
+
+      const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 1000);
+
+      // 1. Calculate base capacity (how many professionals CAN do this service)
+      let totalPros = 1; // Default if no professionals exist or are configured
+
+      const { data: pros } = await supabaseAdmin
+        .from('professionals')
+        .select('id, professional_services(service_id)')
+        .eq('tenant_id', tenantId);
+
+      if (pros && pros.length > 0) {
+        if (serviceId) {
+          // Count pros that explicitly link to this service
+          const capablePros = pros.filter(p =>
+            p.professional_services.some((ps: any) => ps.service_id === serviceId)
+          );
+          // If nobody has specific bindings, assume ALL pros can do it it (fallback)
+          totalPros = capablePros.length > 0 ? capablePros.length : pros.length;
+        } else {
+          totalPros = pros.length;
+        }
+      }
+
+      // 2. Count concurrent appointments in this exact time window
+      const { count: busyCount } = await supabaseAdmin
         .from('appointments')
         .select('*', { count: 'exact', head: true })
         .eq('tenant_id', tenantId)
@@ -544,7 +586,8 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
         .lt('start_time', endDateTime.toISOString())
         .gt('end_time', startDateTime.toISOString());
 
-      return (count ?? 0) === 0;
+      // Available if we have fewer busy slots than total staff capable of this service
+      return (busyCount ?? 0) < totalPros;
     } catch (error) {
       console.error('[availability] Error:', error);
       return true;
@@ -659,9 +702,45 @@ Pedido "Quero marcar chapinha amanhã 10h sou João" → {"hasIntent":true,"acti
       const duration = service?.duration || 60;
       const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 1000);
 
+      // --- NEW STAFF ASSIGNMENT LOGIC ---
+      let assignedProfId = null;
+      const { data: pros } = await supabaseAdmin
+        .from('professionals')
+        .select('id, professional_services(service_id)')
+        .eq('tenant_id', tenantId);
+
+      if (pros && pros.length > 0) {
+        let capablePros = pros;
+        if (service?.id) {
+          const linked = pros.filter(p => p.professional_services.some((ps: any) => ps.service_id === service.id));
+          if (linked.length > 0) capablePros = linked;
+        }
+
+        // Find which constraints overlap
+        const { data: overlaps } = await supabaseAdmin
+          .from('appointments')
+          .select('professional_id')
+          .eq('tenant_id', tenantId)
+          .neq('status', 'cancelled')
+          .not('professional_id', 'is', null)
+          .lt('start_time', endDateTime.toISOString())
+          .gt('end_time', startDateTime.toISOString());
+
+        const busyProfIds = new Set((overlaps || []).map(o => o.professional_id));
+        const freePros = capablePros.filter(p => !busyProfIds.has(p.id));
+
+        if (freePros.length > 0) {
+          // Assign the professional randomly among available, or taking the first one
+          assignedProfId = freePros[Math.floor(Math.random() * freePros.length)].id;
+          console.log(`[booking] Assigned professional ID: ${assignedProfId}`);
+        }
+      }
+      // ----------------------------------
+
       const insertData = {
         tenant_id: tenantId,
         service_id: service?.id || null,
+        professional_id: assignedProfId,
         customer_name: booking.customer_name || `WhatsApp: ${cleanPhone}`,
         customer_phone: cleanPhone,
         start_time: startDateTime.toISOString(), // Standard UTC in DB

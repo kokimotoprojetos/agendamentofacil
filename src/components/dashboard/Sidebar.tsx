@@ -10,6 +10,7 @@ import {
     Calendar,
     Settings,
     Users,
+    Briefcase,
     HelpCircle,
     Scissors,
     Smartphone,
@@ -34,6 +35,7 @@ const MENU_ITEMS = [
     { icon: MessageSquare, label: 'Conversas', href: '/dashboard/chats' },
     { icon: Calendar, label: 'Agenda', href: '/dashboard/calendar' },
     { icon: Scissors, label: 'Serviços', href: '/dashboard/services' },
+    { icon: Briefcase, label: 'Equipe', href: '/dashboard/team' },
 
     { icon: Users, label: 'Agente IA', href: '/dashboard/agent' },
     { icon: WhatsAppIcon, label: 'WhatsApp', href: '/dashboard/whatsapp' },
